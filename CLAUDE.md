@@ -118,8 +118,8 @@ npm run lint       # ESLint
 | P1 数据结构 + 8 字母索引 + 200 题总库 | `types/keys/loaders` + `questions.json` + schema + 4 硬约束 | ✅ |
 | P2 动态出题引擎 | `state/adaptiveSelector` + App.tsx 单入口改造 | ✅ |
 | P3 评估 + 渲染管线 | `similarity/result/loaders` + `ResultCard` + `shareImage` 重写 + A/B/C/D/E grade | ✅ |
-| P4 文案物料批量生成 | `scripts/generate-copy.ts` + 5 目录 ~280 条 JSON 落盘 | ⏳ 待开工 |
-| P5 菜品向量数据 | `dishes.json`（按省份覆盖） | ⏳ 待开工 |
+| P4 文案物料批量生成 | `scripts/generate-content.mjs` + 5 目录 289 条 JSON 落盘 | ✅ |
+| P5 菜品向量数据 | `dishes.json`（85 道菜，27 菜系/区域覆盖） | ✅ |
 
 ## 用户偏好
 
