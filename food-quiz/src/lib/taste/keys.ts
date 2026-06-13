@@ -7,7 +7,7 @@ import type { TasteDimension, TasteLetter } from './types';
  * - K = 苦 bitter
  * - L = 辣 spicy
  * - I = 咸 salty   (第 2 字母,因「浓」占 X 让位)
- * - X = 浓 rich     (原 umami,已改名为 rich)
+ * - X = 浓 rich
  * - C = 脆 crunchy
  * - N = 嫩 tender
  */
@@ -25,7 +25,7 @@ export const DIM_FIELDS = [
   'tender',
 ] as const satisfies readonly TasteDimension[];
 
-/** 8 维顺序的中文名,与 DIMS 一一对应;第 6 位为「浓」(原「鲜」) */
+/** 8 维顺序的中文名,与 DIMS 一一对应;第 6 位为「浓」 */
 export const DIM_CHINESE = ['酸', '甜', '苦', '辣', '咸', '浓', '脆', '嫩'] as const;
 
 /** 单字母 → 英文驼峰字段名 */

@@ -1,6 +1,5 @@
 // 8 维味觉维度（中文：酸甜苦辣咸浓脆嫩）
 // 字段名一律英文驼峰;顺序与 keys.ts 的 DIMS 严格一致: S T K L I X C N
-// 第 6 位为 rich(浓),原 umami 已弃用。
 export type TasteDimension =
   | 'sour'
   | 'sweet'
