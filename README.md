@@ -20,9 +20,9 @@
 | **8 中文味觉维度迁移** | ✅ 数据结构已就绪([pro.md § 一](pro.md)) |
 | **单字母索引(keys.ts)** | ✅ 已实现([pro.md § 三·P3.4](pro.md)) |
 | **200 题总库(8 维均衡)** | ✅ 已实现 + 4 硬约束全过 |
-| **256 区间文案** | 🚧 文案资产待补([pro.md § 三·P3.4](pro.md)) |
-| **极档/联动/全能/避雷文案** | 🚧 规划中([pro.md § 三·P3.5–P3.9](pro.md)) |
-| **菜品推荐 + 折叠展开** | 🚧 规划中([pro.md § 三·P3.10](pro.md)) |
+| **256 区间文案** | ✅ 已生成 + 落盘([P4](docs/superpowers/plans/phase4-copy-generation-log.md)) |
+| **极档/联动/全能/避雷文案** | ✅ 已生成 + 落盘([P4](docs/superpowers/plans/phase4-copy-generation-log.md)) |
+| **菜品推荐 + 折叠展开** | ✅ 85 道菜数据就绪([P5](docs/superpowers/plans/phase5-dishes-data-log.md)) |
 
 ---
 
