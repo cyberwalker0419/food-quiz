@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import type { AssembledResult } from '../lib/taste/result';
+import { RadarChart } from './RadarChart';
 
 interface Props {
   result: AssembledResult;
@@ -44,26 +45,24 @@ export function ResultCard({ result, questionCount, onRestart, onCopy, onDownloa
           </section>
         )}
 
-        {/* 2. 8 维图(视觉层用 A/B/C/D/E 5 等级,每档 20 分;文案档位仍走 tierLabel) */}
+        {/* 2. 8 维图(P6.3 改为 Canvas 雷达图) */}
         <section className="profile-section">
           <h2 className="section-title">8 维味觉图谱</h2>
-          <div className="profile-bars">
-            {result.allIntervals.map((iv) => (
-              <div key={iv.letter} className="profile-bar">
-                <div className="bar-label">
-                  <span className="bar-name">{iv.tierLabel}</span>
-                  <span className="bar-grade" data-grade={iv.grade}>{iv.grade}</span>
-                  <span className="bar-value">{iv.value.toFixed(0)}</span>
-                </div>
-                <div className="bar-track">
-                  <div
-                    className={`bar-fill grade-${iv.grade}`}
-                    style={{ width: `${iv.value}%` }}
-                  />
-                </div>
-              </div>
-            ))}
+          <div className="radar-wrap">
+            <RadarChart intervals={result.allIntervals} size={320} fontFamily='"Noto Sans SC", "PingFang SC", system-ui, sans-serif' />
           </div>
+          <details className="dimension-list">
+            <summary>8 维档位明细</summary>
+            <ul className="dim-list">
+              {result.allIntervals.map((iv) => (
+                <li key={iv.letter}>
+                  <span className={`dim-grade grade-${iv.grade}`}>{iv.grade}</span>
+                  <span className="dim-label">{iv.tierLabel}</span>
+                  <span className="dim-value">{iv.value.toFixed(0)}</span>
+                </li>
+              ))}
+            </ul>
+          </details>
         </section>
 
         {/* 3. 区间文案 / 全能文案 */}

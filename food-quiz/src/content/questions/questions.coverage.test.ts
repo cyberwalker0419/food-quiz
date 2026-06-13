@@ -61,4 +61,19 @@ describe('questions.json 形状与硬约束', () => {
     const min = Math.min(...values);
     expect(max - min, `counts=${JSON.stringify(counts)}`).toBeLessThanOrEqual(30);
   });
+
+  it('约束 5: 所有 option label 不含任何中英文括号(P6.1 清理基线)', () => {
+    for (const q of bank.questions) {
+      for (const o of q.options) {
+        expect(o.label, `q=${q.id} opt=${o.id}`).not.toMatch(/[(（]/);
+      }
+    }
+  });
+
+  it('约束 6: 2 选项题(犀利)与 3+ 选项题(平滑)分布合理(各 ≥ 10 道)', () => {
+    const sharp = bank.questions.filter((q) => q.options.length === 2).length;
+    const smooth = bank.questions.filter((q) => q.options.length >= 3).length;
+    expect(sharp).toBeGreaterThanOrEqual(10);
+    expect(smooth).toBeGreaterThanOrEqual(10);
+  });
 });

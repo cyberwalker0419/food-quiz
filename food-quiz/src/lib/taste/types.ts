@@ -64,3 +64,15 @@ export const ZERO_VECTOR: WeightVector = Object.freeze({
   crunchy: 0,
   tender: 0,
 }) as WeightVector;
+
+/**
+ * 题目犀利度(派生元数据,不入 JSON):
+ * - sharp:   2 选项题,选项权重绝对值大(典型 ±70~80),用于精准探测 / 推动剪枝
+ * - smooth:  3 或 4 选项题,选项权重绝对值小(典型 ±30~50),用于建立基线
+ */
+export type Sharpness = 'sharp' | 'smooth';
+
+/** 题目犀利度判定(派生,不入 JSON):2 选项 → sharp,否则 → smooth */
+export function sharpnessOf(q: QuizQuestion): Sharpness {
+  return q.options.length === 2 ? 'sharp' : 'smooth';
+}

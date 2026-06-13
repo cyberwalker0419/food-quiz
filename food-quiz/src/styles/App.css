@@ -803,6 +803,86 @@ body {
 .bar-grade[data-grade="D"] { background: #1abc9c; }
 .bar-grade[data-grade="E"] { background: #6b5b50; }
 
+/* P6.3:8 维雷达图 */
+.radar-wrap {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 8px 0 16px;
+}
+
+.radar-chart {
+  max-width: 100%;
+  height: auto;
+  display: block;
+}
+
+.dimension-list {
+  margin-top: 12px;
+  border-top: 1px dashed rgba(45, 27, 20, 0.1);
+  padding-top: 12px;
+}
+
+.dimension-list summary {
+  cursor: pointer;
+  color: var(--text-muted);
+  font-size: 13px;
+  user-select: none;
+  padding: 4px 0;
+}
+
+.dimension-list summary:hover {
+  color: var(--text-secondary);
+}
+
+.dim-list {
+  list-style: none;
+  margin: 12px 0 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.dim-list li {
+  display: grid;
+  grid-template-columns: 32px 1fr 48px;
+  align-items: center;
+  gap: 12px;
+  padding: 4px 0;
+}
+
+.dim-grade {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  border-radius: 6px;
+  font-weight: 700;
+  font-size: 13px;
+  color: #fff;
+}
+
+.dim-grade.grade-A { background: #c0392b; }
+.dim-grade.grade-B { background: #e67e22; }
+.dim-grade.grade-C { background: #3498db; }
+.dim-grade.grade-D { background: #1abc9c; }
+.dim-grade.grade-E { background: #6b5b50; }
+
+.dim-label {
+  color: var(--text-primary);
+  font-size: 14px;
+  font-weight: 500;
+}
+
+.dim-value {
+  font-weight: 700;
+  color: var(--text-primary);
+  text-align: right;
+  font-size: 14px;
+}
+
 /* Tags */
 .tags {
   display: flex;
