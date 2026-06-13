@@ -1,0 +1,67 @@
+// 8 维味觉维度（中文：酸甜苦辣咸浓脆嫩）
+// 字段名一律英文驼峰;顺序与 keys.ts 的 DIMS 严格一致: S T K L I X C N
+// 第 6 位为 rich(浓),原 umami 已弃用。
+export type TasteDimension =
+  | 'sour'
+  | 'sweet'
+  | 'bitter'
+  | 'spicy'
+  | 'salty'
+  | 'rich'
+  | 'crunchy'
+  | 'tender';
+
+/** 8 维向量:归一化后 ∈ [0, 100] */
+export type DimensionVector = Record<TasteDimension, number>;
+
+/** 8 维权重向量:原始分,允许负值,允许超过 100 */
+export type WeightVector = Record<TasteDimension, number>;
+
+/** 单字母大写集合(从 keys.ts 复用,避免循环 import) */
+export type TasteLetter = 'S' | 'T' | 'K' | 'L' | 'I' | 'X' | 'C' | 'N';
+
+/** 单个选项 */
+export interface QuizOption {
+  /** 唯一 id,全库唯一,推荐 "q1-a" 形式 */
+  id: string;
+  /** 展示文案(中文) */
+  label: string;
+  /**
+   * 8 维权重向量
+   * - 正值:用户选该项时该维度加分
+   * - 负值:用户选该项时该维度减分(用于"我讨厌..."的探测与剪枝)
+   * - 0:该项不更新该维度
+   */
+  weights: WeightVector;
+}
+
+/** 单道题目 */
+export interface QuizQuestion {
+  id: string;
+  stem: string;
+  options: QuizOption[];
+  /**
+   * 可选:该题主探的字母(1-3 个)
+   * - 留空时,出题引擎自动从 options[*].weights 的 top-K 提取
+   * - 填写时,优先级高于自动提取
+   */
+  probeLetters?: TasteLetter[];
+}
+
+/** 题库根结构 */
+export interface QuestionBank {
+  version: number;
+  questions: QuizQuestion[];
+}
+
+/** 8 维全 0 向量(工厂,避免外部共享引用被误改) */
+export const ZERO_VECTOR: WeightVector = Object.freeze({
+  sour: 0,
+  sweet: 0,
+  bitter: 0,
+  spicy: 0,
+  salty: 0,
+  rich: 0,
+  crunchy: 0,
+  tender: 0,
+}) as WeightVector;
