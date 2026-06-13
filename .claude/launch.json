@@ -1,0 +1,12 @@
+{
+  "version": "0.0.1",
+  "configurations": [
+    {
+      "name": "food-quiz",
+      "runtimeExecutable": "npm",
+      "runtimeArgs": ["run", "dev", "--", "--port", "5180", "--strictPort"],
+      "port": 5180,
+      "cwd": "D:\\ROG\\Documents\\Github\\是啊，吃什么呢\\food-quiz"
+    }
+  ]
+}
