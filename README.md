@@ -17,7 +17,7 @@
     │   ├── App.tsx           # 业务主组件（4 个 phase 状态机）
     │   ├── data/
     │   │   ├── cuisines.ts   # 22 道菜系定义 + 八维口味向量
-    │   │   └── questions.ts  # 150 道题（精简版 30 / 完整版 60）
+    │   │   └── questions.ts  # 151 道题（精简版 30 / 完整版 60）
     │   ├── utils/
     │   │   ├── adaptiveQuiz.ts   # 自适应选题器
     │   │   └── shareImage.ts     # Canvas 分享卡生成
@@ -176,10 +176,10 @@ similarity(user, cuisine) = Σ (a_i - ā)(b_i - b̄) / √(Σ (a_i - ā)² · Σ
 
 ### 4.1 算法层面
 
-- [ ] **`seed` 未真正生效**：`Math.random()` 仍主导，加 seed 只是参数透传。需用 `mulberry32` 替代所有 `Math.random()`，让"同一 seed 同一序列"成为可重现承诺。
+- [ ] **`seed` 未完全生效**：`mulberry32` PRNG 已实现（`food-quiz/src/utils/adaptiveQuiz.ts:18-38`、`food-quiz/src/App.tsx:116` 选题流程已用），但仍有 4 处 `Math.random()` 残留 —— 初始 seed 生成（`App.tsx:104, 140`）、计算屏文案随机选（`App.tsx:324`）、PRNG fallback（`adaptiveQuiz.ts:36`）。需逐一替换为基于 seed 的稳定输出。
 - [ ] **平坦 profile 被推为第一**：藏菜 / 徽菜 / 新疆菜 / 蒙古菜 profile 较平，Pearson 在中心化后接近 0 相似度，偶尔会因随机噪声被推到首位。考虑加偏置项或最小阈值。
-- [ ] **缺乏"反向题"**：题库没识别"用户对 X 强烈排斥"的信号，只能识别"用户喜欢 X"。可加 5 道反向题（如"绝对不能接受的食材"）。
-- [ ] **题库偏置**：当前 150 道题在不同 category 上分布不均（`daily` 多，`culture-deep` 少），导致"早期阶段"类别覆盖有偏。
+- [ ] **反向题数量不足**：题库中已有 1 道反向题（题 85 "你最讨厌的食物类型是？"），但只能识别"排斥清单"这一种信号，无法识别"用户对 X 强烈过敏 / 忌口"等更细的排斥维度。建议扩到 5~8 道覆盖（腥味 / 苦味 / 特定食材 / 烹饪方式等）。
+- [ ] **题库偏置**：当前 151 道题在不同 category 上分布不均 —— `sensory` (5) / `texture` (3) 远少于 `daily` (37) / `final` (26)，导致"早期阶段"几乎不会触达感官与质地类问题。
 
 ### 4.2 体验 / 交互
 
@@ -200,7 +200,7 @@ similarity(user, cuisine) = Σ (a_i - ā)(b_i - b̄) / √(Σ (a_i - ā)² · Σ
 - [ ] **缺 `prefers-reduced-motion`**：动画对前庭敏感用户不友好。
 - [ ] **缺 `aria-live` / `aria-hidden` 标注**：copy-toast 不会朗读，浮动 emoji 会被读屏念。
 - [ ] **`index.html` 仍有 `user-scalable=no`**：违反无障碍最佳实践。
-- [ ] **`transition: all` 仍出现在 CSS 多处**：违反 Web Interface Guidelines（应改为显式属性）。
+- [ ] **`transition: all` 仍出现 1 处**（`food-quiz/src/styles/App.css:27` 全局变量定义）：违反 Web Interface Guidelines（应改为显式属性）。
 - [ ] **字体未 subset**：`Noto Sans SC` 完整加载 ≈ 200KB，可按词频 subset 到 ~80KB。
 
 ### 4.5 工程化
@@ -221,7 +221,7 @@ similarity(user, cuisine) = Σ (a_i - ā)(b_i - b̄) / √(Σ (a_i - ā)² · Σ
 | 日期 | 变更 |
 | --- | --- |
 | 2026-06-12 | 初始化 Vite + React + TS 模板 |
-| 2026-06-12 | 完成 30 题精简版 + 150 题完整版 |
+| 2026-06-12 | 完成 30 题精简版 + 151 题完整版池 |
 | 2026-06-12 | 加入自适应选题器 + Pearson 相似度 |
 | 2026-06-13 | 重构 shareCard（等 CJK 字体 + 渐变背景） |
 | 2026-06-13 | 扩充到 22 道中国菜系（含 9 道新地方/民族/港澳台菜） |
