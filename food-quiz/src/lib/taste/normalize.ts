@@ -7,9 +7,11 @@ const DIMS: readonly TasteDimension[] = [
 
 /**
  * 8 维原始权重 → [0, 100] 归一化向量。
- * 算法:对每维 raw_k,先按 max(|raw|) 缩放,再 clip 到 [0, 100]。
- * 负值不会"被吃掉":raw 越负,目标值越接近 0(raw 越正越接近 100)。
- * 这是简化版 Min-Max,单测覆盖边界。
+ * 算法:对每维 raw_k,按 max(|raw|) 缩放后线性映射到 [0, 100],中点 50。
+ * - raw =  maxAbs → v = 100
+ * - raw = -maxAbs → v = 0
+ * - raw = 0       → v = 50
+ * 单测覆盖边界;P3 极档(≥ 90)与高档(> 60)能正确触发。
  */
 export function normalize(raw: WeightVector, maxAbs?: number): DimensionVector {
   const m =
@@ -17,7 +19,7 @@ export function normalize(raw: WeightVector, maxAbs?: number): DimensionVector {
     Math.max(1, ...DIMS.map((d) => Math.abs(raw[d] || 0)));
   const out = {} as DimensionVector;
   for (const d of DIMS) {
-    const v = 50 + (25 * (raw[d] || 0)) / m;
+    const v = 50 + (50 * (raw[d] || 0)) / m;
     out[d] = Math.max(0, Math.min(100, v));
   }
   return out;
@@ -31,25 +33,5 @@ export function std(vec: DimensionVector): number {
   return Math.sqrt(variance);
 }
 
-/** 标准余弦相似度(不去中心化)。所有 dim ∈ [0, 100],自动非负。 */
-export function cosineSim(a: DimensionVector, b: DimensionVector): number {
-  let dot = 0, magA = 0, magB = 0;
-  for (const d of DIMS) {
-    dot += a[d] * b[d];
-    magA += a[d] * a[d];
-    magB += b[d] * b[d];
-  }
-  const denom = Math.sqrt(magA * magB);
-  if (denom < 1e-9) return 0;
-  return dot / denom;
-}
-
-/** 欧氏距离。 */
-export function euclideanDist(a: DimensionVector, b: DimensionVector): number {
-  let s = 0;
-  for (const d of DIMS) {
-    const diff = a[d] - b[d];
-    s += diff * diff;
-  }
-  return Math.sqrt(s);
-}
+// similarity 函数在 P3 拆出,本文件 re-export 保持向后兼容
+export { cosineSim, euclideanDist, blendedScore } from './similarity';

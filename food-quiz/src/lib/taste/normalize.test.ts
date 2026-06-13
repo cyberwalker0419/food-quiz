@@ -21,14 +21,14 @@ describe('normalize', () => {
     });
   });
 
-  it('极值:某维 = maxAbs → 该维 = 75', () => {
+  it('极值:某维 = maxAbs → 该维 = 100', () => {
     const out = normalize({ ...ZERO_VECTOR, sour: 100 }, 100);
-    expect(out.sour).toBe(75);
+    expect(out.sour).toBe(100);
   });
 
-  it('极值:某维 = -maxAbs → 该维 = 25', () => {
+  it('极值:某维 = -maxAbs → 该维 = 0', () => {
     const out = normalize({ ...ZERO_VECTOR, sour: -100 }, 100);
-    expect(out.sour).toBe(25);
+    expect(out.sour).toBe(0);
   });
 
   it('clip 到 [0, 100]', () => {
@@ -39,8 +39,8 @@ describe('normalize', () => {
 
   it('不传 maxAbs 时自动取 max(|raw|)', () => {
     const out = normalize({ ...ZERO_VECTOR, sour: 80, sweet: 40 });
-    expect(out.sour).toBe(75);
-    expect(out.sweet).toBeCloseTo(50 + 25 * 40 / 80, 6);
+    expect(out.sour).toBe(100);
+    expect(out.sweet).toBeCloseTo(50 + 50 * 40 / 80, 6);
   });
 });
 

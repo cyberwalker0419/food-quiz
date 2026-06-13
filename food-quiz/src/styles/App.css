@@ -777,6 +777,32 @@ body {
   transition: width 1s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
+/* P3:5 等级 grade 视觉档(A/B/C/D/E,每档 20 分) */
+.bar-fill.grade-A { background: linear-gradient(90deg, #e74c3c 0%, #c0392b 100%); }
+.bar-fill.grade-B { background: linear-gradient(90deg, #f39c12 0%, #e67e22 100%); }
+.bar-fill.grade-C { background: linear-gradient(90deg, #5dade2 0%, #3498db 100%); }
+.bar-fill.grade-D { background: linear-gradient(90deg, #48c9b0 0%, #1abc9c 100%); }
+.bar-fill.grade-E { background: linear-gradient(90deg, #a89689 0%, #6b5b50 100%); }
+
+.bar-grade {
+  display: inline-block;
+  min-width: 24px;
+  height: 24px;
+  padding: 0 6px;
+  margin: 0 8px;
+  border-radius: 6px;
+  font-weight: 700;
+  font-size: 13px;
+  line-height: 24px;
+  text-align: center;
+  color: #fff;
+}
+.bar-grade[data-grade="A"] { background: #c0392b; }
+.bar-grade[data-grade="B"] { background: #e67e22; }
+.bar-grade[data-grade="C"] { background: #3498db; }
+.bar-grade[data-grade="D"] { background: #1abc9c; }
+.bar-grade[data-grade="E"] { background: #6b5b50; }
+
 /* Tags */
 .tags {
   display: flex;

@@ -10,6 +10,7 @@ import {
   indexToKey,
   isHigh,
   letterToTierLabel,
+  valueToGrade,
 } from './keys';
 
 describe('DIMS / DIM_FIELDS / DIM_CHINESE 一一对应', () => {
@@ -179,5 +180,34 @@ describe('letterToTierLabel', () => {
   it('非法 score 抛错', () => {
     expect(() => letterToTierLabel('S', NaN)).toThrow();
     expect(() => letterToTierLabel('S', Infinity)).toThrow();
+  });
+});
+
+describe('valueToGrade(5 等级 A/B/C/D/E)', () => {
+  it('边界:0 → E,19.99 → E,20 → D,39.99 → D,40 → C', () => {
+    expect(valueToGrade(0)).toBe('E');
+    expect(valueToGrade(19.99)).toBe('E');
+    expect(valueToGrade(20)).toBe('D');
+    expect(valueToGrade(39.99)).toBe('D');
+    expect(valueToGrade(40)).toBe('C');
+  });
+
+  it('边界:60 → B,80 → A,100 → A', () => {
+    expect(valueToGrade(60)).toBe('B');
+    expect(valueToGrade(80)).toBe('A');
+    expect(valueToGrade(100)).toBe('A');
+  });
+
+  it('每档典型值', () => {
+    expect(valueToGrade(10)).toBe('E');
+    expect(valueToGrade(30)).toBe('D');
+    expect(valueToGrade(50)).toBe('C');
+    expect(valueToGrade(70)).toBe('B');
+    expect(valueToGrade(90)).toBe('A');
+  });
+
+  it('非法 value 抛错', () => {
+    expect(() => valueToGrade(NaN)).toThrow();
+    expect(() => valueToGrade(Infinity)).toThrow();
   });
 });

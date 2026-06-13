@@ -103,3 +103,31 @@ export function letterToTierLabel(letter: TasteLetter, score: number): string {
   }
   return isX ? '清淡' : `低${letterToChinese(letter)}`;
 }
+
+/**
+ * 五等级视觉档位(A/B/C/D/E,每档 20 分)。
+ * 仅用于"8 维图视觉层"(雷达 / bar / 数值标注),**不**取代低/重/极文案触发。
+ *
+ * 阈值(归一化后 [0, 100]):
+ * | 档 | 区间        | 含义       |
+ * |:--:|:----------:|:----------|
+ * | A  | [80, 100]  | 顶档       |
+ * | B  | [60, 80)   | 高         |
+ * | C  | [40, 60)   | 中         |
+ * | D  | [20, 40)   | 低         |
+ * | E  | [0, 20)    | 底档       |
+ *
+ * 注:本函数与 letterToTierLabel 互不替换,二者并行存在。
+ */
+export type Grade = 'A' | 'B' | 'C' | 'D' | 'E';
+
+export function valueToGrade(value: number): Grade {
+  if (!Number.isFinite(value)) {
+    throw new Error(`value must be a finite number, got ${value}`);
+  }
+  if (value >= 80) return 'A';
+  if (value >= 60) return 'B';
+  if (value >= 40) return 'C';
+  if (value >= 20) return 'D';
+  return 'E';
+}
