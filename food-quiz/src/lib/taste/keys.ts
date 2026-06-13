@@ -1,0 +1,105 @@
+import type { TasteDimension, TasteLetter } from './types';
+
+/**
+ * 8 维单字母常量(顺序固定,不可重排)
+ * - S = 酸 sour
+ * - T = 甜 sweet
+ * - K = 苦 bitter
+ * - L = 辣 spicy
+ * - I = 咸 salty   (第 2 字母,因「浓」占 X 让位)
+ * - X = 浓 rich     (原 umami,已改名为 rich)
+ * - C = 脆 crunchy
+ * - N = 嫩 tender
+ */
+export const DIMS = ['S', 'T', 'K', 'L', 'I', 'X', 'C', 'N'] as const satisfies readonly TasteLetter[];
+
+/** 8 维顺序的英文字段名,与 DIMS 一一对应 */
+export const DIM_FIELDS = [
+  'sour',
+  'sweet',
+  'bitter',
+  'spicy',
+  'salty',
+  'rich',
+  'crunchy',
+  'tender',
+] as const satisfies readonly TasteDimension[];
+
+/** 8 维顺序的中文名,与 DIMS 一一对应;第 6 位为「浓」(原「鲜」) */
+export const DIM_CHINESE = ['酸', '甜', '苦', '辣', '咸', '浓', '脆', '嫩'] as const;
+
+/** 单字母 → 英文驼峰字段名 */
+export function letterToDim(letter: TasteLetter): TasteDimension {
+  const idx = DIMS.indexOf(letter);
+  if (idx < 0) throw new Error(`Unknown letter: ${letter}`);
+  return DIM_FIELDS[idx];
+}
+
+/** 单字母 → 中文名(供结果页和模板占位符 {a} {b} 使用) */
+export function letterToChinese(letter: TasteLetter): string {
+  const idx = DIMS.indexOf(letter);
+  if (idx < 0) throw new Error(`Unknown letter: ${letter}`);
+  return DIM_CHINESE[idx];
+}
+
+/** 英文字段名 → 单字母 */
+export function dimToLetter(dim: TasteDimension): TasteLetter {
+  const idx = DIM_FIELDS.indexOf(dim);
+  if (idx < 0) throw new Error(`Unknown dim: ${dim}`);
+  return DIMS[idx];
+}
+
+/**
+ * 8 字符索引串 → 3 位十进制序号
+ * 大写→1,小写→0,S T K L I X C N 顺序对应 bit7..bit0
+ * 例:"StKliXcN" → S(1) t(0) K(1) l(0) i(0) X(1) c(0) N(1) → 0b10100101 = 165
+ */
+export function keyToIndex(key: string): number {
+  if (key.length !== 8) throw new Error(`key length must be 8, got ${key.length}: ${key}`);
+  for (const c of key) {
+    const upper = c.toUpperCase();
+    if (!DIMS.includes(upper as TasteLetter)) {
+      throw new Error(`Invalid char in key: ${c}`);
+    }
+  }
+  return parseInt(
+    key
+      .split('')
+      .map((c) => (c === c.toUpperCase() ? '1' : '0'))
+      .join(''),
+    2
+  );
+}
+
+/** 3 位十进制序号 → 8 字符索引串 */
+export function indexToKey(index: number): string {
+  if (!Number.isInteger(index) || index < 0 || index > 255) {
+    throw new Error(`index must be integer 0..255, got ${index}`);
+  }
+  return DIMS.map((c, i) => ((index >> (7 - i)) & 1 ? c : c.toLowerCase())).join('');
+}
+
+/** 把字母按键值大小写归一化:大写=高,小写=低 */
+export function isHigh(letter: string): boolean {
+  return letter === letter.toUpperCase();
+}
+
+/**
+ * 三档中文渲染标签。
+ * - 除「浓」维外,高档 = 重<中文名>,极档 = 重<中文名> ⚡极
+ * - 「浓」维(letter = X)三档:清淡 / 浓 / 口味重 ⚡极
+ * - score 阈值: ≤ 60 低档, 60 < score < 90 高档, score ≥ 90 极档
+ */
+export function letterToTierLabel(letter: TasteLetter, score: number): string {
+  if (!Number.isFinite(score)) {
+    throw new Error(`score must be a finite number, got ${score}`);
+  }
+  const isX = letter === 'X';
+  if (score >= 90) {
+    return isX ? '口味重 ⚡极' : `重${letterToChinese(letter)} ⚡极`;
+  }
+  if (score > 60) {
+    return isX ? '浓' : `重${letterToChinese(letter)}`;
+  }
+  return isX ? '清淡' : `低${letterToChinese(letter)}`;
+}
