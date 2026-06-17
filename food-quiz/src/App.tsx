@@ -2,7 +2,7 @@ import { useState, useCallback, useEffect } from 'react'
 import { initialState, applyAnswer, undoLast, type QuizState } from './lib/taste/state'
 import { pickNextQuestion, MIN_QUESTIONS, MAX_QUESTIONS } from './lib/taste/adaptiveSelector'
 import { assembleResult, type AssembledResult } from './lib/taste/result'
-import { downloadShareCard } from './utils/shareImage'
+import { downloadShareCard, preloadShareCardFonts } from './utils/shareImage'
 import { ResultCard } from './components/ResultCard'
 import type { QuizQuestion } from './lib/taste/types'
 import './styles/App.css'
@@ -25,6 +25,11 @@ function App() {
   const [showConfetti, setShowConfetti] = useState(false)
   const [seed, setSeed] = useState<number>(() => Math.floor(Math.random() * 1000000))
   const [copyToast, setCopyToast] = useState(false)
+
+  // P7.2 顶层预加载分享卡字体,确保 result 阶段字体已就绪
+  useEffect(() => {
+    preloadShareCardFonts()
+  }, [])
 
   const startQuiz = useCallback(() => {
     const newSeed = Math.floor(Math.random() * 1000000)

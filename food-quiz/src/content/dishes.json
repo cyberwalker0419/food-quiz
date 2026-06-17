@@ -1273,5 +1273,1670 @@
       "crunchy": 50,
       "tender": 20
     }
+  },
+  {
+    "name": "熘肉段",
+    "cuisine": "鲁菜",
+    "region": "辽宁",
+    "vector": {
+      "sour": 0,
+      "sweet": 55,
+      "bitter": 0,
+      "spicy": 10,
+      "salty": 60,
+      "rich": 50,
+      "crunchy": 85,
+      "tender": 55
+    }
+  },
+  {
+    "name": "糖醋里脊",
+    "cuisine": "鲁菜",
+    "region": "辽宁",
+    "vector": {
+      "sour": 15,
+      "sweet": 70,
+      "bitter": 0,
+      "spicy": 0,
+      "salty": 30,
+      "rich": 45,
+      "crunchy": 80,
+      "tender": 50
+    }
+  },
+  {
+    "name": "酱骨架",
+    "cuisine": "鲁菜",
+    "region": "辽宁",
+    "vector": {
+      "sour": 0,
+      "sweet": 15,
+      "bitter": 0,
+      "spicy": 5,
+      "salty": 80,
+      "rich": 75,
+      "crunchy": 10,
+      "tender": 55
+    }
+  },
+  {
+    "name": "脆皮大虾",
+    "cuisine": "鲁菜",
+    "region": "辽宁",
+    "vector": {
+      "sour": 0,
+      "sweet": 10,
+      "bitter": 0,
+      "spicy": 0,
+      "salty": 55,
+      "rich": 40,
+      "crunchy": 90,
+      "tender": 65
+    }
+  },
+  {
+    "name": "红烧偏口",
+    "cuisine": "鲁菜",
+    "region": "辽宁",
+    "vector": {
+      "sour": 0,
+      "sweet": 20,
+      "bitter": 0,
+      "spicy": 5,
+      "salty": 65,
+      "rich": 60,
+      "crunchy": 5,
+      "tender": 75
+    }
+  },
+  {
+    "name": "东北乱炖",
+    "cuisine": "东北菜",
+    "region": "辽宁",
+    "vector": {
+      "sour": 5,
+      "sweet": 15,
+      "bitter": 5,
+      "spicy": 15,
+      "salty": 60,
+      "rich": 70,
+      "crunchy": 10,
+      "tender": 65
+    }
+  },
+  {
+    "name": "酱大骨",
+    "cuisine": "东北菜",
+    "region": "辽宁",
+    "vector": {
+      "sour": 0,
+      "sweet": 10,
+      "bitter": 0,
+      "spicy": 5,
+      "salty": 80,
+      "rich": 80,
+      "crunchy": 5,
+      "tender": 60
+    }
+  },
+  {
+    "name": "铁锅炖鱼",
+    "cuisine": "东北菜",
+    "region": "辽宁",
+    "vector": {
+      "sour": 0,
+      "sweet": 15,
+      "bitter": 0,
+      "spicy": 10,
+      "salty": 65,
+      "rich": 65,
+      "crunchy": 5,
+      "tender": 70
+    }
+  },
+  {
+    "name": "渍菜粉",
+    "cuisine": "东北菜",
+    "region": "辽宁",
+    "vector": {
+      "sour": 50,
+      "sweet": 10,
+      "bitter": 5,
+      "spicy": 10,
+      "salty": 45,
+      "rich": 35,
+      "crunchy": 15,
+      "tender": 60
+    }
+  },
+  {
+    "name": "笨鸡炖粉",
+    "cuisine": "东北菜",
+    "region": "辽宁",
+    "vector": {
+      "sour": 0,
+      "sweet": 10,
+      "bitter": 0,
+      "spicy": 5,
+      "salty": 60,
+      "rich": 65,
+      "crunchy": 5,
+      "tender": 70
+    }
+  },
+  {
+    "name": "熏肉大饼",
+    "cuisine": "东北菜",
+    "region": "吉林",
+    "vector": {
+      "sour": 5,
+      "sweet": 15,
+      "bitter": 0,
+      "spicy": 5,
+      "salty": 75,
+      "rich": 70,
+      "crunchy": 60,
+      "tender": 40
+    }
+  },
+  {
+    "name": "酸菜炖排骨",
+    "cuisine": "东北菜",
+    "region": "吉林",
+    "vector": {
+      "sour": 55,
+      "sweet": 10,
+      "bitter": 0,
+      "spicy": 10,
+      "salty": 55,
+      "rich": 55,
+      "crunchy": 5,
+      "tender": 70
+    }
+  },
+  {
+    "name": "铁锅炖大鹅",
+    "cuisine": "东北菜",
+    "region": "吉林",
+    "vector": {
+      "sour": 0,
+      "sweet": 5,
+      "bitter": 0,
+      "spicy": 5,
+      "salty": 60,
+      "rich": 65,
+      "crunchy": 5,
+      "tender": 75
+    }
+  },
+  {
+    "name": "白肉血肠",
+    "cuisine": "东北菜",
+    "region": "吉林",
+    "vector": {
+      "sour": 10,
+      "sweet": 5,
+      "bitter": 0,
+      "spicy": 0,
+      "salty": 65,
+      "rich": 60,
+      "crunchy": 20,
+      "tender": 75
+    }
+  },
+  {
+    "name": "雪衣豆沙",
+    "cuisine": "东北菜",
+    "region": "吉林",
+    "vector": {
+      "sour": 0,
+      "sweet": 85,
+      "bitter": 0,
+      "spicy": 0,
+      "salty": 10,
+      "rich": 30,
+      "crunchy": 75,
+      "tender": 65
+    }
+  },
+  {
+    "name": "嘎巴菜",
+    "cuisine": "津菜",
+    "region": "天津",
+    "vector": {
+      "sour": 10,
+      "sweet": 10,
+      "bitter": 0,
+      "spicy": 10,
+      "salty": 65,
+      "rich": 55,
+      "crunchy": 75,
+      "tender": 50
+    }
+  },
+  {
+    "name": "崩豆张",
+    "cuisine": "津菜",
+    "region": "天津",
+    "vector": {
+      "sour": 0,
+      "sweet": 5,
+      "bitter": 0,
+      "spicy": 0,
+      "salty": 60,
+      "rich": 35,
+      "crunchy": 95,
+      "tender": 5
+    }
+  },
+  {
+    "name": "十八街麻花",
+    "cuisine": "津菜",
+    "region": "天津",
+    "vector": {
+      "sour": 0,
+      "sweet": 50,
+      "bitter": 0,
+      "spicy": 0,
+      "salty": 35,
+      "rich": 50,
+      "crunchy": 85,
+      "tender": 15
+    }
+  },
+  {
+    "name": "煎饼果子",
+    "cuisine": "津菜",
+    "region": "天津",
+    "vector": {
+      "sour": 0,
+      "sweet": 10,
+      "bitter": 0,
+      "spicy": 5,
+      "salty": 55,
+      "rich": 45,
+      "crunchy": 90,
+      "tender": 30
+    }
+  },
+  {
+    "name": "老豆腐",
+    "cuisine": "津菜",
+    "region": "天津",
+    "vector": {
+      "sour": 5,
+      "sweet": 5,
+      "bitter": 0,
+      "spicy": 0,
+      "salty": 55,
+      "rich": 40,
+      "crunchy": 5,
+      "tender": 75
+    }
+  },
+  {
+    "name": "辣椒饼",
+    "cuisine": "赣菜",
+    "region": "江西",
+    "vector": {
+      "sour": 0,
+      "sweet": 15,
+      "bitter": 0,
+      "spicy": 75,
+      "salty": 45,
+      "rich": 40,
+      "crunchy": 60,
+      "tender": 30
+    }
+  },
+  {
+    "name": "瓦罐汤",
+    "cuisine": "赣菜",
+    "region": "江西",
+    "vector": {
+      "sour": 5,
+      "sweet": 15,
+      "bitter": 0,
+      "spicy": 5,
+      "salty": 65,
+      "rich": 60,
+      "crunchy": 0,
+      "tender": 70
+    }
+  },
+  {
+    "name": "米粉蒸肉",
+    "cuisine": "赣菜",
+    "region": "江西",
+    "vector": {
+      "sour": 5,
+      "sweet": 30,
+      "bitter": 0,
+      "spicy": 15,
+      "salty": 60,
+      "rich": 75,
+      "crunchy": 5,
+      "tender": 60
+    }
+  },
+  {
+    "name": "藜蒿炒腊肉",
+    "cuisine": "赣菜",
+    "region": "江西",
+    "vector": {
+      "sour": 0,
+      "sweet": 10,
+      "bitter": 0,
+      "spicy": 30,
+      "salty": 65,
+      "rich": 60,
+      "crunchy": 30,
+      "tender": 50
+    }
+  },
+  {
+    "name": "客家酿豆腐",
+    "cuisine": "赣菜",
+    "region": "江西",
+    "vector": {
+      "sour": 5,
+      "sweet": 10,
+      "bitter": 0,
+      "spicy": 10,
+      "salty": 55,
+      "rich": 50,
+      "crunchy": 5,
+      "tender": 75
+    }
+  },
+  {
+    "name": "灌汤包",
+    "cuisine": "豫菜",
+    "region": "河南",
+    "vector": {
+      "sour": 5,
+      "sweet": 15,
+      "bitter": 0,
+      "spicy": 5,
+      "salty": 60,
+      "rich": 65,
+      "crunchy": 10,
+      "tender": 70
+    }
+  },
+  {
+    "name": "道口烧鸡",
+    "cuisine": "豫菜",
+    "region": "河南",
+    "vector": {
+      "sour": 5,
+      "sweet": 20,
+      "bitter": 0,
+      "spicy": 10,
+      "salty": 75,
+      "rich": 70,
+      "crunchy": 15,
+      "tender": 65
+    }
+  },
+  {
+    "name": "焖面",
+    "cuisine": "豫菜",
+    "region": "河南",
+    "vector": {
+      "sour": 5,
+      "sweet": 10,
+      "bitter": 0,
+      "spicy": 10,
+      "salty": 60,
+      "rich": 55,
+      "crunchy": 10,
+      "tender": 60
+    }
+  },
+  {
+    "name": "胡辣汤",
+    "cuisine": "豫菜",
+    "region": "河南",
+    "vector": {
+      "sour": 20,
+      "sweet": 10,
+      "bitter": 0,
+      "spicy": 65,
+      "salty": 65,
+      "rich": 60,
+      "crunchy": 5,
+      "tender": 50
+    }
+  },
+  {
+    "name": "洛阳浆面条",
+    "cuisine": "豫菜",
+    "region": "河南",
+    "vector": {
+      "sour": 40,
+      "sweet": 10,
+      "bitter": 5,
+      "spicy": 5,
+      "salty": 50,
+      "rich": 40,
+      "crunchy": 0,
+      "tender": 60
+    }
+  },
+  {
+    "name": "羊杂碎",
+    "cuisine": "清真菜",
+    "region": "宁夏",
+    "vector": {
+      "sour": 5,
+      "sweet": 10,
+      "bitter": 0,
+      "spicy": 15,
+      "salty": 75,
+      "rich": 70,
+      "crunchy": 10,
+      "tender": 60
+    }
+  },
+  {
+    "name": "羊肉臊子面",
+    "cuisine": "清真菜",
+    "region": "宁夏",
+    "vector": {
+      "sour": 10,
+      "sweet": 15,
+      "bitter": 0,
+      "spicy": 30,
+      "salty": 65,
+      "rich": 60,
+      "crunchy": 10,
+      "tender": 55
+    }
+  },
+  {
+    "name": "回族馄饨",
+    "cuisine": "清真菜",
+    "region": "宁夏",
+    "vector": {
+      "sour": 5,
+      "sweet": 10,
+      "bitter": 0,
+      "spicy": 10,
+      "salty": 60,
+      "rich": 50,
+      "crunchy": 5,
+      "tender": 75
+    }
+  },
+  {
+    "name": "粉汤",
+    "cuisine": "清真菜",
+    "region": "宁夏",
+    "vector": {
+      "sour": 25,
+      "sweet": 10,
+      "bitter": 0,
+      "spicy": 20,
+      "salty": 65,
+      "rich": 60,
+      "crunchy": 5,
+      "tender": 65
+    }
+  },
+  {
+    "name": "烩小吃",
+    "cuisine": "清真菜",
+    "region": "宁夏",
+    "vector": {
+      "sour": 10,
+      "sweet": 15,
+      "bitter": 0,
+      "spicy": 15,
+      "salty": 60,
+      "rich": 55,
+      "crunchy": 20,
+      "tender": 60
+    }
+  },
+  {
+    "name": "干炸黄花鱼",
+    "cuisine": "东北菜",
+    "region": "黑龙江",
+    "vector": {
+      "sour": 0,
+      "sweet": 10,
+      "bitter": 0,
+      "spicy": 0,
+      "salty": 60,
+      "rich": 40,
+      "crunchy": 90,
+      "tender": 55
+    }
+  },
+  {
+    "name": "得莫利炖鱼",
+    "cuisine": "东北菜",
+    "region": "黑龙江",
+    "vector": {
+      "sour": 0,
+      "sweet": 15,
+      "bitter": 0,
+      "spicy": 10,
+      "salty": 65,
+      "rich": 60,
+      "crunchy": 5,
+      "tender": 70
+    }
+  },
+  {
+    "name": "汆白肉",
+    "cuisine": "东北菜",
+    "region": "黑龙江",
+    "vector": {
+      "sour": 10,
+      "sweet": 5,
+      "bitter": 0,
+      "spicy": 5,
+      "salty": 55,
+      "rich": 55,
+      "crunchy": 5,
+      "tender": 75
+    }
+  },
+  {
+    "name": "粘豆包",
+    "cuisine": "东北菜",
+    "region": "黑龙江",
+    "vector": {
+      "sour": 0,
+      "sweet": 55,
+      "bitter": 0,
+      "spicy": 0,
+      "salty": 20,
+      "rich": 40,
+      "crunchy": 10,
+      "tender": 65
+    }
+  },
+  {
+    "name": "武汉鸭脖",
+    "cuisine": "鄂菜",
+    "region": "湖北",
+    "vector": {
+      "sour": 5,
+      "sweet": 10,
+      "bitter": 0,
+      "spicy": 90,
+      "salty": 55,
+      "rich": 50,
+      "crunchy": 65,
+      "tender": 40
+    }
+  },
+  {
+    "name": "潜江油焖大虾",
+    "cuisine": "鄂菜",
+    "region": "湖北",
+    "vector": {
+      "sour": 0,
+      "sweet": 20,
+      "bitter": 0,
+      "spicy": 75,
+      "salty": 60,
+      "rich": 65,
+      "crunchy": 10,
+      "tender": 70
+    }
+  },
+  {
+    "name": "豆皮",
+    "cuisine": "鄂菜",
+    "region": "湖北",
+    "vector": {
+      "sour": 5,
+      "sweet": 15,
+      "bitter": 0,
+      "spicy": 10,
+      "salty": 55,
+      "rich": 45,
+      "crunchy": 80,
+      "tender": 40
+    }
+  },
+  {
+    "name": "排骨藕汤",
+    "cuisine": "鄂菜",
+    "region": "湖北",
+    "vector": {
+      "sour": 5,
+      "sweet": 15,
+      "bitter": 0,
+      "spicy": 5,
+      "salty": 65,
+      "rich": 65,
+      "crunchy": 0,
+      "tender": 70
+    }
+  },
+  {
+    "name": "大理砂锅鱼",
+    "cuisine": "云菜",
+    "region": "云南",
+    "vector": {
+      "sour": 5,
+      "sweet": 15,
+      "bitter": 0,
+      "spicy": 20,
+      "salty": 60,
+      "rich": 60,
+      "crunchy": 5,
+      "tender": 75
+    }
+  },
+  {
+    "name": "宣威火腿炒饭",
+    "cuisine": "云菜",
+    "region": "云南",
+    "vector": {
+      "sour": 5,
+      "sweet": 15,
+      "bitter": 0,
+      "spicy": 10,
+      "salty": 75,
+      "rich": 70,
+      "crunchy": 25,
+      "tender": 50
+    }
+  },
+  {
+    "name": "云南火腿月饼",
+    "cuisine": "云菜",
+    "region": "云南",
+    "vector": {
+      "sour": 5,
+      "sweet": 25,
+      "bitter": 0,
+      "spicy": 5,
+      "salty": 70,
+      "rich": 75,
+      "crunchy": 40,
+      "tender": 35
+    }
+  },
+  {
+    "name": "傣味烤鱼",
+    "cuisine": "云菜",
+    "region": "云南",
+    "vector": {
+      "sour": 15,
+      "sweet": 10,
+      "bitter": 0,
+      "spicy": 65,
+      "salty": 55,
+      "rich": 50,
+      "crunchy": 15,
+      "tender": 70
+    }
+  },
+  {
+    "name": "酸汤面",
+    "cuisine": "黔菜",
+    "region": "贵州",
+    "vector": {
+      "sour": 70,
+      "sweet": 10,
+      "bitter": 0,
+      "spicy": 50,
+      "salty": 45,
+      "rich": 40,
+      "crunchy": 5,
+      "tender": 55
+    }
+  },
+  {
+    "name": "丝娃娃",
+    "cuisine": "黔菜",
+    "region": "贵州",
+    "vector": {
+      "sour": 40,
+      "sweet": 10,
+      "bitter": 0,
+      "spicy": 30,
+      "salty": 40,
+      "rich": 25,
+      "crunchy": 45,
+      "tender": 55
+    }
+  },
+  {
+    "name": "豆米火锅",
+    "cuisine": "黔菜",
+    "region": "贵州",
+    "vector": {
+      "sour": 15,
+      "sweet": 15,
+      "bitter": 0,
+      "spicy": 55,
+      "salty": 60,
+      "rich": 65,
+      "crunchy": 10,
+      "tender": 60
+    }
+  },
+  {
+    "name": "和乐蟹",
+    "cuisine": "琼菜",
+    "region": "海南",
+    "vector": {
+      "sour": 5,
+      "sweet": 20,
+      "bitter": 0,
+      "spicy": 15,
+      "salty": 65,
+      "rich": 55,
+      "crunchy": 10,
+      "tender": 80
+    }
+  },
+  {
+    "name": "东山羊",
+    "cuisine": "琼菜",
+    "region": "海南",
+    "vector": {
+      "sour": 5,
+      "sweet": 15,
+      "bitter": 0,
+      "spicy": 10,
+      "salty": 65,
+      "rich": 65,
+      "crunchy": 5,
+      "tender": 75
+    }
+  },
+  {
+    "name": "椰蓉粽",
+    "cuisine": "琼菜",
+    "region": "海南",
+    "vector": {
+      "sour": 0,
+      "sweet": 75,
+      "bitter": 0,
+      "spicy": 0,
+      "salty": 15,
+      "rich": 45,
+      "crunchy": 20,
+      "tender": 50
+    }
+  },
+  {
+    "name": "清补凉",
+    "cuisine": "琼菜",
+    "region": "海南",
+    "vector": {
+      "sour": 15,
+      "sweet": 65,
+      "bitter": 0,
+      "spicy": 0,
+      "salty": 15,
+      "rich": 30,
+      "crunchy": 30,
+      "tender": 55
+    }
+  },
+  {
+    "name": "荔浦芋扣肉",
+    "cuisine": "桂菜",
+    "region": "广西",
+    "vector": {
+      "sour": 5,
+      "sweet": 25,
+      "bitter": 0,
+      "spicy": 15,
+      "salty": 60,
+      "rich": 80,
+      "crunchy": 5,
+      "tender": 55
+    }
+  },
+  {
+    "name": "壮家竹筒饭",
+    "cuisine": "桂菜",
+    "region": "广西",
+    "vector": {
+      "sour": 0,
+      "sweet": 20,
+      "bitter": 0,
+      "spicy": 5,
+      "salty": 50,
+      "rich": 50,
+      "crunchy": 30,
+      "tender": 60
+    }
+  },
+  {
+    "name": "南宁老友粉",
+    "cuisine": "桂菜",
+    "region": "广西",
+    "vector": {
+      "sour": 30,
+      "sweet": 10,
+      "bitter": 0,
+      "spicy": 70,
+      "salty": 55,
+      "rich": 50,
+      "crunchy": 10,
+      "tender": 55
+    }
+  },
+  {
+    "name": "蒙古奶茶",
+    "cuisine": "蒙餐",
+    "region": "内蒙古",
+    "vector": {
+      "sour": 20,
+      "sweet": 15,
+      "bitter": 15,
+      "spicy": 0,
+      "salty": 70,
+      "rich": 60,
+      "crunchy": 0,
+      "tender": 45
+    }
+  },
+  {
+    "name": "蒙古包子",
+    "cuisine": "蒙餐",
+    "region": "内蒙古",
+    "vector": {
+      "sour": 5,
+      "sweet": 15,
+      "bitter": 0,
+      "spicy": 10,
+      "salty": 65,
+      "rich": 60,
+      "crunchy": 10,
+      "tender": 70
+    }
+  },
+  {
+    "name": "沙葱拌羊肉",
+    "cuisine": "蒙餐",
+    "region": "内蒙古",
+    "vector": {
+      "sour": 10,
+      "sweet": 10,
+      "bitter": 0,
+      "spicy": 20,
+      "salty": 55,
+      "rich": 55,
+      "crunchy": 35,
+      "tender": 70
+    }
+  },
+  {
+    "name": "大肠蚵仔面线",
+    "cuisine": "台菜",
+    "region": "台湾",
+    "vector": {
+      "sour": 15,
+      "sweet": 15,
+      "bitter": 0,
+      "spicy": 5,
+      "salty": 65,
+      "rich": 60,
+      "crunchy": 5,
+      "tender": 65
+    }
+  },
+  {
+    "name": "虱目鱼粥",
+    "cuisine": "台菜",
+    "region": "台湾",
+    "vector": {
+      "sour": 5,
+      "sweet": 15,
+      "bitter": 0,
+      "spicy": 5,
+      "salty": 60,
+      "rich": 50,
+      "crunchy": 5,
+      "tender": 75
+    }
+  },
+  {
+    "name": "剉冰",
+    "cuisine": "台菜",
+    "region": "台湾",
+    "vector": {
+      "sour": 15,
+      "sweet": 80,
+      "bitter": 0,
+      "spicy": 0,
+      "salty": 5,
+      "rich": 20,
+      "crunchy": 85,
+      "tender": 15
+    }
+  },
+  {
+    "name": "珍珠奶茶",
+    "cuisine": "台菜",
+    "region": "台湾",
+    "vector": {
+      "sour": 5,
+      "sweet": 90,
+      "bitter": 0,
+      "spicy": 0,
+      "salty": 10,
+      "rich": 35,
+      "crunchy": 75,
+      "tender": 35
+    }
+  },
+  {
+    "name": "酥油人参果",
+    "cuisine": "藏餐",
+    "region": "西藏",
+    "vector": {
+      "sour": 5,
+      "sweet": 45,
+      "bitter": 0,
+      "spicy": 0,
+      "salty": 35,
+      "rich": 50,
+      "crunchy": 5,
+      "tender": 60
+    }
+  },
+  {
+    "name": "青稞面片",
+    "cuisine": "藏餐",
+    "region": "西藏",
+    "vector": {
+      "sour": 5,
+      "sweet": 10,
+      "bitter": 5,
+      "spicy": 5,
+      "salty": 55,
+      "rich": 50,
+      "crunchy": 10,
+      "tender": 60
+    }
+  },
+  {
+    "name": "藏族血肠",
+    "cuisine": "藏餐",
+    "region": "西藏",
+    "vector": {
+      "sour": 10,
+      "sweet": 5,
+      "bitter": 0,
+      "spicy": 5,
+      "salty": 65,
+      "rich": 60,
+      "crunchy": 25,
+      "tender": 65
+    }
+  },
+  {
+    "name": "酥油茶饼",
+    "cuisine": "藏餐",
+    "region": "西藏",
+    "vector": {
+      "sour": 15,
+      "sweet": 10,
+      "bitter": 20,
+      "spicy": 0,
+      "salty": 60,
+      "rich": 65,
+      "crunchy": 15,
+      "tender": 50
+    }
+  },
+  {
+    "name": "包烧肉",
+    "cuisine": "傣菜",
+    "region": "云南",
+    "vector": {
+      "sour": 10,
+      "sweet": 10,
+      "bitter": 0,
+      "spicy": 55,
+      "salty": 55,
+      "rich": 60,
+      "crunchy": 25,
+      "tender": 60
+    }
+  },
+  {
+    "name": "竹筒饭",
+    "cuisine": "傣菜",
+    "region": "云南",
+    "vector": {
+      "sour": 0,
+      "sweet": 25,
+      "bitter": 0,
+      "spicy": 5,
+      "salty": 45,
+      "rich": 50,
+      "crunchy": 20,
+      "tender": 60
+    }
+  },
+  {
+    "name": "酸笋煮牛肉",
+    "cuisine": "傣菜",
+    "region": "云南",
+    "vector": {
+      "sour": 65,
+      "sweet": 10,
+      "bitter": 0,
+      "spicy": 45,
+      "salty": 50,
+      "rich": 55,
+      "crunchy": 5,
+      "tender": 70
+    }
+  },
+  {
+    "name": "香茅草烤鱼",
+    "cuisine": "傣菜",
+    "region": "云南",
+    "vector": {
+      "sour": 10,
+      "sweet": 15,
+      "bitter": 0,
+      "spicy": 40,
+      "salty": 55,
+      "rich": 50,
+      "crunchy": 20,
+      "tender": 70
+    }
+  },
+  {
+    "name": "万州烤鱼",
+    "cuisine": "渝菜",
+    "region": "重庆",
+    "vector": {
+      "sour": 10,
+      "sweet": 15,
+      "bitter": 0,
+      "spicy": 85,
+      "salty": 60,
+      "rich": 60,
+      "crunchy": 20,
+      "tender": 60
+    }
+  },
+  {
+    "name": "歌乐山辣子鸡",
+    "cuisine": "渝菜",
+    "region": "重庆",
+    "vector": {
+      "sour": 5,
+      "sweet": 10,
+      "bitter": 0,
+      "spicy": 90,
+      "salty": 50,
+      "rich": 55,
+      "crunchy": 75,
+      "tender": 40
+    }
+  },
+  {
+    "name": "泡椒牛蛙",
+    "cuisine": "渝菜",
+    "region": "重庆",
+    "vector": {
+      "sour": 30,
+      "sweet": 10,
+      "bitter": 0,
+      "spicy": 80,
+      "salty": 50,
+      "rich": 55,
+      "crunchy": 10,
+      "tender": 70
+    }
+  },
+  {
+    "name": "biangbiang面",
+    "cuisine": "陕菜",
+    "region": "陕西",
+    "vector": {
+      "sour": 10,
+      "sweet": 15,
+      "bitter": 0,
+      "spicy": 50,
+      "salty": 65,
+      "rich": 55,
+      "crunchy": 50,
+      "tender": 55
+    }
+  },
+  {
+    "name": "葫芦鸡",
+    "cuisine": "陕菜",
+    "region": "陕西",
+    "vector": {
+      "sour": 5,
+      "sweet": 20,
+      "bitter": 0,
+      "spicy": 10,
+      "salty": 60,
+      "rich": 70,
+      "crunchy": 65,
+      "tender": 65
+    }
+  },
+  {
+    "name": "臊子面",
+    "cuisine": "陕菜",
+    "region": "陕西",
+    "vector": {
+      "sour": 10,
+      "sweet": 15,
+      "bitter": 0,
+      "spicy": 30,
+      "salty": 65,
+      "rich": 55,
+      "crunchy": 10,
+      "tender": 60
+    }
+  },
+  {
+    "name": "腌笃鲜",
+    "cuisine": "沪菜",
+    "region": "上海",
+    "vector": {
+      "sour": 5,
+      "sweet": 25,
+      "bitter": 0,
+      "spicy": 5,
+      "salty": 55,
+      "rich": 65,
+      "crunchy": 5,
+      "tender": 70
+    }
+  },
+  {
+    "name": "油爆虾",
+    "cuisine": "沪菜",
+    "region": "上海",
+    "vector": {
+      "sour": 5,
+      "sweet": 40,
+      "bitter": 0,
+      "spicy": 10,
+      "salty": 65,
+      "rich": 60,
+      "crunchy": 80,
+      "tender": 55
+    }
+  },
+  {
+    "name": "草头圈子",
+    "cuisine": "沪菜",
+    "region": "上海",
+    "vector": {
+      "sour": 5,
+      "sweet": 20,
+      "bitter": 0,
+      "spicy": 5,
+      "salty": 65,
+      "rich": 75,
+      "crunchy": 5,
+      "tender": 60
+    }
+  },
+  {
+    "name": "油爆海螺",
+    "cuisine": "鲁菜",
+    "region": "山东",
+    "vector": {
+      "sour": 0,
+      "sweet": 10,
+      "bitter": 0,
+      "spicy": 5,
+      "salty": 60,
+      "rich": 55,
+      "crunchy": 75,
+      "tender": 70
+    }
+  },
+  {
+    "name": "鲅鱼水饺",
+    "cuisine": "鲁菜",
+    "region": "山东",
+    "vector": {
+      "sour": 0,
+      "sweet": 15,
+      "bitter": 0,
+      "spicy": 5,
+      "salty": 65,
+      "rich": 55,
+      "crunchy": 10,
+      "tender": 75
+    }
+  },
+  {
+    "name": "糖醋排骨",
+    "cuisine": "浙菜",
+    "region": "浙江",
+    "vector": {
+      "sour": 15,
+      "sweet": 65,
+      "bitter": 0,
+      "spicy": 0,
+      "salty": 45,
+      "rich": 60,
+      "crunchy": 40,
+      "tender": 55
+    }
+  },
+  {
+    "name": "西湖莼菜汤",
+    "cuisine": "浙菜",
+    "region": "浙江",
+    "vector": {
+      "sour": 5,
+      "sweet": 20,
+      "bitter": 0,
+      "spicy": 0,
+      "salty": 50,
+      "rich": 40,
+      "crunchy": 0,
+      "tender": 75
+    }
+  },
+  {
+    "name": "南普陀素面",
+    "cuisine": "闽菜",
+    "region": "福建",
+    "vector": {
+      "sour": 10,
+      "sweet": 15,
+      "bitter": 0,
+      "spicy": 15,
+      "salty": 60,
+      "rich": 55,
+      "crunchy": 5,
+      "tender": 65
+    }
+  },
+  {
+    "name": "福州鱼丸",
+    "cuisine": "闽菜",
+    "region": "福建",
+    "vector": {
+      "sour": 5,
+      "sweet": 15,
+      "bitter": 0,
+      "spicy": 5,
+      "salty": 65,
+      "rich": 50,
+      "crunchy": 5,
+      "tender": 80
+    }
+  },
+  {
+    "name": "黄山炖鸽",
+    "cuisine": "徽菜",
+    "region": "安徽",
+    "vector": {
+      "sour": 5,
+      "sweet": 20,
+      "bitter": 0,
+      "spicy": 5,
+      "salty": 60,
+      "rich": 60,
+      "crunchy": 5,
+      "tender": 75
+    }
+  },
+  {
+    "name": "徽州包袱饺子",
+    "cuisine": "徽菜",
+    "region": "安徽",
+    "vector": {
+      "sour": 5,
+      "sweet": 15,
+      "bitter": 0,
+      "spicy": 10,
+      "salty": 60,
+      "rich": 55,
+      "crunchy": 10,
+      "tender": 70
+    }
+  },
+  {
+    "name": "豆汁焦圈",
+    "cuisine": "京菜",
+    "region": "北京",
+    "vector": {
+      "sour": 75,
+      "sweet": 5,
+      "bitter": 10,
+      "spicy": 0,
+      "salty": 45,
+      "rich": 40,
+      "crunchy": 85,
+      "tender": 20
+    }
+  },
+  {
+    "name": "冰糖葫芦",
+    "cuisine": "京菜",
+    "region": "北京",
+    "vector": {
+      "sour": 30,
+      "sweet": 80,
+      "bitter": 0,
+      "spicy": 0,
+      "salty": 5,
+      "rich": 25,
+      "crunchy": 90,
+      "tender": 30
+    }
+  },
+  {
+    "name": "拌面",
+    "cuisine": "西北菜",
+    "region": "新疆",
+    "vector": {
+      "sour": 10,
+      "sweet": 15,
+      "bitter": 0,
+      "spicy": 30,
+      "salty": 65,
+      "rich": 55,
+      "crunchy": 20,
+      "tender": 55
+    }
+  },
+  {
+    "name": "椒麻鸡",
+    "cuisine": "西北菜",
+    "region": "新疆",
+    "vector": {
+      "sour": 10,
+      "sweet": 10,
+      "bitter": 0,
+      "spicy": 75,
+      "salty": 55,
+      "rich": 50,
+      "crunchy": 50,
+      "tender": 60
+    }
+  },
+  {
+    "name": "干煸四季豆",
+    "cuisine": "川菜",
+    "region": "四川",
+    "vector": {
+      "sour": 5,
+      "sweet": 10,
+      "bitter": 0,
+      "spicy": 60,
+      "salty": 55,
+      "rich": 45,
+      "crunchy": 55,
+      "tender": 50
+    }
+  },
+  {
+    "name": "蛋挞",
+    "cuisine": "粤菜",
+    "region": "广东",
+    "vector": {
+      "sour": 5,
+      "sweet": 80,
+      "bitter": 0,
+      "spicy": 0,
+      "salty": 20,
+      "rich": 50,
+      "crunchy": 65,
+      "tender": 50
+    }
+  },
+  {
+    "name": "驴肉火烧",
+    "cuisine": "冀菜",
+    "region": "河北",
+    "vector": {
+      "sour": 0,
+      "sweet": 15,
+      "bitter": 0,
+      "spicy": 10,
+      "salty": 65,
+      "rich": 65,
+      "crunchy": 75,
+      "tender": 55
+    }
+  },
+  {
+    "name": "白洋淀全鱼宴",
+    "cuisine": "冀菜",
+    "region": "河北",
+    "vector": {
+      "sour": 5,
+      "sweet": 15,
+      "bitter": 0,
+      "spicy": 15,
+      "salty": 60,
+      "rich": 60,
+      "crunchy": 10,
+      "tender": 70
+    }
+  },
+  {
+    "name": "沧州羊汤",
+    "cuisine": "冀菜",
+    "region": "河北",
+    "vector": {
+      "sour": 10,
+      "sweet": 10,
+      "bitter": 0,
+      "spicy": 15,
+      "salty": 75,
+      "rich": 70,
+      "crunchy": 5,
+      "tender": 60
+    }
+  },
+  {
+    "name": "承德烤全羊",
+    "cuisine": "冀菜",
+    "region": "河北",
+    "vector": {
+      "sour": 5,
+      "sweet": 20,
+      "bitter": 0,
+      "spicy": 20,
+      "salty": 70,
+      "rich": 75,
+      "crunchy": 25,
+      "tender": 65
+    }
+  },
+  {
+    "name": "刀削面",
+    "cuisine": "晋菜",
+    "region": "山西",
+    "vector": {
+      "sour": 10,
+      "sweet": 10,
+      "bitter": 0,
+      "spicy": 15,
+      "salty": 60,
+      "rich": 55,
+      "crunchy": 40,
+      "tender": 55
+    }
+  },
+  {
+    "name": "过油肉",
+    "cuisine": "晋菜",
+    "region": "山西",
+    "vector": {
+      "sour": 5,
+      "sweet": 15,
+      "bitter": 0,
+      "spicy": 10,
+      "salty": 65,
+      "rich": 60,
+      "crunchy": 55,
+      "tender": 65
+    }
+  },
+  {
+    "name": "平遥牛肉",
+    "cuisine": "晋菜",
+    "region": "山西",
+    "vector": {
+      "sour": 5,
+      "sweet": 15,
+      "bitter": 0,
+      "spicy": 5,
+      "salty": 75,
+      "rich": 65,
+      "crunchy": 10,
+      "tender": 70
+    }
+  },
+  {
+    "name": "莜面栲栳栳",
+    "cuisine": "晋菜",
+    "region": "山西",
+    "vector": {
+      "sour": 5,
+      "sweet": 10,
+      "bitter": 0,
+      "spicy": 10,
+      "salty": 55,
+      "rich": 50,
+      "crunchy": 45,
+      "tender": 60
+    }
+  },
+  {
+    "name": "兰州牛肉面",
+    "cuisine": "甘菜",
+    "region": "甘肃",
+    "vector": {
+      "sour": 10,
+      "sweet": 10,
+      "bitter": 0,
+      "spicy": 45,
+      "salty": 65,
+      "rich": 60,
+      "crunchy": 15,
+      "tender": 60
+    }
+  },
+  {
+    "name": "酿皮",
+    "cuisine": "甘菜",
+    "region": "甘肃",
+    "vector": {
+      "sour": 15,
+      "sweet": 10,
+      "bitter": 0,
+      "spicy": 30,
+      "salty": 50,
+      "rich": 45,
+      "crunchy": 50,
+      "tender": 60
+    }
+  },
+  {
+    "name": "灰豆子",
+    "cuisine": "甘菜",
+    "region": "甘肃",
+    "vector": {
+      "sour": 5,
+      "sweet": 65,
+      "bitter": 0,
+      "spicy": 0,
+      "salty": 20,
+      "rich": 40,
+      "crunchy": 5,
+      "tender": 55
+    }
+  },
+  {
+    "name": "小炒黄牛肉",
+    "cuisine": "湘菜",
+    "region": "湖南",
+    "vector": {
+      "sour": 5,
+      "sweet": 5,
+      "bitter": 0,
+      "spicy": 75,
+      "salty": 60,
+      "rich": 55,
+      "crunchy": 15,
+      "tender": 75
+    }
+  },
+  {
+    "name": "大煮干丝",
+    "cuisine": "苏菜",
+    "region": "江苏",
+    "vector": {
+      "sour": 5,
+      "sweet": 10,
+      "bitter": 0,
+      "spicy": 5,
+      "salty": 55,
+      "rich": 45,
+      "crunchy": 5,
+      "tender": 80
+    }
+  },
+  {
+    "name": "桂林田螺",
+    "cuisine": "桂菜",
+    "region": "广西",
+    "vector": {
+      "sour": 25,
+      "sweet": 10,
+      "bitter": 0,
+      "spicy": 65,
+      "salty": 60,
+      "rich": 55,
+      "crunchy": 35,
+      "tender": 60
+    }
+  },
+  {
+    "name": "糟辣脆皮鱼",
+    "cuisine": "黔菜",
+    "region": "贵州",
+    "vector": {
+      "sour": 30,
+      "sweet": 15,
+      "bitter": 0,
+      "spicy": 70,
+      "salty": 60,
+      "rich": 50,
+      "crunchy": 75,
+      "tender": 55
+    }
+  },
+  {
+    "name": "风干牛肉",
+    "cuisine": "蒙餐",
+    "region": "内蒙古",
+    "vector": {
+      "sour": 0,
+      "sweet": 10,
+      "bitter": 0,
+      "spicy": 10,
+      "salty": 80,
+      "rich": 60,
+      "crunchy": 50,
+      "tender": 70
+    }
   }
 ]

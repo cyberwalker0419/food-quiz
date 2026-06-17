@@ -18,10 +18,24 @@ export const PRUNE_THRESHOLD = -30;
 /** P6.2 犀利度分层比例:前 10 题 60% 选 smooth,20 题后 60% 选 sharp。 */
 export const EARLY_SMOOTH_RATIO = 0.6;
 export const LATE_SHARP_RATIO = 0.6;
-/** 完全重复阈值:与最近 2 题余弦 ≥ 此值视为雷同,跳过。 */
-export const EXACT_DEDUP_THRESHOLD = 0.98;
+/** 完全重复阈值:与最近 1 题余弦 ≥ 此值视为雷同,跳过(P7.1 0.98 → 0.85)。 */
+export const EXACT_DEDUP_THRESHOLD = 0.85;
+/** 二级去重:与最近 2-5 题维度覆盖重合数 > 此值视为覆盖雷同,跳过。 */
+export const COVER_OVERLAP_THRESHOLD = 3;
+/** 三级去重:与最近 5 题主题向量余弦 ≥ 此值的题,评分阶段 × 0.3^n 降权。 */
+export const TOPIC_OVERLAP_THRESHOLD = 0.7;
+/** 四级全局去重:最近 N 题窗口内,同一题最多出现 1 次。 */
+export const GLOBAL_DEDUP_WINDOW = 10;
+/** 矛盾追问豁免阈值:最近 LOW_RESPONSE_WINDOW 题 profile |delta| std 跨维均值 > 此值时,跳过四级去重。 */
+export const CONTRADICTION_STD_THRESHOLD = 40;
 /** 低响应维度窗口:基于最近 N 题的 profile 增量。 */
 const LOW_RESPONSE_WINDOW = 5;
+/** P8.1 stem 全 session 软惩罚:累计出现 n 次 → 评分 × penalty[n](capped at 4)。 */
+export const STEM_DEDUP_SOFT_PENALTY: readonly number[] = [1.0, 0.3, 0.1, 0.03, 0.01];
+/** P8.1 后期额外折扣:全 session 内某 stem 累计 ≥ 2 次时,候选评分 × 此值。 */
+export const STEM_DEDUP_LATE_DOUBLE_PENALTY = 0.3;
+/** P8.1 后期 stem 去重启动阈值:已答 ≥ 此值才启用硬折扣(避免早期题池饿死)。 */
+export const STEM_DEDUP_LATE_THRESHOLD = 20;
 
 const TOP_K = 5;
 const TOP_K_WEIGHTS = [0.34, 0.24, 0.18, 0.14, 0.10];
@@ -151,15 +165,94 @@ function lowResponseDims(state: {
 }
 
 /**
- * 候选 q 与最近 2 题的主题向量余弦 ≥ EXACT_DEDUP_THRESHOLD → 视为完全雷同,排除。
+ * 候选 q 与最近 1 题的主题向量余弦 ≥ EXACT_DEDUP_THRESHOLD → 视为完全雷同,排除。
+ * (P7.1:从最近 2 题收紧到最近 1 题,与阈值 0.85 协同放大去重力度。)
  */
 function isExactDuplicate(q: QuizQuestion, recent: QuizQuestion[]): boolean {
   if (recent.length === 0) return false;
   const sig = topicVector(q);
-  for (const r of recent.slice(-2)) {
-    if (signatureSim(sig, topicVector(r)) >= EXACT_DEDUP_THRESHOLD) return true;
+  const last = recent[recent.length - 1];
+  if (!last) return false;
+  return signatureSim(sig, topicVector(last)) >= EXACT_DEDUP_THRESHOLD;
+}
+
+/** 维度覆盖重合数:两个 WeightVector 同时非零的维度数。 */
+function coverOverlap(a: WeightVector, b: WeightVector): number {
+  let n = 0;
+  for (const d of DIMS) {
+    if ((a[d] || 0) !== 0 && (b[d] || 0) !== 0) n++;
+  }
+  return n;
+}
+
+/**
+ * 二级去重:与最近 2-5 题中任一题的维度覆盖重合数 > COVER_OVERLAP_THRESHOLD → 排除。
+ * (最近 1 题已被一级处理,这里只看 2-5。)
+ */
+function isCoverDuplicate(q: QuizQuestion, recent: QuizQuestion[]): boolean {
+  if (recent.length < 2) return false;
+  const sig = topicVector(q);
+  // recent 末尾第 1 个已在 isExactDuplicate 中处理,这里从倒数第 2 个开始往后看 4 个
+  const slice = recent.slice(-5, -1);
+  for (const r of slice) {
+    if (coverOverlap(sig, topicVector(r)) > COVER_OVERLAP_THRESHOLD) return true;
   }
   return false;
+}
+
+/** 四级全局去重:某题在最近 GLOBAL_DEDUP_WINDOW 题窗口内出现次数。 */
+function recentOccurrences(
+  qid: string,
+  askedIds: readonly string[],
+): number {
+  const window = askedIds.slice(-GLOBAL_DEDUP_WINDOW);
+  return window.filter((id) => id === qid).length;
+}
+
+/**
+ * P8.1 stem 全 session 频次统计:已答所有题(全 askedIds 范围)的 stem 出现次数。
+ * - 用户原始诉求"避免后期抽到前期的题"——窗口覆盖整个 session,不是最近 N 题。
+ * - 配合 `STEM_DEDUP_SOFT_PENALTY` 使用,索引 = 累计出现次数,capped at 4。
+ */
+export function getSessionStemCounts(askedIds: readonly string[]): Map<string, number> {
+  const out = new Map<string, number>();
+  for (const id of askedIds) {
+    const q = questionBank.questions.find((qq) => qq.id === id);
+    if (!q) continue;
+    out.set(q.stem, (out.get(q.stem) ?? 0) + 1);
+  }
+  return out;
+}
+
+/**
+ * 矛盾追问豁免:当最近 LOW_RESPONSE_WINDOW 题里 profile 跨维 |delta| std 均值 > 阈值,
+ * 说明用户在多维之间反复横跳,允许跳过四级去重,优先暴露低响应维相关题。
+ */
+function isContradictionPursuit(state: {
+  askedIds: string[];
+  answers: { weights?: WeightVector }[];
+}): boolean {
+  const lastN = state.answers.slice(-LOW_RESPONSE_WINDOW);
+  if (lastN.length < 3) return false;
+  // 收集每个维在最近 N 题里 |delta| 序列 → 求跨题维度的 std
+  const perDimAbs: Record<string, number[]> = {};
+  for (const d of DIMS) perDimAbs[d] = [];
+  for (const a of lastN) {
+    if (!a.weights) continue;
+    for (const d of DIMS) {
+      perDimAbs[d]!.push(Math.abs(a.weights[d] || 0));
+    }
+  }
+  // 每维求 std → 取均值作为"波动剧烈度"
+  const stds: number[] = DIMS.map((d) => {
+    const arr = perDimAbs[d]!;
+    if (arr.length === 0) return 0;
+    const m = arr.reduce((s, v) => s + v, 0) / arr.length;
+    const v = arr.reduce((s, x) => s + (x - m) ** 2, 0) / arr.length;
+    return Math.sqrt(v);
+  });
+  const mean = stds.reduce((s, v) => s + v, 0) / stds.length;
+  return mean > CONTRADICTION_STD_THRESHOLD;
 }
 
 /**
@@ -207,13 +300,30 @@ export function pickNextQuestion(
     if (q) recent.push(q);
   }
 
-  // 完全重复过滤(与最近 2 题余弦 ≥ 0.98 跳过)
-  const fresh = pool.filter((q) => !isExactDuplicate(q, recent));
-  if (fresh.length > 0) pool = fresh;
+  // 完全重复过滤(一级:与最近 1 题余弦 ≥ 0.85 跳过)
+  const noExactDup = pool.filter((q) => !isExactDuplicate(q, recent));
+  if (noExactDup.length > 0) pool = noExactDup;
   // 兜底:全被过滤 → 退回到未过滤池(避免极端情况死锁)
+
+  // 二级去重:与最近 2-5 题维度覆盖重合数 > 3 跳过
+  const noCoverDup = pool.filter((q) => !isCoverDuplicate(q, recent));
+  if (noCoverDup.length > 0) pool = noCoverDup;
+  // 兜底:全被过滤 → 退回原 pool
+
+  // 四级全局去重:窗口 10 题内同题只能出现 1 次(矛盾追问豁免时跳过)
+  const contradictionPursuit = isContradictionPursuit(state);
+  if (!contradictionPursuit) {
+    const noGlobalDup = pool.filter(
+      (q) => recentOccurrences(q.id, state.askedIds) === 0,
+    );
+    if (noGlobalDup.length > 0) pool = noGlobalDup;
+    // 兜底:全被过滤 → 退回原 pool
+  }
 
   // 早期(count < MIN_QUESTIONS)走犀利度匹配权重 + 主题向量对全维覆盖的均匀奖励
   // (早期没有 profile 信息,信息增益退化为"主题向量在 DIMS 上的均匀覆盖")
+  // P8.1:加 stem 全 session 软惩罚,让同 stem 尽量不复出。
+  const stemCounts = getSessionStemCounts(state.askedIds);
   if (count < MIN_QUESTIONS) {
     const scored = pool.map((q) => {
       const sw = sharpnessWeight(count, sharpnessOf(q));
@@ -223,7 +333,11 @@ export function pickNextQuestion(
       const mean = DIMS.reduce((s, d) => s + (tv[d] || 0), 0) / DIMS.length;
       const variance = DIMS.reduce((s, d) => s + ((tv[d] || 0) - mean) ** 2, 0) / DIMS.length;
       const std = Math.sqrt(variance);
-      return { q, score: sw * 10 + std };
+      // P8.1:stem 软惩罚(全 session 累计)
+      const stemCount = stemCounts.get(q.stem) ?? 0;
+      const stemPenaltyIdx = Math.min(stemCount, STEM_DEDUP_SOFT_PENALTY.length - 1);
+      const stemPenalty = STEM_DEDUP_SOFT_PENALTY[stemPenaltyIdx]!;
+      return { q, score: (sw * 10 + std) * stemPenalty };
     });
     scored.sort((a, b) => b.score - a.score);
     const topK = scored.slice(0, Math.min(TOP_K, scored.length));
@@ -258,11 +372,27 @@ export function pickNextQuestion(
     }
     // 归一化:lowResDims.size = 4,典型 tv 单维 0~100 → 0~400
     const lowCoverNorm = Math.min(1, lowCover / 100);
+    // 4) 三级降权:与最近 5 题主题向量余弦 ≥ 0.7 的,每次重合 × 0.3
+    let topicPenalty = 1;
+    const last5 = recent.slice(-5);
+    for (const r of last5) {
+      if (signatureSim(tv, topicVector(r)) >= TOPIC_OVERLAP_THRESHOLD) {
+        topicPenalty *= 0.3;
+      }
+    }
+    // 5) P8.1:stem 全 session 软惩罚(累计出现 n 次 → 评分 × penalty[n])
+    const stemCount = stemCounts.get(q.stem) ?? 0;
+    const stemPenaltyIdx = Math.min(stemCount, STEM_DEDUP_SOFT_PENALTY.length - 1);
+    let stemPenalty = STEM_DEDUP_SOFT_PENALTY[stemPenaltyIdx]!;
+    // 6) P8.1 后期额外折扣:已答 ≥ 20 题 + 该 stem 累计 ≥ 2 → 评分再 × 0.3
+    if (count >= STEM_DEDUP_LATE_THRESHOLD && stemCount >= 2) {
+      stemPenalty *= STEM_DEDUP_LATE_DOUBLE_PENALTY;
+    }
 
-    // 综合分:gain 主项 + 犀利度加成 + 追问加成
+    // 综合分:gain 主项 + 犀利度加成 + 追问加成,再乘以 topicPenalty / stemPenalty
     return {
       q,
-      score: gain * (0.6 + 0.4 * sw) + gain * 0.3 * lowCoverNorm + lowCoverNorm * 5,
+      score: (gain * (0.6 + 0.4 * sw) + gain * 0.3 * lowCoverNorm + lowCoverNorm * 5) * topicPenalty * stemPenalty,
     };
   });
   scored.sort((a, b) => b.score - a.score);

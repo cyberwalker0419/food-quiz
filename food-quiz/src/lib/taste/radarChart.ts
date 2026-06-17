@@ -5,17 +5,8 @@
  * - 输入:Canvas 2D context、归一化后的 8 维数据(按 letters 顺序)、画布尺寸
  * - 输出:在传入 ctx 上直接绘制
  */
-import { DIMS, DIM_CHINESE } from './keys';
-import type { Grade } from './keys';
+import { DIMS, DIM_CHINESE, type Grade } from './keys';
 import type { RenderedInterval } from './result';
-
-const GRADE_COLORS: Record<Grade, [string, string]> = {
-  A: ['#e74c3c', '#c0392b'],
-  B: ['#f39c12', '#e67e22'],
-  C: ['#5dade2', '#3498db'],
-  D: ['#48c9b0', '#1abc9c'],
-  E: ['#a89689', '#6b5b50'],
-};
 
 const POLYGON_FILL_INNER = 'rgba(231, 76, 60, 0.18)';
 const POLYGON_FILL_OUTER = 'rgba(231, 76, 60, 0.40)';
@@ -23,6 +14,40 @@ const GRID_COLOR = 'rgba(45, 27, 20, 0.12)';
 const AXIS_COLOR = 'rgba(45, 27, 20, 0.18)';
 const LABEL_COLOR = '#6b5b50';
 const RING_LABEL_COLOR = 'rgba(168, 150, 137, 0.7)';
+
+/** P8.2 grade 颜色映射:与 ResultCard `.grade-A/B/C/D/E` CSS 类同色,保持视觉一致。 */
+export const GRADE_COLORS: Record<Grade, string> = {
+  A: '#c0392b',  // 深红
+  B: '#e67e22',  // 橙
+  C: '#3498db',  // 蓝
+  D: '#1abc9c',  // 青
+  E: '#6b5b50',  // 灰棕
+};
+const GRADE_BADGE_FG = '#ffffff';
+const GRADE_BADGE_W = 18;
+const GRADE_BADGE_H = 16;
+
+/** P8.2 roundRect 路径工具(从 shareImage 复制,供 grade 徽章用)。 */
+function roundRectPath(
+  ctx: CanvasRenderingContext2D,
+  x: number,
+  y: number,
+  w: number,
+  h: number,
+  r: number,
+): void {
+  ctx.beginPath();
+  ctx.moveTo(x + r, y);
+  ctx.lineTo(x + w - r, y);
+  ctx.quadraticCurveTo(x + w, y, x + w, y + r);
+  ctx.lineTo(x + w, y + h - r);
+  ctx.quadraticCurveTo(x + w, y + h, x + w - r, y + h);
+  ctx.lineTo(x + r, y + h);
+  ctx.quadraticCurveTo(x, y + h, x, y + h - r);
+  ctx.lineTo(x, y + r);
+  ctx.quadraticCurveTo(x, y, x + r, y);
+  ctx.closePath();
+}
 
 export interface RadarDrawOptions {
   /** 中文字体栈,默认 'sans-serif' */
@@ -46,8 +71,9 @@ export function drawRadarChart(
   const R = size * 0.38;
   const labelOffset = size * 0.10;
 
-  // 清空
-  ctx.clearRect(0, 0, size, size);
+  // 填底色(避免 PNG 透明区域在某些导出路径下显示为黑色;与 shareImage 背景渐变中段色 #fff5f0 一致)
+  ctx.fillStyle = '#fff5f0';
+  ctx.fillRect(0, 0, size, size);
 
   // 1. 5 圈同心八边形网格
   ctx.strokeStyle = GRID_COLOR;
@@ -75,16 +101,29 @@ export function drawRadarChart(
     ctx.stroke();
   }
 
-  // 3. 轴标签(中文,与 DIMS 顺序严格一致)
-  ctx.fillStyle = LABEL_COLOR;
-  ctx.font = `500 ${Math.max(11, Math.round(size * 0.044))}px ${fontFamily}`;
+  // 3. 轴标签(P8.2:中文 + grade 徽章,代替原"中文 + 维度单字母")
+  const labelFontSize = Math.max(11, Math.round(size * 0.044));
+  const gradeFontSize = Math.max(11, Math.round(size * 0.040));
   ctx.textAlign = 'center';
   ctx.textBaseline = 'middle';
   for (let i = 0; i < N; i++) {
     const angle = (Math.PI * 2 * i) / N - Math.PI / 2;
     const lx = cx + (R + labelOffset) * Math.cos(angle);
     const ly = cy + (R + labelOffset) * Math.sin(angle);
-    ctx.fillText(DIM_CHINESE[i]!, lx, ly);
+    // 上行:中文
+    ctx.fillStyle = LABEL_COLOR;
+    ctx.font = `500 ${labelFontSize}px ${fontFamily}`;
+    ctx.fillText(DIM_CHINESE[i]!, lx, ly - GRADE_BADGE_H * 0.7);
+    // 下行:grade 徽章(填 grade 色,白字,粗体)
+    const grade = intervals[i]?.grade ?? 'E';
+    const bx = lx - GRADE_BADGE_W / 2;
+    const by = ly + GRADE_BADGE_H * 0.2;
+    ctx.fillStyle = GRADE_COLORS[grade];
+    roundRectPath(ctx, bx, by, GRADE_BADGE_W, GRADE_BADGE_H, 6);
+    ctx.fill();
+    ctx.fillStyle = GRADE_BADGE_FG;
+    ctx.font = `700 ${gradeFontSize}px ${fontFamily}`;
+    ctx.fillText(grade, lx, by + GRADE_BADGE_H / 2 + 1);
   }
 
   // 4. 数据多边形
@@ -112,23 +151,20 @@ export function drawRadarChart(
   ctx.lineWidth = 2;
   ctx.stroke();
 
-  // 5. 数据点 + grade 染色
+  // 5. 数据点(全部 #e74c3c,与多边形描边线同色,不再按 grade 染色)
   for (let i = 0; i < N; i++) {
     const angle = (Math.PI * 2 * i) / N - Math.PI / 2;
     const r = R * data[i]!;
     const x = cx + r * Math.cos(angle);
     const y = cy + r * Math.sin(angle);
-    const letter = DIMS[i]!;
-    const iv = intervals.find((x) => x.letter === letter);
-    if (!iv) continue;
-    const [c1, c2] = GRADE_COLORS[iv.grade];
-    const dot = ctx.createRadialGradient(x, y, 0, x, y, 6);
-    dot.addColorStop(0, c1);
-    dot.addColorStop(1, c2);
-    ctx.fillStyle = dot;
+    ctx.fillStyle = '#e74c3c';
     ctx.beginPath();
     ctx.arc(x, y, 5, 0, Math.PI * 2);
     ctx.fill();
+    // 白描边圈(防数据点在小尺寸下糊在多边形上)
+    ctx.strokeStyle = '#ffffff';
+    ctx.lineWidth = 1.5;
+    ctx.stroke();
   }
 
   // 6. 等级环刻度标签(20/40/60/80/100,在顶部轴右侧)

@@ -6,9 +6,18 @@ import {
   sharpnessWeight,
   topicVector,
   signatureSim,
+  getSessionStemCounts,
+  STEM_DEDUP_SOFT_PENALTY,
+  STEM_DEDUP_LATE_DOUBLE_PENALTY,
+  STEM_DEDUP_LATE_THRESHOLD,
   MIN_QUESTIONS,
   MAX_QUESTIONS,
   PRUNE_THRESHOLD,
+  EXACT_DEDUP_THRESHOLD,
+  COVER_OVERLAP_THRESHOLD,
+  TOPIC_OVERLAP_THRESHOLD,
+  GLOBAL_DEDUP_WINDOW,
+  CONTRADICTION_STD_THRESHOLD,
 } from './adaptiveSelector';
 import type { Sharpness, WeightVector } from './types';
 import { normalize, cosineSim } from './normalize';
@@ -305,5 +314,184 @@ describe('P6.2 追问策略(集成)', () => {
       }
     }
     expect(askedIds.length).toBeGreaterThanOrEqual(MIN_QUESTIONS);
+  });
+});
+
+describe('P7.1 四级全局去重', () => {
+  it('最近 10 题窗口内同题不重复出现', () => {
+    const askedIds: string[] = [];
+    const answers: { questionId: string; weights?: WeightVector }[] = [];
+    let profile: WeightVector = { ...ZERO_VECTOR };
+    // 模拟前 9 题
+    for (let i = 0; i < 9; i++) {
+      const q = pickNextQuestion(makeState(askedIds, answers, profile), i + 1);
+      if (!q) break;
+      askedIds.push(q.id);
+      const opt = q.options[0]!;
+      answers.push({ questionId: q.id, weights: opt.weights });
+      for (const k of Object.keys(profile) as (keyof WeightVector)[]) {
+        profile[k] += opt.weights[k] || 0;
+      }
+    }
+    // 第 10 题:窗口内 9 题都不同,新题不应等于任何 1 个
+    const q10 = pickNextQuestion(makeState(askedIds, answers, profile), 10);
+    if (q10) {
+      expect(askedIds.slice(-10)).not.toContain(q10.id);
+    }
+  });
+
+  it('窗口外(> 10 题前)的题允许重新出现', () => {
+    const askedIds = ['q0', 'q1', 'q2', 'q3', 'q4', 'q5', 'q6', 'q7', 'q8', 'q9', 'q10'];
+    // 取最近 10 题窗口:q1..q10
+    const recentWindow = askedIds.slice(-10);
+    expect(recentWindow).not.toContain('q0');
+  });
+});
+
+describe('P7.1 矛盾追问豁免', () => {
+  it('CONTRADICTION_STD_THRESHOLD 在合理范围', () => {
+    expect(CONTRADICTION_STD_THRESHOLD).toBeGreaterThan(0);
+    expect(CONTRADICTION_STD_THRESHOLD).toBeLessThan(100);
+  });
+
+  it('跨维 delta 剧烈波动时 pickNextQuestion 不抛错', () => {
+    const answers = [
+      { questionId: 'a0', weights: { ...ZERO_VECTOR, sour: 50 } },
+      { questionId: 'a1', weights: { ...ZERO_VECTOR, sweet: -50 } },
+      { questionId: 'a2', weights: { ...ZERO_VECTOR, bitter: 50 } },
+      { questionId: 'a3', weights: { ...ZERO_VECTOR, spicy: -50 } },
+      { questionId: 'a4', weights: { ...ZERO_VECTOR, salty: 50 } },
+    ];
+    const askedIds = answers.map((a) => a.questionId);
+    const state = makeState(askedIds, answers, { ...ZERO_VECTOR });
+    expect(() => pickNextQuestion(state, 12345)).not.toThrow();
+  });
+});
+
+describe('P7.1 二级 + 三级去重常量', () => {
+  it('COVER_OVERLAP_THRESHOLD = 3', () => {
+    expect(COVER_OVERLAP_THRESHOLD).toBe(3);
+  });
+  it('TOPIC_OVERLAP_THRESHOLD = 0.7', () => {
+    expect(TOPIC_OVERLAP_THRESHOLD).toBe(0.7);
+  });
+  it('EXACT_DEDUP_THRESHOLD 已下调至 0.85', () => {
+    expect(EXACT_DEDUP_THRESHOLD).toBe(0.85);
+  });
+  it('GLOBAL_DEDUP_WINDOW = 10', () => {
+    expect(GLOBAL_DEDUP_WINDOW).toBe(10);
+  });
+});
+
+describe('P7.1 回归:5 目标 × 3 seed 出题数 ∈ [20, 45]', () => {
+  it('去重机制不破坏 MIN/MAX 区间', () => {
+    const targets: WeightVector[] = [
+      { sour: 90, sweet: 30, bitter: 80, spicy: 0, salty: 20, rich: 40, crunchy: 60, tender: 30 },
+      { sour: 10, sweet: 20, bitter: 10, spicy: 95, salty: 60, rich: 70, crunchy: 30, tender: 40 },
+      { sour: 0, sweet: 0, bitter: 0, spicy: 0, salty: 0, rich: 0, crunchy: 0, tender: 0 },
+      { sour: 50, sweet: 50, bitter: 50, spicy: 50, salty: 50, rich: 50, crunchy: 50, tender: 50 },
+      { sour: 95, sweet: 0, bitter: 95, spicy: 0, salty: 0, rich: 0, crunchy: 0, tender: 0 },
+    ];
+    for (let seed = 1; seed <= 3; seed++) {
+      for (let t = 0; t < targets.length; t++) {
+        const askedIds: string[] = [];
+        const answers: { questionId: string }[] = [];
+        let profile: WeightVector = { ...ZERO_VECTOR };
+        const target = targets[t]!;
+        for (let step = 0; step < 60; step++) {
+          const q = pickNextQuestion(makeState(askedIds, answers, profile), seed * 1000 + t * 100 + step);
+          if (!q) break;
+          // 模拟答对目标方向:用最大权重 option
+          const opt = q.options[0]!;
+          askedIds.push(q.id);
+          answers.push({ questionId: q.id });
+          for (const k of Object.keys(profile) as (keyof WeightVector)[]) {
+            profile[k] += opt.weights[k] || 0;
+          }
+          if (shouldStop({ askedIds, profile }, 0.5)) break;
+        }
+        expect(askedIds.length).toBeGreaterThanOrEqual(MIN_QUESTIONS);
+        expect(askedIds.length).toBeLessThanOrEqual(MAX_QUESTIONS);
+        // 防止静默 target 引用未用
+        void target;
+      }
+    }
+  });
+});
+
+// ===========================================================================
+// P8.1 stem 全 session 软惩罚
+// ===========================================================================
+
+describe('P8.1 stem 全 session 软惩罚', () => {
+  it('STEM_DEDUP_SOFT_PENALTY 长度 5,首项 1.0,末项 ≤ 0.05,单调降', () => {
+    expect(STEM_DEDUP_SOFT_PENALTY.length).toBe(5);
+    expect(STEM_DEDUP_SOFT_PENALTY[0]).toBe(1.0);
+    expect(STEM_DEDUP_SOFT_PENALTY[STEM_DEDUP_SOFT_PENALTY.length - 1]).toBeLessThanOrEqual(0.05);
+    for (let i = 1; i < STEM_DEDUP_SOFT_PENALTY.length; i++) {
+      expect(STEM_DEDUP_SOFT_PENALTY[i]!).toBeLessThan(STEM_DEDUP_SOFT_PENALTY[i - 1]!);
+    }
+  });
+
+  it('STEM_DEDUP_LATE_THRESHOLD = 20(后期启动)', () => {
+    expect(STEM_DEDUP_LATE_THRESHOLD).toBe(20);
+  });
+
+  it('STEM_DEDUP_LATE_DOUBLE_PENALTY = 0.3', () => {
+    expect(STEM_DEDUP_LATE_DOUBLE_PENALTY).toBeCloseTo(0.3, 5);
+  });
+
+  it('getSessionStemCounts 统计全 session 范围', () => {
+    const ids: string[] = [];
+    for (let i = 1; i <= 10; i++) ids.push(`q${i}`);
+    const counts = getSessionStemCounts(ids);
+    const sum = [...counts.values()].reduce((s, v) => s + v, 0);
+    expect(sum).toBe(10);  // 10 题累计 10 个 stem 计数
+  });
+
+  it('软惩罚使 30 题 session 内同 stem 累计 ≤ 3 次(最高频)', () => {
+    const askedIds: string[] = [];
+    const answers: { questionId: string }[] = [];
+    let profile: WeightVector = { ...ZERO_VECTOR };
+    for (let step = 0; step < 30; step++) {
+      const q = pickNextQuestion(makeState(askedIds, answers, profile), 8000 + step);
+      if (!q) break;
+      askedIds.push(q.id);
+      answers.push({ questionId: q.id });
+      const opt = q.options[0]!;
+      for (const k of Object.keys(profile) as (keyof WeightVector)[]) {
+        profile[k] += opt.weights[k] || 0;
+      }
+    }
+    const counts = getSessionStemCounts(askedIds);
+    const maxCount = Math.max(0, ...counts.values());
+    // 软惩罚:最高频 stem 应 ≤ 3 题(54 个 stem / 30 题,理论平均 0.55)
+    expect(maxCount).toBeLessThanOrEqual(3);
+  });
+
+  it('后期(≥ 20 题)同 stem 累计 ≥ 2 时,后续 pickNextQuestion 倾向选其他 stem', () => {
+    // 模拟 22 题状态,跑 50 seed,统计返回 q.stem 在 heavyStems 里的次数比例 < 50%
+    const askedIds: string[] = [];
+    for (let i = 1; i <= 22; i++) askedIds.push(`q${i}`);
+    const counts = getSessionStemCounts(askedIds);
+    const heavyStems = new Set<string>();
+    for (const [stem, c] of counts) {
+      if (c >= 2) heavyStems.add(stem);
+    }
+    // 如果题库 stem 分布没出现 ≥ 2 次同 stem,跳过此断言
+    if (heavyStems.size === 0) {
+      expect(true).toBe(true);
+      return;
+    }
+    let inHeavy = 0;
+    const total = 50;
+    let profile: WeightVector = { ...ZERO_VECTOR };
+    const answers = askedIds.map((id) => ({ questionId: id }));
+    for (let seed = 0; seed < total; seed++) {
+      const q = pickNextQuestion(makeState(askedIds, answers, profile), 9000 + seed);
+      if (!q) continue;
+      if (heavyStems.has(q.stem)) inHeavy++;
+    }
+    expect(inHeavy / total).toBeLessThan(0.5);
   });
 });

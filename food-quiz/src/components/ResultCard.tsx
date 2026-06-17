@@ -1,6 +1,7 @@
-import { useState } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import type { AssembledResult } from '../lib/taste/result';
 import { RadarChart } from './RadarChart';
+import { getShareCardDataUrl } from '../utils/shareImage';
 
 interface Props {
   result: AssembledResult;
@@ -27,6 +28,40 @@ export function ResultCard({ result, questionCount, onRestart, onCopy, onDownloa
   const [expanded, setExpanded] = useState(false);
   const [dishesOpen, setDishesOpen] = useState(false);
   const visibleIntervals = expanded ? result.allIntervals : result.intervals;
+
+  // P7.2 挂载时预渲染分享卡 dataURL 并缓存 — 用户点「保存结果图」时直接走 <a download>,绕过 toBlob 异步
+  const cachedDataUrlRef = useRef<string | null>(null);
+
+  useEffect(() => {
+    let cancelled = false;
+    getShareCardDataUrl({ result, questionCount })
+      .then((url) => {
+        if (!cancelled) cachedDataUrlRef.current = url;
+      })
+      .catch(() => {
+        // 失败 → onDownload prop 兜底
+      });
+    return () => {
+      cancelled = true;
+    };
+  }, [result, questionCount]);
+
+  const handleDownloadClick = () => {
+    const cached = cachedDataUrlRef.current;
+    if (cached) {
+      const top = result.allIntervals[0];
+      const tag = top ? top.tierLabel : '味觉灵魂';
+      const a = document.createElement('a');
+      a.href = cached;
+      a.download = `味觉灵魂_${tag}.jpg`;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+    } else {
+      // 缓存未就绪 → 降级到原 onDownload 路径
+      onDownload();
+    }
+  };
 
   return (
     <div className="app result-screen">
@@ -148,7 +183,7 @@ export function ResultCard({ result, questionCount, onRestart, onCopy, onDownloa
           >
             <span>📋</span> 复制文案
           </button>
-          <button className="action-btn primary" onClick={onDownload}>
+          <button className="action-btn primary" onClick={handleDownloadClick}>
             <span>💾</span> 保存结果图
           </button>
         </div>
