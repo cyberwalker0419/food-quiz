@@ -26,7 +26,7 @@ interface Props {
  */
 export function ResultCard({ result, questionCount, onRestart, onCopy, onDownload }: Props) {
   const [expanded, setExpanded] = useState(false);
-  const [dishesOpen, setDishesOpen] = useState(false);
+  const [dishesOpen, setDishesOpen] = useState(true);
   const visibleIntervals = expanded ? result.allIntervals : result.intervals;
 
   // P7.2 挂载时预渲染分享卡 dataURL 并缓存 — 用户点「保存结果图」时直接走 <a download>,绕过 toBlob 异步
@@ -157,14 +157,15 @@ export function ResultCard({ result, questionCount, onRestart, onCopy, onDownloa
               className="dishes-toggle"
               onClick={() => setDishesOpen(!dishesOpen)}
             >
-              <h2 className="section-title">看看今天吃啥 {dishesOpen ? '▲' : '▼'}</h2>
+              <h2 className="section-title">今夜吃什么 {dishesOpen ? '▲' : '▼'}</h2>
             </button>
             {dishesOpen && (
               <div className="dishes-grid">
                 {result.topDishes.map((d, i) => (
                   <div key={i} className="dish-card">
+                    <span className="dish-cuisine">{d.cuisine}</span>
                     <span className="dish-name">{d.name}</span>
-                    <span className="dish-meta">{d.cuisine} · {d.region}</span>
+                    <span className="dish-region">{d.region}</span>
                   </div>
                 ))}
               </div>

@@ -4,10 +4,11 @@ import { pickNextQuestion, MIN_QUESTIONS, MAX_QUESTIONS } from './lib/taste/adap
 import { assembleResult, type AssembledResult } from './lib/taste/result'
 import { downloadShareCard, preloadShareCardFonts } from './utils/shareImage'
 import { ResultCard } from './components/ResultCard'
+import { RandomDish } from './components/RandomDish'
 import type { QuizQuestion } from './lib/taste/types'
 import './styles/App.css'
 
-type Phase = 'intro' | 'quiz' | 'calculating' | 'result'
+type Phase = 'intro' | 'quiz' | 'calculating' | 'result' | 'random-dish'
 
 interface RuntimeQuestion {
   q: QuizQuestion
@@ -111,6 +112,8 @@ function App() {
     setIsTransitioning(false)
   }, [])
 
+  const goRandomDish = useCallback(() => setPhase('random-dish'), [])
+
   const handleCopy = useCallback(async (text: string) => {
     try {
       if (navigator.clipboard && navigator.clipboard.writeText) {
@@ -176,8 +179,11 @@ function App() {
             </div>
           </div>
           <button className="start-btn" onClick={startQuiz}>
-            <span>开始探索</span>
+            <span>开始勘察</span>
             <span className="btn-arrow">→</span>
+          </button>
+          <button className="random-entry-btn" onClick={goRandomDish}>
+            吃什么啊？
           </button>
           <p className="intro-note">题目随你的选择动态变化 · 一题接一题，越答越懂你</p>
         </div>
@@ -222,6 +228,11 @@ function App() {
         )}
       </>
     )
+  }
+
+  // ============ RANDOM DISH SCREEN ============
+  if (phase === 'random-dish') {
+    return <RandomDish onBack={() => setPhase('intro')} />
   }
 
   // ============ QUIZ SCREEN ============
