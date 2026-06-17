@@ -1,5 +1,17 @@
 # 味觉测试项目：算法架构设计与全面重构方案
 
+> **⚠️ 本文档为 2026-06-13 之前的初版重构方案。后续决策修订在 master plan（`C:\Users\ROG\.claude\plans\d-rog-documents-github-pro-md-plan-pure-chipmunk.md`）附录 A 中汇总。以代码 + [CLAUDE.md](CLAUDE.md) 为准。**
+>
+> **changelog（按时间倒序）：**
+> - **2026-06-13 rev6** —「鲜」维英文字段 `umami` 全仓改名为 `rich`（"浓"），单字母位仍 `X`；8 维高档/极档档位名称用「重」字（`重酸`/`重酸 ⚡极`），不再用「高」；浓维三档名 `清淡/浓/口味重 ⚡极`。
+> - **2026-06-13 rev5** — 总库由 15 题扩为 **200 题**；自适应出题引擎动态抽 **20–45 题**；取消 quick/full 双模式，UI 只保留"开始测试"单一入口。
+> - **2026-06-13 rev4** — 维度从 8 英文感官维改为 8 中文味觉维（`sour/sweet/bitter/spicy/salty/rich/crunchy/tender`），单字母索引 `S T K L I X C N` 互异、位 7→0。
+> - **2026-06-13 rev3** — 标签层：基因码 ABCD-pq + 16 原型彩蛋 → 区间/极档/联动/全能/避雷五元结构（约 280 条独立 JSON 资产）。
+> - **2026-06-13 rev2** — 评估层：Pearson → Min-Max + 标准余弦 + 欧氏距离惩罚；推荐层：独立 `dishes.json` 运行时 Top N。
+> - **2026-06-13 rev1** — 初版（intense/light 8 维 + Cuisine 匹配）。
+>
+> **master plan 中保留以下"原版"表格/模板是为了历史比对**，新代码以 master plan 为准：① §三-4 索引串中"鲜 = X"与 master 中"浓 = X (rich)"字面冲突——以 master 为准；② §三-7 模板"高<中文名>"已统一被 master 的"重<中文名>"覆盖；③ 题库 15 题示例已被 200 题总库替代。
+
 ## 一、 算法核心策略设计（基于 8 维感官模型）
 
 针对 8 个连续的感官维度（酸 `sour` / 甜 `sweet` / 苦 `bitter` / 辣 `spicy` / 咸 `salty` / 鲜 `umami` / 脆 `crunchy` / 嫩 `tender`），算法的核心思想是：**"底层构建 8 维高精度向量，表层通过区间映射生成区间文案与联动文案"**。
@@ -412,3 +424,21 @@ Execution Rules:
 - LLM 在**开发期一次性批量生成**，落盘后固化，运行时无 LLM 调用。
 - 现在，请只执行 Phase 1，给出新的数据结构设计和一段示例题库 JSON，等我 review。
 ```
+
+---
+
+## 附：本文档被 master plan 覆盖项一览
+
+| 项 | pro.md 原表述 | master plan 新表述 | 触发时间 |
+|---|---|---|---|
+| 维度第 6 维字段名 | `umami`（"鲜"） | `rich`（"浓"），单字母位仍 `X` | rev6 |
+| 8 维高档 / 极档档位 | `高<中文名>` / `高<中文名> ⚡极` | `重<中文名>` / `重<中文名> ⚡极` | rev6 |
+| 浓维低档名 | `低<中文名>` | `清淡` | rev6 |
+| 题库规模 | 15 题示例 | 200 题总库（6 桶分布） | rev5 |
+| 出题数 | 10–12 题 | 20–45 题动态 | rev5 |
+| 入口模式 | quick / full 双模式 | 单一入口，UI 仅"开始测试" | rev5 |
+| 标签层结构 | 基因码 + 16 原型彩蛋 | 五元文案结构（区间/极档/联动/全能/避雷） | rev3 |
+| 评估算法 | Pearson 相似度 | Min-Max + 标准余弦 + 欧氏距离惩罚 | rev2 |
+| 推荐层 | 内嵌于 cuisine | 独立 `dishes.json` 运行时 Top N | rev2 |
+
+> master plan 文件位置：`C:\Users\ROG\.claude\plans\d-rog-documents-github-pro-md-plan-pure-chipmunk.md`
