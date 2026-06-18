@@ -92,14 +92,13 @@ function App() {
 
   const goToPreviousQuestion = useCallback(() => {
     if (isTransitioning) return
-    if (state.currentIndex === 0) return
-    const newState = undoLast(state)
-    setState(newState)
-    const newAsked = askedQuestions.slice(0, -1)
-    setAskedQuestions(newAsked)
-    if (newAsked.length > 0) {
-      setCurrentQuestion(newAsked[newAsked.length - 1]!)
-    }
+    if (askedQuestions.length === 0) return // 没有已答的题 → 没有上一题
+    // askedQuestions 存「已答题」，currentQuestion 是「当前待答题」，
+    // 所以「上一题」= askedQuestions 的最后一题（不是 slice 去尾后的最后一题，那样会跳过上一题）
+    const prev = askedQuestions[askedQuestions.length - 1]!
+    setState(undoLast(state))
+    setAskedQuestions(askedQuestions.slice(0, -1))
+    setCurrentQuestion({ q: prev.q, rerolled: false })
   }, [isTransitioning, state, askedQuestions])
 
   const restartQuiz = useCallback(() => {
