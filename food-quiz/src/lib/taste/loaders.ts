@@ -2,7 +2,8 @@ import type { DimensionVector } from './types';
 import { letterToChinese } from './keys';
 
 // Vite glob 批量加载所有文案(用 eager 模式同步拿到)
-const allJson = import.meta.glob<{ default: unknown }>('../content/**/*.json', { eager: true });
+// loaders.ts 位于 src/lib/taste/，到 src/content/ 需两层 ../
+const allJson = import.meta.glob<{ default: unknown }>('../../content/**/*.json', { eager: true });
 
 // ===== 类型定义 =====
 

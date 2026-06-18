@@ -9,11 +9,14 @@ import {
 } from './loaders';
 
 describe('loadInterval', () => {
-  it('缺文件 → null', () => {
-    expect(loadInterval(0)).toBeNull();
+  it('index 0 → 全低档区间文案', () => {
+    const r = loadInterval(0);
+    expect(r).toBeTruthy();
+    expect(r?.key).toBe('stklixcn');
+    expect(typeof r?.label).toBe('string');
   });
 
-  it('非法 index 抛错防御(返回 null)', () => {
+  it('非法 index 返回 null（防御）', () => {
     expect(loadInterval(-1)).toBeNull();
     expect(loadInterval(256)).toBeNull();
     expect(loadInterval(1.5)).toBeNull();
@@ -21,8 +24,10 @@ describe('loadInterval', () => {
 });
 
 describe('loadExtreme', () => {
-  it('缺文件 → null', () => {
-    expect(loadExtreme('s')).toBeNull();
+  it('字母 s → 酸极档文案', () => {
+    const r = loadExtreme('s');
+    expect(r).toBeTruthy();
+    expect(r?.letter).toBe('s');
   });
 
   it('任意字母输入不抛错', () => {
@@ -31,11 +36,10 @@ describe('loadExtreme', () => {
 });
 
 describe('loadSynergy', () => {
-  it('未命中具体文件 → 走 _fallback 或硬编码兜底,返回带 copy 的 entry', () => {
+  it('命中或兜底，返回带 copy 的 entry', () => {
     const r = loadSynergy('L', 'X');
     expect(r).toBeTruthy();
     expect(typeof r.label).toBe('string');
-    // copy 是数组或字符串,任一种能拿到内容即可
     const copyText = Array.isArray(r.copy) ? r.copy.join(' ') : r.copy;
     expect(copyText.length).toBeGreaterThan(0);
   });
@@ -52,19 +56,27 @@ describe('loadSynergy', () => {
 });
 
 describe('loadAllround', () => {
-  it('缺 _index.json → null', () => {
-    expect(loadAllround()).toBeNull();
+  it('返回全能文案 entry', () => {
+    const r = loadAllround();
+    expect(r).toBeTruthy();
+    expect(typeof r?.label).toBe('string');
   });
 });
 
 describe('loadAvoid', () => {
-  it('缺文件 → null', () => {
-    expect(loadAvoid('x')).toBeNull();
+  it('字母 x → 浓维避雷文案', () => {
+    const r = loadAvoid('x');
+    expect(r).toBeTruthy();
+    expect(r?.letter).toBe('x');
   });
 });
 
 describe('loadDishes', () => {
-  it('缺 dishes.json → null', () => {
-    expect(loadDishes()).toBeNull();
+  it('返回 dishes.json 全库（196 道）', () => {
+    const r = loadDishes();
+    expect(r).not.toBeNull();
+    expect(r?.length).toBe(196);
+    expect(r?.[0]?.name).toBeTruthy();
+    expect(r?.[0]?.vector).toBeTruthy();
   });
 });

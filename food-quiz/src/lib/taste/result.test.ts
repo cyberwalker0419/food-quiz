@@ -21,8 +21,8 @@ describe('assembleResult — 4 典型输入', () => {
     const r = assembleResult(v);
     expect(r.synergy).not.toBeNull();
     expect(r.std).toBe(0); // 完全均匀
-    // 极档 ≥ 90 → 全 80 不触发 extreme
-    expect(r.extremes.length).toBe(0);
+    // 全 80 归一化后 = 100,8 维全 ≥ 90,触发 8 条 extreme
+    expect(r.extremes.length).toBe(8);
   });
 
   it('8 维混合高(差别大):std>0,无 allround,有 synergy', () => {
@@ -40,17 +40,18 @@ describe('assembleResult — 4 典型输入', () => {
     // 归一化后 spicy = 100,其他 = 50,8 维 std > 0
     const v: WeightVector = { ...ZERO_VECTOR, spicy: 95 };
     const r = assembleResult(v);
-    // 文件缺 → 静默跳过,extremes 数组保持空(P4 落盘后此测试需更新)
-    expect(r.extremes.length).toBe(0);
-    // 但 allIntervals 标记了 isExtreme
+    // 文件齐全 → spicy 归一化 100 ≥ 90,触发 1 条 extreme
+    expect(r.extremes.length).toBe(1);
+    // 且 allIntervals 标记了 isExtreme
     const spicyIv = r.allIntervals.find((iv) => iv.letter === 'L');
     expect(spicyIv?.isExtreme).toBe(true);
   });
 
-  it('方差 < 15:allround 路径触发(文件缺 → null,渲染兜底)', () => {
+  it('方差 < 15:allround 路径触发(文案已落盘)', () => {
     const r = assembleResult(ZERO_VECTOR);
     expect(r.std).toBeLessThan(15);
-    expect(r.allround).toBeNull(); // 文案缺
+    expect(r.allround).not.toBeNull();
+    expect(typeof r.allround?.label).toBe('string');
   });
 });
 
@@ -74,12 +75,13 @@ describe('assembleResult — 极档边界 89.9/90.0/90.1(归一化后 [0,100] �
 });
 
 describe('assembleResult — 联动未命中走 _fallback', () => {
-  it('任意一对高档维(本 PR 缺文件)→ synergy 来自硬编码兜底', () => {
+  it('S+K 未命中具体 synergy 文件 → 走 _fallback,copy 非空', () => {
     const v: WeightVector = { ...ZERO_VECTOR, sour: 90, bitter: 90 };
     const r = assembleResult(v);
     expect(r.synergy).not.toBeNull();
-    // 兜底文案含 「你最强」 字样
-    expect(r.synergy!.copy).toContain('你最强');
+    const syn = r.synergy!.copy;
+    const synText = Array.isArray(syn) ? syn.join('') : syn;
+    expect(synText.length).toBeGreaterThan(0);
   });
 });
 
@@ -117,9 +119,10 @@ describe('assembleResult — 维度档位标签', () => {
 });
 
 describe('assembleResult — 避雷指南', () => {
-  it('永远返回 avoid(若文件存在;本 PR 文件缺 → null)', () => {
+  it('永远返回 avoid(文件已落盘,取最低分维)', () => {
     const r = assembleResult(ZERO_VECTOR);
-    expect(r.avoid).toBeNull(); // 文案缺
+    expect(r.avoid).not.toBeNull();
+    expect(r.avoid?.letter).toBeTruthy();
   });
 });
 
