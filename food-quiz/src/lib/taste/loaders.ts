@@ -61,6 +61,8 @@ export interface DishEntry {
   cuisine: string;
   region: string;
   vector: DimensionVector;
+  /** 是否日常/知名菜（true=推荐/题库/随机菜可用；false=冷门地方菜，仅入库） */
+  popular?: boolean;
 }
 
 // ===== 工具 =====

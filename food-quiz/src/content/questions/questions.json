@@ -105,7 +105,7 @@
     },
     {
       "id": "q4",
-      "stem": "心情不好想吃重口，锅包肉和九转大肠你选哪个？",
+      "stem": "心情不好想吃重口，锅包肉和辣子鸡你选哪个？",
       "options": [
         {
           "id": "q4-a",
@@ -123,15 +123,15 @@
         },
         {
           "id": "q4-b",
-          "label": "九转大肠",
+          "label": "辣子鸡",
           "weights": {
-            "sour": 10,
-            "sweet": 15,
-            "bitter": 5,
-            "spicy": 5,
+            "sour": 5,
+            "sweet": 0,
+            "bitter": 6,
+            "spicy": 90,
             "salty": 55,
-            "rich": 70,
-            "crunchy": 20,
+            "rich": 40,
+            "crunchy": 35,
             "tender": 40
           }
         }
@@ -253,16 +253,16 @@
         },
         {
           "id": "q7-d",
-          "label": "酱大骨",
+          "label": "红烧肉",
           "weights": {
             "sour": 5,
-            "sweet": 10,
+            "sweet": 25,
             "bitter": 6,
-            "spicy": 5,
-            "salty": 80,
-            "rich": 80,
+            "spicy": 4,
+            "salty": 45,
+            "rich": 70,
             "crunchy": 5,
-            "tender": 60
+            "tender": 75
           }
         }
       ]
@@ -569,7 +569,7 @@
     },
     {
       "id": "q16",
-      "stem": "想吃豆腐，麻婆豆腐和文思豆腐你选哪个？",
+      "stem": "想吃豆腐，麻婆豆腐和豆腐脑你选哪个？",
       "options": [
         {
           "id": "q16-a",
@@ -587,16 +587,16 @@
         },
         {
           "id": "q16-b",
-          "label": "文思豆腐",
+          "label": "豆腐脑",
           "weights": {
             "sour": 5,
-            "sweet": 2,
-            "bitter": 0,
-            "spicy": 0,
-            "salty": 35,
-            "rich": 70,
-            "crunchy": 5,
-            "tender": 95
+            "sweet": 5,
+            "bitter": 6,
+            "spicy": 5,
+            "salty": 45,
+            "rich": 40,
+            "crunchy": 0,
+            "tender": 85
           }
         }
       ]
@@ -971,34 +971,34 @@
     },
     {
       "id": "q27",
-      "stem": "想吃口清淡的，龙井虾仁和西湖莼菜汤你选哪个？",
+      "stem": "想吃口清淡的，清蒸鱼和酸辣汤你选哪个？",
       "options": [
         {
           "id": "q27-a",
-          "label": "龙井虾仁",
+          "label": "清蒸鱼",
           "weights": {
             "sour": 5,
             "sweet": 5,
-            "bitter": 5,
+            "bitter": 0,
             "spicy": 0,
             "salty": 35,
-            "rich": 65,
-            "crunchy": 20,
+            "rich": 50,
+            "crunchy": 0,
             "tender": 80
           }
         },
         {
           "id": "q27-b",
-          "label": "西湖莼菜汤",
+          "label": "酸辣汤",
           "weights": {
-            "sour": 5,
-            "sweet": 20,
+            "sour": 50,
+            "sweet": 5,
             "bitter": 6,
-            "spicy": 4,
-            "salty": 50,
-            "rich": 40,
-            "crunchy": 0,
-            "tender": 75
+            "spicy": 55,
+            "salty": 55,
+            "rich": 55,
+            "crunchy": 10,
+            "tender": 45
           }
         }
       ]
@@ -1243,20 +1243,20 @@
     },
     {
       "id": "q35",
-      "stem": "想吃口咸香的，酱骨架和风干牛肉你选哪个？",
+      "stem": "想吃口咸香的，红烧排骨和风干牛肉你选哪个？",
       "options": [
         {
           "id": "q35-a",
-          "label": "酱骨架",
+          "label": "红烧排骨",
           "weights": {
             "sour": 5,
-            "sweet": 15,
+            "sweet": 30,
             "bitter": 6,
-            "spicy": 5,
-            "salty": 80,
+            "spicy": 4,
+            "salty": 55,
             "rich": 75,
-            "crunchy": 10,
-            "tender": 55
+            "crunchy": 15,
+            "tender": 75
           }
         },
         {
@@ -2271,16 +2271,16 @@
         },
         {
           "id": "q54-b",
-          "label": "文思豆腐",
+          "label": "豆腐脑",
           "weights": {
             "sour": 5,
-            "sweet": 2,
-            "bitter": 0,
-            "spicy": 0,
-            "salty": 35,
-            "rich": 70,
-            "crunchy": 5,
-            "tender": 95
+            "sweet": 5,
+            "bitter": 6,
+            "spicy": 5,
+            "salty": 45,
+            "rich": 40,
+            "crunchy": 0,
+            "tender": 85
           }
         },
         {
@@ -3449,16 +3449,16 @@
         },
         {
           "id": "q73-b",
-          "label": "粘豆包",
+          "label": "红薯",
           "weights": {
             "sour": 3,
             "sweet": 55,
             "bitter": 0,
             "spicy": 0,
-            "salty": 20,
+            "salty": 5,
             "rich": 40,
-            "crunchy": 10,
-            "tender": 65
+            "crunchy": 0,
+            "tender": 80
           }
         },
         {
@@ -3511,16 +3511,16 @@
         },
         {
           "id": "q74-b",
-          "label": "酱骨架",
+          "label": "红烧排骨",
           "weights": {
             "sour": 5,
-            "sweet": 15,
+            "sweet": 30,
             "bitter": 6,
-            "spicy": 5,
-            "salty": 80,
+            "spicy": 4,
+            "salty": 55,
             "rich": 75,
-            "crunchy": 10,
-            "tender": 55
+            "crunchy": 15,
+            "tender": 75
           }
         },
         {
@@ -3573,16 +3573,16 @@
         },
         {
           "id": "q75-b",
-          "label": "西湖莼菜汤",
+          "label": "酸辣汤",
           "weights": {
-            "sour": 5,
-            "sweet": 20,
+            "sour": 50,
+            "sweet": 5,
             "bitter": 6,
-            "spicy": 4,
-            "salty": 50,
-            "rich": 40,
-            "crunchy": 0,
-            "tender": 75
+            "spicy": 55,
+            "salty": 55,
+            "rich": 55,
+            "crunchy": 10,
+            "tender": 45
           }
         },
         {
@@ -3711,15 +3711,15 @@
         },
         {
           "id": "q77-c",
-          "label": "龙井虾仁",
+          "label": "清蒸鱼",
           "weights": {
             "sour": 5,
             "sweet": 5,
-            "bitter": 5,
+            "bitter": 0,
             "spicy": 0,
             "salty": 35,
-            "rich": 65,
-            "crunchy": 20,
+            "rich": 50,
+            "crunchy": 0,
             "tender": 80
           }
         },
@@ -5545,7 +5545,7 @@
     },
     {
       "id": "q108",
-      "stem": "招待长辈，佛跳墙和松鼠桂鱼你选哪个？",
+      "stem": "招待长辈，佛跳墙和清蒸鱼你选哪个？",
       "options": [
         {
           "id": "q108-a",
@@ -5563,16 +5563,16 @@
         },
         {
           "id": "q108-b",
-          "label": "松鼠桂鱼",
+          "label": "清蒸鱼",
           "weights": {
-            "sour": 25,
-            "sweet": 35,
+            "sour": 5,
+            "sweet": 5,
             "bitter": 0,
             "spicy": 0,
-            "salty": 25,
-            "rich": 45,
-            "crunchy": 40,
-            "tender": 35
+            "salty": 35,
+            "rich": 50,
+            "crunchy": 0,
+            "tender": 80
           }
         }
       ]
@@ -5681,33 +5681,33 @@
     },
     {
       "id": "q112",
-      "stem": "福建朋友请客，沙茶面和海蛎煎只点一个你选哪个？",
+      "stem": "福建朋友请客，担担面和煎饺只点一个你选哪个？",
       "options": [
         {
           "id": "q112-a",
-          "label": "沙茶面",
+          "label": "担担面",
           "weights": {
-            "sour": 5,
-            "sweet": 10,
+            "sour": 10,
+            "sweet": 5,
             "bitter": 6,
-            "spicy": 20,
-            "salty": 55,
+            "spicy": 65,
+            "salty": 70,
             "rich": 50,
-            "crunchy": 15,
+            "crunchy": 10,
             "tender": 40
           }
         },
         {
           "id": "q112-b",
-          "label": "海蛎煎",
+          "label": "煎饺",
           "weights": {
             "sour": 5,
-            "sweet": 0,
+            "sweet": 5,
             "bitter": 6,
             "spicy": 5,
             "salty": 50,
-            "rich": 65,
-            "crunchy": 35,
+            "rich": 50,
+            "crunchy": 60,
             "tender": 50
           }
         }
@@ -5715,34 +5715,34 @@
     },
     {
       "id": "q113",
-      "stem": "公司聚餐，荔枝肉和糖醋鲤鱼你选哪个？",
+      "stem": "公司聚餐，糖醋里脊和糖醋排骨你选哪个？",
       "options": [
         {
           "id": "q113-a",
-          "label": "荔枝肉",
+          "label": "糖醋里脊",
           "weights": {
             "sour": 15,
-            "sweet": 30,
+            "sweet": 70,
             "bitter": 0,
-            "spicy": 5,
-            "salty": 35,
+            "spicy": 0,
+            "salty": 30,
             "rich": 45,
-            "crunchy": 25,
-            "tender": 55
+            "crunchy": 80,
+            "tender": 50
           }
         },
         {
           "id": "q113-b",
-          "label": "糖醋鲤鱼",
+          "label": "糖醋排骨",
           "weights": {
-            "sour": 35,
-            "sweet": 40,
-            "bitter": 0,
-            "spicy": 0,
-            "salty": 30,
-            "rich": 50,
-            "crunchy": 45,
-            "tender": 40
+            "sour": 30,
+            "sweet": 55,
+            "bitter": 6,
+            "spicy": 4,
+            "salty": 40,
+            "rich": 55,
+            "crunchy": 50,
+            "tender": 55
           }
         }
       ]
@@ -6205,16 +6205,16 @@
         },
         {
           "id": "q124-c",
-          "label": "文思豆腐",
+          "label": "豆腐脑",
           "weights": {
             "sour": 5,
-            "sweet": 2,
-            "bitter": 0,
-            "spicy": 0,
-            "salty": 35,
-            "rich": 70,
-            "crunchy": 5,
-            "tender": 95
+            "sweet": 5,
+            "bitter": 6,
+            "spicy": 5,
+            "salty": 45,
+            "rich": 40,
+            "crunchy": 0,
+            "tender": 85
           }
         },
         {

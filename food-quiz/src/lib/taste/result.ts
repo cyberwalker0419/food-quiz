@@ -231,11 +231,12 @@ export function assembleResult(
     avoid = { letter: minLetter, label: avoidEntry.label, copy: pickOne(avoidEntry.copy) };
   }
 
-  // topDishes
+  // topDishes —— 仅从日常/知名菜（popular）推荐，过滤冷门地方菜
   let topDishes: DishEntry[] = [];
   const dishes = loadDishes();
   if (dishes) {
-    const scored = dishes.map((d) => ({ d, score: blendedScore(v, d.vector) }));
+    const popular = dishes.filter((d) => d.popular !== false);
+    const scored = popular.map((d) => ({ d, score: blendedScore(v, d.vector) }));
     scored.sort((x, y) => y.score - x.score);
     topDishes = scored.slice(0, topNDishes).map((s) => s.d);
   }

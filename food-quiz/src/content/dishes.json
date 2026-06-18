@@ -12,7 +12,8 @@
       "rich": 50,
       "crunchy": 10,
       "tender": 70
-    }
+    },
+    "popular": true
   },
   {
     "name": "水煮鱼",
@@ -27,7 +28,8 @@
       "rich": 60,
       "crunchy": 5,
       "tender": 80
-    }
+    },
+    "popular": true
   },
   {
     "name": "火锅",
@@ -42,7 +44,8 @@
       "rich": 70,
       "crunchy": 30,
       "tender": 50
-    }
+    },
+    "popular": true
   },
   {
     "name": "宫保鸡丁",
@@ -57,7 +60,8 @@
       "rich": 45,
       "crunchy": 40,
       "tender": 60
-    }
+    },
+    "popular": true
   },
   {
     "name": "夫妻肺片",
@@ -72,7 +76,8 @@
       "rich": 55,
       "crunchy": 20,
       "tender": 55
-    }
+    },
+    "popular": true
   },
   {
     "name": "回锅肉",
@@ -87,7 +92,8 @@
       "rich": 65,
       "crunchy": 15,
       "tender": 50
-    }
+    },
+    "popular": true
   },
   {
     "name": "担担面",
@@ -102,7 +108,8 @@
       "rich": 50,
       "crunchy": 10,
       "tender": 40
-    }
+    },
+    "popular": true
   },
   {
     "name": "钵钵鸡",
@@ -117,7 +124,8 @@
       "rich": 40,
       "crunchy": 30,
       "tender": 50
-    }
+    },
+    "popular": true
   },
   {
     "name": "白切鸡",
@@ -132,7 +140,8 @@
       "rich": 75,
       "crunchy": 15,
       "tender": 90
-    }
+    },
+    "popular": true
   },
   {
     "name": "虾饺",
@@ -147,7 +156,8 @@
       "rich": 80,
       "crunchy": 10,
       "tender": 90
-    }
+    },
+    "popular": true
   },
   {
     "name": "烧腊",
@@ -162,7 +172,8 @@
       "rich": 70,
       "crunchy": 40,
       "tender": 50
-    }
+    },
+    "popular": true
   },
   {
     "name": "叉烧",
@@ -177,7 +188,8 @@
       "rich": 60,
       "crunchy": 20,
       "tender": 55
-    }
+    },
+    "popular": true
   },
   {
     "name": "煲仔饭",
@@ -192,7 +204,8 @@
       "rich": 65,
       "crunchy": 40,
       "tender": 45
-    }
+    },
+    "popular": true
   },
   {
     "name": "肠粉",
@@ -207,7 +220,8 @@
       "rich": 60,
       "crunchy": 5,
       "tender": 85
-    }
+    },
+    "popular": true
   },
   {
     "name": "蒸凤爪",
@@ -222,7 +236,8 @@
       "rich": 55,
       "crunchy": 10,
       "tender": 75
-    }
+    },
+    "popular": true
   },
   {
     "name": "糖醋鲤鱼",
@@ -237,7 +252,8 @@
       "rich": 50,
       "crunchy": 45,
       "tender": 40
-    }
+    },
+    "popular": false
   },
   {
     "name": "九转大肠",
@@ -252,7 +268,8 @@
       "rich": 70,
       "crunchy": 20,
       "tender": 40
-    }
+    },
+    "popular": false
   },
   {
     "name": "葱烧海参",
@@ -267,7 +284,8 @@
       "rich": 80,
       "crunchy": 5,
       "tender": 70
-    }
+    },
+    "popular": true
   },
   {
     "name": "锅包肉",
@@ -282,7 +300,8 @@
       "rich": 45,
       "crunchy": 55,
       "tender": 40
-    }
+    },
+    "popular": true
   },
   {
     "name": "德州扒鸡",
@@ -297,7 +316,8 @@
       "rich": 65,
       "crunchy": 10,
       "tender": 80
-    }
+    },
+    "popular": false
   },
   {
     "name": "剁椒鱼头",
@@ -312,7 +332,8 @@
       "rich": 60,
       "crunchy": 5,
       "tender": 70
-    }
+    },
+    "popular": true
   },
   {
     "name": "辣椒炒肉",
@@ -327,7 +348,8 @@
       "rich": 55,
       "crunchy": 25,
       "tender": 45
-    }
+    },
+    "popular": true
   },
   {
     "name": "臭豆腐",
@@ -342,7 +364,8 @@
       "rich": 40,
       "crunchy": 35,
       "tender": 60
-    }
+    },
+    "popular": true
   },
   {
     "name": "毛氏红烧肉",
@@ -357,7 +380,8 @@
       "rich": 75,
       "crunchy": 5,
       "tender": 80
-    }
+    },
+    "popular": true
   },
   {
     "name": "湘西腊肉",
@@ -372,7 +396,8 @@
       "rich": 60,
       "crunchy": 15,
       "tender": 40
-    }
+    },
+    "popular": true
   },
   {
     "name": "松鼠桂鱼",
@@ -387,7 +412,8 @@
       "rich": 45,
       "crunchy": 40,
       "tender": 35
-    }
+    },
+    "popular": false
   },
   {
     "name": "狮子头",
@@ -402,7 +428,8 @@
       "rich": 65,
       "crunchy": 5,
       "tender": 80
-    }
+    },
+    "popular": true
   },
   {
     "name": "盐水鸭",
@@ -417,7 +444,8 @@
       "rich": 55,
       "crunchy": 10,
       "tender": 65
-    }
+    },
+    "popular": true
   },
   {
     "name": "蟹黄汤包",
@@ -432,7 +460,8 @@
       "rich": 85,
       "crunchy": 5,
       "tender": 85
-    }
+    },
+    "popular": false
   },
   {
     "name": "文思豆腐",
@@ -447,7 +476,8 @@
       "rich": 70,
       "crunchy": 5,
       "tender": 95
-    }
+    },
+    "popular": false
   },
   {
     "name": "西湖醋鱼",
@@ -462,7 +492,8 @@
       "rich": 40,
       "crunchy": 5,
       "tender": 65
-    }
+    },
+    "popular": true
   },
   {
     "name": "东坡肉",
@@ -477,7 +508,8 @@
       "rich": 70,
       "crunchy": 5,
       "tender": 85
-    }
+    },
+    "popular": true
   },
   {
     "name": "龙井虾仁",
@@ -492,7 +524,8 @@
       "rich": 65,
       "crunchy": 20,
       "tender": 80
-    }
+    },
+    "popular": false
   },
   {
     "name": "叫花鸡",
@@ -507,7 +540,8 @@
       "rich": 60,
       "crunchy": 15,
       "tender": 75
-    }
+    },
+    "popular": true
   },
   {
     "name": "佛跳墙",
@@ -522,7 +556,8 @@
       "rich": 90,
       "crunchy": 15,
       "tender": 70
-    }
+    },
+    "popular": true
   },
   {
     "name": "荔枝肉",
@@ -537,7 +572,8 @@
       "rich": 45,
       "crunchy": 25,
       "tender": 55
-    }
+    },
+    "popular": false
   },
   {
     "name": "沙茶面",
@@ -552,7 +588,8 @@
       "rich": 50,
       "crunchy": 15,
       "tender": 40
-    }
+    },
+    "popular": false
   },
   {
     "name": "海蛎煎",
@@ -567,7 +604,8 @@
       "rich": 65,
       "crunchy": 35,
       "tender": 50
-    }
+    },
+    "popular": false
   },
   {
     "name": "臭鳜鱼",
@@ -582,7 +620,8 @@
       "rich": 70,
       "crunchy": 10,
       "tender": 60
-    }
+    },
+    "popular": true
   },
   {
     "name": "毛豆腐",
@@ -597,7 +636,8 @@
       "rich": 55,
       "crunchy": 20,
       "tender": 70
-    }
+    },
+    "popular": false
   },
   {
     "name": "一品锅",
@@ -612,7 +652,8 @@
       "rich": 60,
       "crunchy": 20,
       "tender": 55
-    }
+    },
+    "popular": false
   },
   {
     "name": "火腿炖甲鱼",
@@ -627,7 +668,8 @@
       "rich": 75,
       "crunchy": 5,
       "tender": 70
-    }
+    },
+    "popular": false
   },
   {
     "name": "北京烤鸭",
@@ -642,7 +684,8 @@
       "rich": 70,
       "crunchy": 60,
       "tender": 65
-    }
+    },
+    "popular": true
   },
   {
     "name": "涮羊肉",
@@ -657,7 +700,8 @@
       "rich": 65,
       "crunchy": 10,
       "tender": 80
-    }
+    },
+    "popular": true
   },
   {
     "name": "炸酱面",
@@ -672,7 +716,8 @@
       "rich": 45,
       "crunchy": 15,
       "tender": 35
-    }
+    },
+    "popular": true
   },
   {
     "name": "卤煮火烧",
@@ -687,7 +732,8 @@
       "rich": 55,
       "crunchy": 20,
       "tender": 40
-    }
+    },
+    "popular": false
   },
   {
     "name": "红烧肉",
@@ -702,7 +748,8 @@
       "rich": 70,
       "crunchy": 5,
       "tender": 75
-    }
+    },
+    "popular": true
   },
   {
     "name": "小笼包",
@@ -717,7 +764,8 @@
       "rich": 65,
       "crunchy": 5,
       "tender": 80
-    }
+    },
+    "popular": true
   },
   {
     "name": "生煎",
@@ -732,7 +780,8 @@
       "rich": 55,
       "crunchy": 50,
       "tender": 50
-    }
+    },
+    "popular": true
   },
   {
     "name": "酸辣粉",
@@ -747,7 +796,8 @@
       "rich": 45,
       "crunchy": 5,
       "tender": 35
-    }
+    },
+    "popular": true
   },
   {
     "name": "辣子鸡",
@@ -762,7 +812,8 @@
       "rich": 40,
       "crunchy": 35,
       "tender": 40
-    }
+    },
+    "popular": true
   },
   {
     "name": "重庆小面",
@@ -777,7 +828,8 @@
       "rich": 45,
       "crunchy": 10,
       "tender": 30
-    }
+    },
+    "popular": true
   },
   {
     "name": "肉夹馍",
@@ -792,7 +844,8 @@
       "rich": 50,
       "crunchy": 35,
       "tender": 50
-    }
+    },
+    "popular": true
   },
   {
     "name": "凉皮",
@@ -807,7 +860,8 @@
       "rich": 20,
       "crunchy": 15,
       "tender": 40
-    }
+    },
+    "popular": true
   },
   {
     "name": "羊肉泡馍",
@@ -822,7 +876,8 @@
       "rich": 70,
       "crunchy": 30,
       "tender": 35
-    }
+    },
+    "popular": true
   },
   {
     "name": "锅包肉",
@@ -837,7 +892,8 @@
       "rich": 45,
       "crunchy": 55,
       "tender": 40
-    }
+    },
+    "popular": true
   },
   {
     "name": "地三鲜",
@@ -852,7 +908,8 @@
       "rich": 40,
       "crunchy": 30,
       "tender": 50
-    }
+    },
+    "popular": true
   },
   {
     "name": "酸菜白肉",
@@ -867,7 +924,8 @@
       "rich": 50,
       "crunchy": 10,
       "tender": 55
-    }
+    },
+    "popular": true
   },
   {
     "name": "杀猪菜",
@@ -882,7 +940,8 @@
       "rich": 55,
       "crunchy": 15,
       "tender": 45
-    }
+    },
+    "popular": true
   },
   {
     "name": "热干面",
@@ -897,7 +956,8 @@
       "rich": 40,
       "crunchy": 5,
       "tender": 30
-    }
+    },
+    "popular": true
   },
   {
     "name": "武昌鱼",
@@ -912,7 +972,8 @@
       "rich": 55,
       "crunchy": 5,
       "tender": 70
-    }
+    },
+    "popular": true
   },
   {
     "name": "大盘鸡",
@@ -927,7 +988,8 @@
       "rich": 50,
       "crunchy": 20,
       "tender": 50
-    }
+    },
+    "popular": true
   },
   {
     "name": "手抓饭",
@@ -942,7 +1004,8 @@
       "rich": 55,
       "crunchy": 20,
       "tender": 40
-    }
+    },
+    "popular": true
   },
   {
     "name": "烤羊肉串",
@@ -957,7 +1020,8 @@
       "rich": 50,
       "crunchy": 30,
       "tender": 45
-    }
+    },
+    "popular": true
   },
   {
     "name": "过桥米线",
@@ -972,7 +1036,8 @@
       "rich": 55,
       "crunchy": 15,
       "tender": 40
-    }
+    },
+    "popular": true
   },
   {
     "name": "汽锅鸡",
@@ -987,7 +1052,8 @@
       "rich": 70,
       "crunchy": 5,
       "tender": 85
-    }
+    },
+    "popular": true
   },
   {
     "name": "酸汤鱼",
@@ -1002,7 +1068,8 @@
       "rich": 55,
       "crunchy": 5,
       "tender": 60
-    }
+    },
+    "popular": true
   },
   {
     "name": "折耳根炒肉",
@@ -1017,7 +1084,8 @@
       "rich": 40,
       "crunchy": 20,
       "tender": 45
-    }
+    },
+    "popular": false
   },
   {
     "name": "文昌鸡",
@@ -1032,7 +1100,8 @@
       "rich": 70,
       "crunchy": 5,
       "tender": 85
-    }
+    },
+    "popular": true
   },
   {
     "name": "椰子鸡",
@@ -1047,7 +1116,8 @@
       "rich": 65,
       "crunchy": 5,
       "tender": 80
-    }
+    },
+    "popular": true
   },
   {
     "name": "螺蛳粉",
@@ -1062,7 +1132,8 @@
       "rich": 35,
       "crunchy": 15,
       "tender": 30
-    }
+    },
+    "popular": true
   },
   {
     "name": "桂林米粉",
@@ -1077,7 +1148,8 @@
       "rich": 40,
       "crunchy": 5,
       "tender": 35
-    }
+    },
+    "popular": true
   },
   {
     "name": "手把肉",
@@ -1092,7 +1164,8 @@
       "rich": 65,
       "crunchy": 5,
       "tender": 70
-    }
+    },
+    "popular": true
   },
   {
     "name": "烤全羊",
@@ -1107,7 +1180,8 @@
       "rich": 60,
       "crunchy": 30,
       "tender": 55
-    }
+    },
+    "popular": true
   },
   {
     "name": "卤肉饭",
@@ -1122,7 +1196,8 @@
       "rich": 60,
       "crunchy": 5,
       "tender": 65
-    }
+    },
+    "popular": true
   },
   {
     "name": "盐酥鸡",
@@ -1137,7 +1212,8 @@
       "rich": 40,
       "crunchy": 50,
       "tender": 45
-    }
+    },
+    "popular": true
   },
   {
     "name": "狗不理包子",
@@ -1152,7 +1228,8 @@
       "rich": 55,
       "crunchy": 5,
       "tender": 70
-    }
+    },
+    "popular": true
   },
   {
     "name": "三杯鸡",
@@ -1167,7 +1244,8 @@
       "rich": 65,
       "crunchy": 10,
       "tender": 60
-    }
+    },
+    "popular": true
   },
   {
     "name": "烩面",
@@ -1182,7 +1260,8 @@
       "rich": 50,
       "crunchy": 10,
       "tender": 40
-    }
+    },
+    "popular": true
   },
   {
     "name": "酥油茶",
@@ -1197,7 +1276,8 @@
       "rich": 70,
       "crunchy": 5,
       "tender": 20
-    }
+    },
+    "popular": false
   },
   {
     "name": "糌粑",
@@ -1212,7 +1292,8 @@
       "rich": 50,
       "crunchy": 15,
       "tender": 25
-    }
+    },
+    "popular": false
   },
   {
     "name": "手抓羊肉",
@@ -1227,7 +1308,8 @@
       "rich": 60,
       "crunchy": 5,
       "tender": 70
-    }
+    },
+    "popular": true
   },
   {
     "name": "孔雀宴",
@@ -1242,7 +1324,8 @@
       "rich": 45,
       "crunchy": 30,
       "tender": 50
-    }
+    },
+    "popular": false
   },
   {
     "name": "舂鸡脚",
@@ -1257,7 +1340,8 @@
       "rich": 30,
       "crunchy": 25,
       "tender": 60
-    }
+    },
+    "popular": false
   },
   {
     "name": "馕",
@@ -1272,7 +1356,8 @@
       "rich": 35,
       "crunchy": 50,
       "tender": 20
-    }
+    },
+    "popular": true
   },
   {
     "name": "熘肉段",
@@ -1287,7 +1372,8 @@
       "rich": 50,
       "crunchy": 85,
       "tender": 55
-    }
+    },
+    "popular": false
   },
   {
     "name": "糖醋里脊",
@@ -1302,7 +1388,8 @@
       "rich": 45,
       "crunchy": 80,
       "tender": 50
-    }
+    },
+    "popular": true
   },
   {
     "name": "酱骨架",
@@ -1317,7 +1404,8 @@
       "rich": 75,
       "crunchy": 10,
       "tender": 55
-    }
+    },
+    "popular": false
   },
   {
     "name": "脆皮大虾",
@@ -1332,7 +1420,8 @@
       "rich": 40,
       "crunchy": 90,
       "tender": 65
-    }
+    },
+    "popular": false
   },
   {
     "name": "红烧偏口",
@@ -1347,7 +1436,8 @@
       "rich": 60,
       "crunchy": 5,
       "tender": 75
-    }
+    },
+    "popular": false
   },
   {
     "name": "东北乱炖",
@@ -1362,7 +1452,8 @@
       "rich": 70,
       "crunchy": 10,
       "tender": 65
-    }
+    },
+    "popular": false
   },
   {
     "name": "酱大骨",
@@ -1377,7 +1468,8 @@
       "rich": 80,
       "crunchy": 5,
       "tender": 60
-    }
+    },
+    "popular": false
   },
   {
     "name": "铁锅炖鱼",
@@ -1392,7 +1484,8 @@
       "rich": 65,
       "crunchy": 5,
       "tender": 70
-    }
+    },
+    "popular": true
   },
   {
     "name": "渍菜粉",
@@ -1407,7 +1500,8 @@
       "rich": 35,
       "crunchy": 15,
       "tender": 60
-    }
+    },
+    "popular": false
   },
   {
     "name": "笨鸡炖粉",
@@ -1422,7 +1516,8 @@
       "rich": 65,
       "crunchy": 5,
       "tender": 70
-    }
+    },
+    "popular": false
   },
   {
     "name": "熏肉大饼",
@@ -1437,7 +1532,8 @@
       "rich": 70,
       "crunchy": 60,
       "tender": 40
-    }
+    },
+    "popular": false
   },
   {
     "name": "酸菜炖排骨",
@@ -1452,7 +1548,8 @@
       "rich": 55,
       "crunchy": 5,
       "tender": 70
-    }
+    },
+    "popular": true
   },
   {
     "name": "铁锅炖大鹅",
@@ -1467,7 +1564,8 @@
       "rich": 65,
       "crunchy": 5,
       "tender": 75
-    }
+    },
+    "popular": false
   },
   {
     "name": "白肉血肠",
@@ -1482,7 +1580,8 @@
       "rich": 60,
       "crunchy": 20,
       "tender": 75
-    }
+    },
+    "popular": false
   },
   {
     "name": "雪衣豆沙",
@@ -1497,7 +1596,8 @@
       "rich": 30,
       "crunchy": 75,
       "tender": 65
-    }
+    },
+    "popular": true
   },
   {
     "name": "嘎巴菜",
@@ -1512,7 +1612,8 @@
       "rich": 55,
       "crunchy": 75,
       "tender": 50
-    }
+    },
+    "popular": false
   },
   {
     "name": "崩豆张",
@@ -1527,7 +1628,8 @@
       "rich": 35,
       "crunchy": 95,
       "tender": 5
-    }
+    },
+    "popular": false
   },
   {
     "name": "十八街麻花",
@@ -1542,7 +1644,8 @@
       "rich": 50,
       "crunchy": 85,
       "tender": 15
-    }
+    },
+    "popular": false
   },
   {
     "name": "煎饼果子",
@@ -1557,7 +1660,8 @@
       "rich": 45,
       "crunchy": 90,
       "tender": 30
-    }
+    },
+    "popular": true
   },
   {
     "name": "老豆腐",
@@ -1572,7 +1676,8 @@
       "rich": 40,
       "crunchy": 5,
       "tender": 75
-    }
+    },
+    "popular": false
   },
   {
     "name": "辣椒饼",
@@ -1587,7 +1692,8 @@
       "rich": 40,
       "crunchy": 60,
       "tender": 30
-    }
+    },
+    "popular": false
   },
   {
     "name": "瓦罐汤",
@@ -1602,7 +1708,8 @@
       "rich": 60,
       "crunchy": 0,
       "tender": 70
-    }
+    },
+    "popular": true
   },
   {
     "name": "米粉蒸肉",
@@ -1617,7 +1724,8 @@
       "rich": 75,
       "crunchy": 5,
       "tender": 60
-    }
+    },
+    "popular": false
   },
   {
     "name": "藜蒿炒腊肉",
@@ -1632,7 +1740,8 @@
       "rich": 60,
       "crunchy": 30,
       "tender": 50
-    }
+    },
+    "popular": false
   },
   {
     "name": "客家酿豆腐",
@@ -1647,7 +1756,8 @@
       "rich": 50,
       "crunchy": 5,
       "tender": 75
-    }
+    },
+    "popular": false
   },
   {
     "name": "灌汤包",
@@ -1662,7 +1772,8 @@
       "rich": 65,
       "crunchy": 10,
       "tender": 70
-    }
+    },
+    "popular": true
   },
   {
     "name": "道口烧鸡",
@@ -1677,7 +1788,8 @@
       "rich": 70,
       "crunchy": 15,
       "tender": 65
-    }
+    },
+    "popular": true
   },
   {
     "name": "焖面",
@@ -1692,7 +1804,8 @@
       "rich": 55,
       "crunchy": 10,
       "tender": 60
-    }
+    },
+    "popular": true
   },
   {
     "name": "胡辣汤",
@@ -1707,7 +1820,8 @@
       "rich": 60,
       "crunchy": 5,
       "tender": 50
-    }
+    },
+    "popular": true
   },
   {
     "name": "洛阳浆面条",
@@ -1722,7 +1836,8 @@
       "rich": 40,
       "crunchy": 0,
       "tender": 60
-    }
+    },
+    "popular": false
   },
   {
     "name": "羊杂碎",
@@ -1737,7 +1852,8 @@
       "rich": 70,
       "crunchy": 10,
       "tender": 60
-    }
+    },
+    "popular": false
   },
   {
     "name": "羊肉臊子面",
@@ -1752,7 +1868,8 @@
       "rich": 60,
       "crunchy": 10,
       "tender": 55
-    }
+    },
+    "popular": false
   },
   {
     "name": "回族馄饨",
@@ -1767,7 +1884,8 @@
       "rich": 50,
       "crunchy": 5,
       "tender": 75
-    }
+    },
+    "popular": false
   },
   {
     "name": "粉汤",
@@ -1782,7 +1900,8 @@
       "rich": 60,
       "crunchy": 5,
       "tender": 65
-    }
+    },
+    "popular": false
   },
   {
     "name": "烩小吃",
@@ -1797,7 +1916,8 @@
       "rich": 55,
       "crunchy": 20,
       "tender": 60
-    }
+    },
+    "popular": false
   },
   {
     "name": "干炸黄花鱼",
@@ -1812,7 +1932,8 @@
       "rich": 40,
       "crunchy": 90,
       "tender": 55
-    }
+    },
+    "popular": false
   },
   {
     "name": "得莫利炖鱼",
@@ -1827,7 +1948,8 @@
       "rich": 60,
       "crunchy": 5,
       "tender": 70
-    }
+    },
+    "popular": false
   },
   {
     "name": "汆白肉",
@@ -1842,7 +1964,8 @@
       "rich": 55,
       "crunchy": 5,
       "tender": 75
-    }
+    },
+    "popular": true
   },
   {
     "name": "粘豆包",
@@ -1857,7 +1980,8 @@
       "rich": 40,
       "crunchy": 10,
       "tender": 65
-    }
+    },
+    "popular": false
   },
   {
     "name": "武汉鸭脖",
@@ -1872,7 +1996,8 @@
       "rich": 50,
       "crunchy": 65,
       "tender": 40
-    }
+    },
+    "popular": true
   },
   {
     "name": "潜江油焖大虾",
@@ -1887,7 +2012,8 @@
       "rich": 65,
       "crunchy": 10,
       "tender": 70
-    }
+    },
+    "popular": true
   },
   {
     "name": "豆皮",
@@ -1902,7 +2028,8 @@
       "rich": 45,
       "crunchy": 80,
       "tender": 40
-    }
+    },
+    "popular": true
   },
   {
     "name": "排骨藕汤",
@@ -1917,7 +2044,8 @@
       "rich": 65,
       "crunchy": 0,
       "tender": 70
-    }
+    },
+    "popular": true
   },
   {
     "name": "大理砂锅鱼",
@@ -1932,7 +2060,8 @@
       "rich": 60,
       "crunchy": 5,
       "tender": 75
-    }
+    },
+    "popular": false
   },
   {
     "name": "宣威火腿炒饭",
@@ -1947,7 +2076,8 @@
       "rich": 70,
       "crunchy": 25,
       "tender": 50
-    }
+    },
+    "popular": false
   },
   {
     "name": "云南火腿月饼",
@@ -1962,7 +2092,8 @@
       "rich": 75,
       "crunchy": 40,
       "tender": 35
-    }
+    },
+    "popular": false
   },
   {
     "name": "傣味烤鱼",
@@ -1977,7 +2108,8 @@
       "rich": 50,
       "crunchy": 15,
       "tender": 70
-    }
+    },
+    "popular": false
   },
   {
     "name": "酸汤面",
@@ -1992,7 +2124,8 @@
       "rich": 40,
       "crunchy": 5,
       "tender": 55
-    }
+    },
+    "popular": false
   },
   {
     "name": "丝娃娃",
@@ -2007,7 +2140,8 @@
       "rich": 25,
       "crunchy": 45,
       "tender": 55
-    }
+    },
+    "popular": false
   },
   {
     "name": "豆米火锅",
@@ -2022,7 +2156,8 @@
       "rich": 65,
       "crunchy": 10,
       "tender": 60
-    }
+    },
+    "popular": false
   },
   {
     "name": "和乐蟹",
@@ -2037,7 +2172,8 @@
       "rich": 55,
       "crunchy": 10,
       "tender": 80
-    }
+    },
+    "popular": false
   },
   {
     "name": "东山羊",
@@ -2052,7 +2188,8 @@
       "rich": 65,
       "crunchy": 5,
       "tender": 75
-    }
+    },
+    "popular": false
   },
   {
     "name": "椰蓉粽",
@@ -2067,7 +2204,8 @@
       "rich": 45,
       "crunchy": 20,
       "tender": 50
-    }
+    },
+    "popular": false
   },
   {
     "name": "清补凉",
@@ -2082,7 +2220,8 @@
       "rich": 30,
       "crunchy": 30,
       "tender": 55
-    }
+    },
+    "popular": true
   },
   {
     "name": "荔浦芋扣肉",
@@ -2097,7 +2236,8 @@
       "rich": 80,
       "crunchy": 5,
       "tender": 55
-    }
+    },
+    "popular": true
   },
   {
     "name": "壮家竹筒饭",
@@ -2112,7 +2252,8 @@
       "rich": 50,
       "crunchy": 30,
       "tender": 60
-    }
+    },
+    "popular": false
   },
   {
     "name": "南宁老友粉",
@@ -2127,7 +2268,8 @@
       "rich": 50,
       "crunchy": 10,
       "tender": 55
-    }
+    },
+    "popular": false
   },
   {
     "name": "蒙古奶茶",
@@ -2142,7 +2284,8 @@
       "rich": 60,
       "crunchy": 0,
       "tender": 45
-    }
+    },
+    "popular": false
   },
   {
     "name": "蒙古包子",
@@ -2157,7 +2300,8 @@
       "rich": 60,
       "crunchy": 10,
       "tender": 70
-    }
+    },
+    "popular": false
   },
   {
     "name": "沙葱拌羊肉",
@@ -2172,7 +2316,8 @@
       "rich": 55,
       "crunchy": 35,
       "tender": 70
-    }
+    },
+    "popular": false
   },
   {
     "name": "大肠蚵仔面线",
@@ -2187,7 +2332,8 @@
       "rich": 60,
       "crunchy": 5,
       "tender": 65
-    }
+    },
+    "popular": false
   },
   {
     "name": "虱目鱼粥",
@@ -2202,7 +2348,8 @@
       "rich": 50,
       "crunchy": 5,
       "tender": 75
-    }
+    },
+    "popular": false
   },
   {
     "name": "剉冰",
@@ -2217,7 +2364,8 @@
       "rich": 20,
       "crunchy": 85,
       "tender": 15
-    }
+    },
+    "popular": true
   },
   {
     "name": "珍珠奶茶",
@@ -2232,7 +2380,8 @@
       "rich": 35,
       "crunchy": 75,
       "tender": 35
-    }
+    },
+    "popular": true
   },
   {
     "name": "酥油人参果",
@@ -2247,7 +2396,8 @@
       "rich": 50,
       "crunchy": 5,
       "tender": 60
-    }
+    },
+    "popular": false
   },
   {
     "name": "青稞面片",
@@ -2262,7 +2412,8 @@
       "rich": 50,
       "crunchy": 10,
       "tender": 60
-    }
+    },
+    "popular": false
   },
   {
     "name": "藏族血肠",
@@ -2277,7 +2428,8 @@
       "rich": 60,
       "crunchy": 25,
       "tender": 65
-    }
+    },
+    "popular": false
   },
   {
     "name": "酥油茶饼",
@@ -2292,7 +2444,8 @@
       "rich": 65,
       "crunchy": 15,
       "tender": 50
-    }
+    },
+    "popular": false
   },
   {
     "name": "包烧肉",
@@ -2307,7 +2460,8 @@
       "rich": 60,
       "crunchy": 25,
       "tender": 60
-    }
+    },
+    "popular": false
   },
   {
     "name": "竹筒饭",
@@ -2322,7 +2476,8 @@
       "rich": 50,
       "crunchy": 20,
       "tender": 60
-    }
+    },
+    "popular": false
   },
   {
     "name": "酸笋煮牛肉",
@@ -2337,7 +2492,8 @@
       "rich": 55,
       "crunchy": 5,
       "tender": 70
-    }
+    },
+    "popular": false
   },
   {
     "name": "香茅草烤鱼",
@@ -2352,7 +2508,8 @@
       "rich": 50,
       "crunchy": 20,
       "tender": 70
-    }
+    },
+    "popular": false
   },
   {
     "name": "万州烤鱼",
@@ -2367,7 +2524,8 @@
       "rich": 60,
       "crunchy": 20,
       "tender": 60
-    }
+    },
+    "popular": true
   },
   {
     "name": "歌乐山辣子鸡",
@@ -2382,7 +2540,8 @@
       "rich": 55,
       "crunchy": 75,
       "tender": 40
-    }
+    },
+    "popular": false
   },
   {
     "name": "泡椒牛蛙",
@@ -2397,7 +2556,8 @@
       "rich": 55,
       "crunchy": 10,
       "tender": 70
-    }
+    },
+    "popular": false
   },
   {
     "name": "biangbiang面",
@@ -2412,7 +2572,8 @@
       "rich": 55,
       "crunchy": 50,
       "tender": 55
-    }
+    },
+    "popular": true
   },
   {
     "name": "葫芦鸡",
@@ -2427,7 +2588,8 @@
       "rich": 70,
       "crunchy": 65,
       "tender": 65
-    }
+    },
+    "popular": false
   },
   {
     "name": "臊子面",
@@ -2442,7 +2604,8 @@
       "rich": 55,
       "crunchy": 10,
       "tender": 60
-    }
+    },
+    "popular": true
   },
   {
     "name": "腌笃鲜",
@@ -2457,7 +2620,8 @@
       "rich": 65,
       "crunchy": 5,
       "tender": 70
-    }
+    },
+    "popular": false
   },
   {
     "name": "油爆虾",
@@ -2472,7 +2636,8 @@
       "rich": 60,
       "crunchy": 80,
       "tender": 55
-    }
+    },
+    "popular": true
   },
   {
     "name": "草头圈子",
@@ -2487,7 +2652,8 @@
       "rich": 75,
       "crunchy": 5,
       "tender": 60
-    }
+    },
+    "popular": false
   },
   {
     "name": "油爆海螺",
@@ -2502,7 +2668,8 @@
       "rich": 55,
       "crunchy": 75,
       "tender": 70
-    }
+    },
+    "popular": false
   },
   {
     "name": "鲅鱼水饺",
@@ -2517,7 +2684,8 @@
       "rich": 55,
       "crunchy": 10,
       "tender": 75
-    }
+    },
+    "popular": false
   },
   {
     "name": "糖醋排骨",
@@ -2532,7 +2700,8 @@
       "rich": 60,
       "crunchy": 40,
       "tender": 55
-    }
+    },
+    "popular": true
   },
   {
     "name": "西湖莼菜汤",
@@ -2547,7 +2716,8 @@
       "rich": 40,
       "crunchy": 0,
       "tender": 75
-    }
+    },
+    "popular": false
   },
   {
     "name": "南普陀素面",
@@ -2562,7 +2732,8 @@
       "rich": 55,
       "crunchy": 5,
       "tender": 65
-    }
+    },
+    "popular": false
   },
   {
     "name": "福州鱼丸",
@@ -2577,7 +2748,8 @@
       "rich": 50,
       "crunchy": 5,
       "tender": 80
-    }
+    },
+    "popular": true
   },
   {
     "name": "黄山炖鸽",
@@ -2592,7 +2764,8 @@
       "rich": 60,
       "crunchy": 5,
       "tender": 75
-    }
+    },
+    "popular": false
   },
   {
     "name": "徽州包袱饺子",
@@ -2607,7 +2780,8 @@
       "rich": 55,
       "crunchy": 10,
       "tender": 70
-    }
+    },
+    "popular": false
   },
   {
     "name": "豆汁焦圈",
@@ -2622,7 +2796,8 @@
       "rich": 40,
       "crunchy": 85,
       "tender": 20
-    }
+    },
+    "popular": false
   },
   {
     "name": "冰糖葫芦",
@@ -2637,7 +2812,8 @@
       "rich": 25,
       "crunchy": 90,
       "tender": 30
-    }
+    },
+    "popular": true
   },
   {
     "name": "拌面",
@@ -2652,7 +2828,8 @@
       "rich": 55,
       "crunchy": 20,
       "tender": 55
-    }
+    },
+    "popular": true
   },
   {
     "name": "椒麻鸡",
@@ -2667,7 +2844,8 @@
       "rich": 50,
       "crunchy": 50,
       "tender": 60
-    }
+    },
+    "popular": true
   },
   {
     "name": "干煸四季豆",
@@ -2682,7 +2860,8 @@
       "rich": 45,
       "crunchy": 55,
       "tender": 50
-    }
+    },
+    "popular": true
   },
   {
     "name": "蛋挞",
@@ -2697,7 +2876,8 @@
       "rich": 50,
       "crunchy": 65,
       "tender": 50
-    }
+    },
+    "popular": true
   },
   {
     "name": "驴肉火烧",
@@ -2712,7 +2892,8 @@
       "rich": 65,
       "crunchy": 75,
       "tender": 55
-    }
+    },
+    "popular": true
   },
   {
     "name": "白洋淀全鱼宴",
@@ -2727,7 +2908,8 @@
       "rich": 60,
       "crunchy": 10,
       "tender": 70
-    }
+    },
+    "popular": false
   },
   {
     "name": "沧州羊汤",
@@ -2742,7 +2924,8 @@
       "rich": 70,
       "crunchy": 5,
       "tender": 60
-    }
+    },
+    "popular": false
   },
   {
     "name": "承德烤全羊",
@@ -2757,7 +2940,8 @@
       "rich": 75,
       "crunchy": 25,
       "tender": 65
-    }
+    },
+    "popular": false
   },
   {
     "name": "刀削面",
@@ -2772,7 +2956,8 @@
       "rich": 55,
       "crunchy": 40,
       "tender": 55
-    }
+    },
+    "popular": true
   },
   {
     "name": "过油肉",
@@ -2787,7 +2972,8 @@
       "rich": 60,
       "crunchy": 55,
       "tender": 65
-    }
+    },
+    "popular": true
   },
   {
     "name": "平遥牛肉",
@@ -2802,7 +2988,8 @@
       "rich": 65,
       "crunchy": 10,
       "tender": 70
-    }
+    },
+    "popular": true
   },
   {
     "name": "莜面栲栳栳",
@@ -2817,7 +3004,8 @@
       "rich": 50,
       "crunchy": 45,
       "tender": 60
-    }
+    },
+    "popular": false
   },
   {
     "name": "兰州牛肉面",
@@ -2832,7 +3020,8 @@
       "rich": 60,
       "crunchy": 15,
       "tender": 60
-    }
+    },
+    "popular": true
   },
   {
     "name": "酿皮",
@@ -2847,7 +3036,8 @@
       "rich": 45,
       "crunchy": 50,
       "tender": 60
-    }
+    },
+    "popular": true
   },
   {
     "name": "灰豆子",
@@ -2862,7 +3052,8 @@
       "rich": 40,
       "crunchy": 5,
       "tender": 55
-    }
+    },
+    "popular": false
   },
   {
     "name": "小炒黄牛肉",
@@ -2877,7 +3068,8 @@
       "rich": 55,
       "crunchy": 15,
       "tender": 75
-    }
+    },
+    "popular": true
   },
   {
     "name": "大煮干丝",
@@ -2892,7 +3084,8 @@
       "rich": 45,
       "crunchy": 5,
       "tender": 80
-    }
+    },
+    "popular": false
   },
   {
     "name": "桂林田螺",
@@ -2907,7 +3100,8 @@
       "rich": 55,
       "crunchy": 35,
       "tender": 60
-    }
+    },
+    "popular": false
   },
   {
     "name": "糟辣脆皮鱼",
@@ -2922,7 +3116,8 @@
       "rich": 50,
       "crunchy": 75,
       "tender": 55
-    }
+    },
+    "popular": false
   },
   {
     "name": "风干牛肉",
@@ -2937,6 +3132,7 @@
       "rich": 60,
       "crunchy": 50,
       "tender": 70
-    }
+    },
+    "popular": true
   }
 ]

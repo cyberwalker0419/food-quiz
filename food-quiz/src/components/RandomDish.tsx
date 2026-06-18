@@ -10,7 +10,8 @@ interface Props {
  * 从 dishes.json 全库随机抽一道，展示菜名 + 菜系 · 地区，「换一个」重新抽（不重复上一道）。
  */
 export function RandomDish({ onBack }: Props) {
-  const dishes = loadDishes() ?? [];
+  const allDishes = loadDishes() ?? [];
+  const dishes = allDishes.filter((d) => d.popular !== false); // 仅日常/知名菜
   const [index, setIndex] = useState<number>(() => (dishes.length ? Math.floor(Math.random() * dishes.length) : -1));
   const [spinning, setSpinning] = useState(false);
 
