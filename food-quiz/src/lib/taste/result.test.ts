@@ -126,6 +126,24 @@ describe('assembleResult — 避雷指南', () => {
   });
 });
 
+describe('assembleResult — 推荐菜只取日常/知名菜', () => {
+  it('topDishes 全部为 popular，无冷门地方菜', () => {
+    const r = assembleResult({ ...ZERO_VECTOR, spicy: 95, salty: 80, rich: 70 });
+    expect(r.topDishes.length).toBeGreaterThan(0);
+    for (const d of r.topDishes) {
+      expect(d.popular, `冷门菜入选推荐: ${d.name}`).not.toBe(false);
+    }
+  });
+
+  it('极端偏好也能推荐到日常菜（不会因小众口味被逼推荐冷门菜）', () => {
+    const r = assembleResult({ ...ZERO_VECTOR, sour: 90, bitter: 90 });
+    expect(r.topDishes.length).toBeGreaterThan(0);
+    for (const d of r.topDishes) {
+      expect(d.popular).not.toBe(false);
+    }
+  });
+});
+
 describe('assembleResult — 5 等级 grade 字段(视觉层)', () => {
   it('全 0 输入 → 归一化全 50 → 全 C', () => {
     const r = assembleResult(ZERO_VECTOR);
