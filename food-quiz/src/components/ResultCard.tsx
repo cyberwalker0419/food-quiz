@@ -140,14 +140,7 @@ export function ResultCard({ result, questionCount, onRestart, onCopy, onDownloa
           </section>
         )}
 
-        {/* 5. 避雷指南 */}
-        {result.avoid && (
-          <section className="profile-section avoid-section">
-            <h2 className="section-title">避雷指南</h2>
-            <p className="avoid-label">{result.avoid.label}</p>
-            <p className="avoid-copy">{result.avoid.copy}</p>
-          </section>
-        )}
+        {/* 5. 避雷指南(已下线) */}
 
         {/* 6. 推荐菜(可折叠) */}
         {result.topDishes.length > 0 && (

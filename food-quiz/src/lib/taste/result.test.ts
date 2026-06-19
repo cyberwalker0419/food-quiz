@@ -118,14 +118,6 @@ describe('assembleResult — 维度档位标签', () => {
   });
 });
 
-describe('assembleResult — 避雷指南', () => {
-  it('永远返回 avoid(文件已落盘,取最低分维)', () => {
-    const r = assembleResult(ZERO_VECTOR);
-    expect(r.avoid).not.toBeNull();
-    expect(r.avoid?.letter).toBeTruthy();
-  });
-});
-
 describe('assembleResult — 推荐菜只取日常/知名菜', () => {
   it('topDishes 全部为 popular，无冷门地方菜', () => {
     const r = assembleResult({ ...ZERO_VECTOR, spicy: 95, salty: 80, rich: 70 });
@@ -141,6 +133,15 @@ describe('assembleResult — 推荐菜只取日常/知名菜', () => {
     for (const d of r.topDishes) {
       expect(d.popular).not.toBe(false);
     }
+  });
+
+  it('topDishes 跨菜系多样(每菜系最多 1 道)+ 地区不重复', () => {
+    const r = assembleResult({ ...ZERO_VECTOR, spicy: 90, salty: 80, rich: 70 });
+    expect(r.topDishes.length).toBeGreaterThan(1);
+    const cuisines = r.topDishes.map((d) => d.cuisine).filter(Boolean);
+    expect(new Set(cuisines).size).toBe(cuisines.length); // 菜系两两不同
+    const regions = r.topDishes.map((d) => d.region).filter(Boolean);
+    expect(new Set(regions).size).toBe(regions.length); // 地区两两不同
   });
 });
 

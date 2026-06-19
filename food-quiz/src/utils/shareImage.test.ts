@@ -24,7 +24,7 @@ function makeResult(): AssembledResult {
       { name: '小笼包', cuisine: '江浙菜', region: '上海', vector: { sour: 0, sweet: 0, bitter: 0, spicy: 0, salty: 0, rich: 0, crunchy: 0, tender: 0 } },
       { name: '北京烤鸭', cuisine: '京菜', region: '北京', vector: { sour: 0, sweet: 0, bitter: 0, spicy: 0, salty: 0, rich: 0, crunchy: 0, tender: 0 } },
     ],
-    extremes: [], synergy: null, allround: null, avoid: null,
+    extremes: [], synergy: null, allround: null,
     vector: { sour: 0, sweet: 0, bitter: 0, spicy: 0, salty: 0, rich: 0, crunchy: 0, tender: 0 },
     raw: { sour: 0, sweet: 0, bitter: 0, spicy: 0, salty: 0, rich: 0, crunchy: 0, tender: 0 },
     std: 0,

@@ -431,9 +431,11 @@ body::before {
 .extreme-label { font-weight: 700; font-size: 14px; color: var(--cinnabar); white-space: nowrap; letter-spacing: 0.05em; }
 .extreme-copy  { font-size: 13px; color: var(--ink-2); text-align: right; }
 
+/* 避雷指南功能已下线(2026-06);若未来恢复,解开下方注释即可。
 .avoid-section { background: var(--paper-2); padding: 22px 20px; border-left: 3px solid var(--ink); }
 .avoid-label { font-weight: 700; font-size: 16px; margin: 0 0 6px; letter-spacing: 0.05em; }
 .avoid-copy  { font-size: 14px; color: var(--ink-2); line-height: 1.8; margin: 0; }
+*/
 
 .dishes-section { padding-top: 30px; }
 .dishes-toggle {

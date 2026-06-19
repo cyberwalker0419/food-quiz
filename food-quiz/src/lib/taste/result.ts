@@ -7,7 +7,6 @@ import {
   loadExtreme,
   loadSynergy,
   loadAllround,
-  loadAvoid,
   loadDishes,
   type DishEntry,
 } from './loaders';
@@ -54,12 +53,6 @@ export interface RenderedAllround {
   copy: string;
 }
 
-export interface RenderedAvoid {
-  letter: TasteLetter;
-  label: string;
-  copy: string;
-}
-
 export interface AssembledResult {
   /** 归一化 [0, 100] 后的 8 维向量 */
   vector: DimensionVector;
@@ -77,9 +70,7 @@ export interface AssembledResult {
   synergy: RenderedSynergy | null;
   /** 全能文案(std < 15 触发,替换 256 区间文案分支) */
   allround: RenderedAllround | null;
-  /** 避雷指南(永远显示) */
-  avoid: RenderedAvoid | null;
-  /** 推荐菜(Phase 5 才有 dishes.json) */
+  /** 推荐菜(Phase 5 才有 dishes.json;每菜系最多 1 道,跨菜系多样) */
   topDishes: DishEntry[];
   /** 8 维档位标签,供雷达图轴标注 */
   tierLabels: Record<TasteLetter, string>;
@@ -96,21 +87,6 @@ function pickTop2High(v: DimensionVector): { a: TasteLetter; b: TasteLetter } | 
   const top2 = sorted[1]!;
   if (top1.value <= HIGH_THRESHOLD || top2.value <= HIGH_THRESHOLD) return null;
   return { a: top1.letter, b: top2.letter };
-}
-
-/** 最低分维度的字母 */
-function pickMinLetter(v: DimensionVector): TasteLetter {
-  let minLetter: TasteLetter = DIMS[0] as TasteLetter;
-  let minVal = v[letterToDim(DIMS[0] as TasteLetter)];
-  for (let i = 1; i < DIMS.length; i++) {
-    const l = DIMS[i] as TasteLetter;
-    const val = v[letterToDim(l)];
-    if (val < minVal) {
-      minVal = val;
-      minLetter = l;
-    }
-  }
-  return minLetter;
 }
 
 /** 从 copy 数组里随机选 1 条;copy 是字符串则原样返回 */
@@ -223,22 +199,37 @@ export function assembleResult(
     if (entry) allround = { label: entry.label, copy: pickOne(entry.copy) };
   }
 
-  // avoid(永远显示)
-  let avoid: RenderedAvoid | null = null;
-  const minLetter = pickMinLetter(v);
-  const avoidEntry = loadAvoid(minLetter.toLowerCase());
-  if (avoidEntry) {
-    avoid = { letter: minLetter, label: avoidEntry.label, copy: pickOne(avoidEntry.copy) };
-  }
+  // 避雷指南已下线(avoid 字段不再生成;loadAvoid 数据保留以备将来恢复)
 
-  // topDishes —— 仅从日常/知名菜（popular）推荐，过滤冷门地方菜
+  // topDishes —— 从日常/知名菜(popular)推荐;每菜系最多 1 道、每地区最多 1 道,
+  // 避免同类菜(同菜系/同省份)挤占 Top N,实现跨菜系多样性。
   let topDishes: DishEntry[] = [];
   const dishes = loadDishes();
   if (dishes) {
     const popular = dishes.filter((d) => d.popular !== false);
-    const scored = popular.map((d) => ({ d, score: blendedScore(v, d.vector) }));
-    scored.sort((x, y) => y.score - x.score);
-    topDishes = scored.slice(0, topNDishes).map((s) => s.d);
+    const scored = popular
+      .map((d) => ({ d, score: blendedScore(v, d.vector) }))
+      .sort((x, y) => y.score - x.score);
+    const usedCuisines = new Set<string>();
+    const usedRegions = new Set<string>();
+    for (const { d } of scored) {
+      if (topDishes.length >= topNDishes) break;
+      if (d.cuisine && usedCuisines.has(d.cuisine)) continue;
+      if (d.region && usedRegions.has(d.region)) continue;
+      topDishes.push(d);
+      if (d.cuisine) usedCuisines.add(d.cuisine);
+      if (d.region) usedRegions.add(d.region);
+    }
+    // 若多样性约束下数量不足(topNDishes),放宽到仅菜系约束再补
+    if (topDishes.length < topNDishes) {
+      for (const { d } of scored) {
+        if (topDishes.length >= topNDishes) break;
+        if (topDishes.includes(d)) continue;
+        if (d.cuisine && usedCuisines.has(d.cuisine)) continue;
+        topDishes.push(d);
+        if (d.cuisine) usedCuisines.add(d.cuisine);
+      }
+    }
   }
 
   return {
@@ -250,7 +241,6 @@ export function assembleResult(
     extremes,
     synergy,
     allround,
-    avoid,
     topDishes,
     tierLabels,
   };
