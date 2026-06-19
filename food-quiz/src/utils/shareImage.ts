@@ -303,7 +303,7 @@ export function drawShareCard(canvas: HTMLCanvasElement, data: ShareCardData) {
 
   // ── 极档警告(朱砂) ──
   if (r.extremes.length > 0) {
-    const exY = 740
+    const exY = 768
     ctx.textAlign = 'left'
     ctx.textBaseline = 'middle'
     ctx.fillStyle = INK_3
@@ -324,8 +324,8 @@ export function drawShareCard(canvas: HTMLCanvasElement, data: ShareCardData) {
     ctx.textBaseline = 'alphabetic'
     ctx.fillStyle = INK_3
     ctx.font = `500 13px ${FONT_SERIF}`
-    ctx.fillText('为你推荐', W / 2, 832)
-    drawTopDishes(ctx, r.topDishes, 40, 852, W - 80, FONT_SERIF)
+    ctx.fillText('为你推荐', W / 2, 852)
+    drawTopDishes(ctx, r.topDishes, 40, 872, W - 80, FONT_SERIF)
   }
 
   // ── footer(双线 + 毛笔标语) ──
