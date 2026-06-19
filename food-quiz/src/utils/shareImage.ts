@@ -289,7 +289,7 @@ export function drawShareCard(canvas: HTMLCanvasElement, data: ShareCardData) {
   const radarY = 400
   ctx.save()
   ctx.translate((W - radarSize) / 2, radarY - radarSize / 2)
-  drawRadarChart(ctx, r.allIntervals, radarSize, { fontFamily: FONT_SERIF })
+  drawRadarChart(ctx, r.allIntervals, radarSize, { fontFamily: FONT_SERIF, padding: radarSize * 0.15 })
   ctx.restore()
 
   // ── 八维档位明细 ──
@@ -316,23 +316,6 @@ export function drawShareCard(canvas: HTMLCanvasElement, data: ShareCardData) {
     ctx.fillStyle = INK_2
     ctx.font = `400 11px ${FONT_SERIF}`
     ctx.fillText((ex.copy[0] || '').slice(0, 24), 40, exY + 20)
-  }
-
-  // ── 避雷指南 ──
-  if (r.avoid) {
-    const avY = 788
-    ctx.textAlign = 'left'
-    ctx.textBaseline = 'middle'
-    ctx.fillStyle = INK_3
-    ctx.font = `500 13px ${FONT_SERIF}`
-    ctx.fillText('避雷指南', 40, avY)
-    ctx.fillStyle = INK
-    ctx.font = `600 13px ${FONT_SERIF}`
-    ctx.fillText(r.avoid.label, 130, avY)
-    ctx.fillStyle = INK_2
-    ctx.font = `400 11px ${FONT_SERIF}`
-    const lines = wrapText(ctx, r.avoid.copy, W - 80)
-    ctx.fillText((lines[0] || '').slice(0, 30), 40, avY + 20)
   }
 
   // ── 推荐菜 ──

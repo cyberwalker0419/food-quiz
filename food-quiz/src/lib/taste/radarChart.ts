@@ -52,10 +52,13 @@ function roundRectPath(
 export interface RadarDrawOptions {
   /** 中文字体栈,默认 'sans-serif' */
   fontFamily?: string;
+  /** 画布内边距(像素),让轴标签不被画布边裁掉;默认 40 */
+  padding?: number;
 }
 
 /**
- * 在 ctx 上绘制 8 轴雷达图。坐标系相对 (0, 0),中心在 (size/2, size/2)。
+ * 在 ctx 上绘制 8 轴雷达图。坐标系相对 (0, 0),画布尺寸 = size,雷达图本身居中。
+ * 画布内边距 = opts.padding(默认 40),保证"中文 + grade 徽章"标签不被裁。
  * 如果要画在画布的某个位置,先 ctx.save() / ctx.translate(x, y) / ctx.restore()。
  */
 export function drawRadarChart(
@@ -65,11 +68,13 @@ export function drawRadarChart(
   opts: RadarDrawOptions = {},
 ): void {
   const fontFamily = opts.fontFamily ?? 'sans-serif';
+  const padding = opts.padding ?? 40;
   const N = 8;
   const cx = size / 2;
   const cy = size / 2;
-  const R = size * 0.38;
-  const labelOffset = size * 0.10;
+  // 雷达图半径 = 可用半径(画布半宽 - 内边距),确保轴标签(中文+徽章 ≈ 28px)整体落在画布内
+  const R = Math.max(60, (size / 2) - padding);
+  const labelOffset = Math.max(28, padding * 0.4);
 
   // 填底色(避免 PNG 透明区域在某些导出路径下显示为黑色;与 shareImage 背景渐变中段色 #fff5f0 一致)
   ctx.fillStyle = '#fff5f0';

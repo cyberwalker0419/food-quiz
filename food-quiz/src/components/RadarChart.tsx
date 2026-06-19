@@ -27,7 +27,7 @@ export function RadarChart({ intervals, size = 320, fontFamily }: Props) {
     const ctx = canvas.getContext('2d');
     if (!ctx) return;
     ctx.scale(dpr, dpr);
-    drawRadarChart(ctx, intervals, size, { fontFamily });
+    drawRadarChart(ctx, intervals, size, { fontFamily, padding: 44 });
   }, [intervals, size, fontFamily]);
 
   return <canvas ref={ref} className="radar-chart" data-testid="radar-chart" />;
