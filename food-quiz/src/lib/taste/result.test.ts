@@ -2,6 +2,20 @@ import { describe, it, expect } from 'vitest';
 import { assembleResult } from './result';
 import { ZERO_VECTOR, type WeightVector } from './types';
 
+describe('assembleResult — 味觉特征去重', () => {
+  it('多维高档时,top3 的 copy 不全相同(高档维度不再共享 interval 文案)', () => {
+    // spicy/salty/rich 三维高档:归一化后都 > 60,top3 即这三维
+    const r = assembleResult({ ...ZERO_VECTOR, spicy: 90, salty: 85, rich: 80 });
+    expect(r.intervals.length).toBe(3);
+    const copies = r.intervals.map((iv) => iv.copy);
+    const unique = new Set(copies).size;
+    expect(unique, `top3 copy 重复: ${copies.join(' | ')}`).toBeGreaterThan(1);
+    // label 同样不应全相同
+    const labels = r.intervals.map((iv) => iv.label);
+    expect(new Set(labels).size, `top3 label 重复: ${labels.join(' | ')}`).toBeGreaterThan(1);
+  });
+});
+
 describe('assembleResult — 4 典型输入', () => {
   it('全低:无 synergy,无 extremes,渲染管线不崩', () => {
     const v: WeightVector = { ...ZERO_VECTOR, sour: -10, sweet: -5 };

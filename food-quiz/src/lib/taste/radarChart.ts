@@ -119,8 +119,10 @@ export function drawRadarChart(
     ctx.fillStyle = LABEL_COLOR;
     ctx.font = `500 ${labelFontSize}px ${fontFamily}`;
     ctx.fillText(DIM_CHINESE[i]!, lx, ly - GRADE_BADGE_H * 0.7);
-    // 下行:grade 徽章(填 grade 色,白字,粗体)
-    const grade = intervals[i]?.grade ?? 'E';
+    // 下行:grade 徽章(按轴 letter 查对应 interval,不能用数组索引——
+    // 传入的 intervals 是按 |value-50| 排序的,与 DIMS 轴顺序不一致)
+    const axisIv = intervals.find((iv) => iv.letter === DIMS[i]);
+    const grade = axisIv?.grade ?? 'E';
     const bx = lx - GRADE_BADGE_W / 2;
     const by = ly + GRADE_BADGE_H * 0.2;
     ctx.fillStyle = GRADE_COLORS[grade];

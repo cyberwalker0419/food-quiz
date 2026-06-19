@@ -184,6 +184,18 @@ export function assembleResult(
   allIntervals.sort((x, y) => Math.abs(y.value - 50) - Math.abs(x.value - 50));
   const intervals = allIntervals.slice(0, topNIntervals);
 
+  // 味觉特征去重:所有高档维度共享同一条 interval 文案(整体组合的 label+copy),
+  // top1 保留整体文案,其余高档维度改用 tierLabel + 维度独立描述,
+  // 避免 ResultCard「味觉特征」top3 显示三条一模一样。
+  const topLabel = intervals[0]?.label ?? '';
+  const topCopy = intervals[0]?.copy ?? '';
+  for (let i = 1; i < intervals.length; i++) {
+    const iv = intervals[i]!;
+    if (!iv.isHigh) continue;
+    if (iv.label === topLabel) iv.label = iv.tierLabel;
+    if (iv.copy === topCopy) iv.copy = `${letterToChinese(iv.letter)}味偏好突出，${iv.tierLabel}`;
+  }
+
   // extremes
   const extremes: RenderedExtreme[] = [];
   for (const r of allIntervals) {
