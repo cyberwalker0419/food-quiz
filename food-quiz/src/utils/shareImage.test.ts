@@ -199,13 +199,17 @@ describe('P8.3 分享图文案补全', () => {
     }
   });
 
-  it('drawShareCard 推荐菜 3 道以"🍴 菜名"形式出现', () => {
+  it('drawShareCard 推荐菜 3 道(菜名 + 菜系,去 emoji)', () => {
     drawShareCard(canvas as unknown as HTMLCanvasElement, makeData());
     const texts = ctx.fillText.mock.calls.map((c: any[]) => c[0]);
-    const joined = texts.join('|');
-    expect(joined).toContain('🍴 麻婆豆腐');
-    expect(joined).toContain('🍴 小笼包');
-    expect(joined).toContain('🍴 北京烤鸭');
+    // 菜名(墨)单独绘制
+    expect(texts).toContain('麻婆豆腐');
+    expect(texts).toContain('小笼包');
+    expect(texts).toContain('北京烤鸭');
+    // 菜系(朱砂)紧跟菜名,形如 " · 川菜"
+    expect(texts).toContain(' · 川菜');
+    expect(texts).toContain(' · 江浙菜');
+    expect(texts).toContain(' · 京菜');
     expect(texts).toContain('为你推荐');
   });
 
@@ -230,11 +234,11 @@ describe('P8.3 分享图文案补全', () => {
     expect(texts).toContain('全能味觉');
   });
 
-  it('drawShareCard 雷达图缩到 280(原 320)节省空间给 8 维明细', () => {
+  it('drawShareCard 八维档位标题 + footer 毛笔标语(去 emoji)', () => {
     drawShareCard(canvas as unknown as HTMLCanvasElement, makeData());
     const texts = ctx.fillText.mock.calls.map((c: any[]) => c[0]);
-    expect(texts).toContain('8 维档位明细');
-    expect(texts).toContain('🍽️ 测测你的味觉灵魂');
+    expect(texts).toContain('八维档位');
+    expect(texts).toContain('测 测 你 的 味 觉 灵 魂');
   });
 
   it('P9.x synergy.label 与 mainCopy y 坐标互斥 + mainCopy 不侵入雷达图区域', () => {
