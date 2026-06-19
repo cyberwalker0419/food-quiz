@@ -85,7 +85,8 @@ function App() {
       }
       setPhase('calculating')
       setTimeout(() => {
-        const assembled = assembleResult(newState.profile)
+        // 每次进入 result 都用独立 seed,让推荐菜锚点随机化(同画像每次推不同)
+        const assembled = assembleResult(newState.profile, { seed: Math.floor(Math.random() * 1_000_000) })
         setResult(assembled)
         setShowConfetti(true)
         setPhase('result')

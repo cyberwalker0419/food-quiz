@@ -161,6 +161,24 @@ describe('assembleResult — 推荐菜只取日常/知名菜', () => {
       }
     }
   });
+
+  it('seed 不同 → 同画像也能推到不同的菜(打破"两次测试推同一道菜")', () => {
+    const profile = { ...ZERO_VECTOR, spicy: 90, salty: 80, rich: 70 };
+    const seenAnchors = new Set<string>();
+    for (let s = 0; s < 12; s++) {
+      const r = assembleResult(profile, { seed: s * 137 + 1 });
+      if (r.topDishes[0]) seenAnchors.add(r.topDishes[0].name);
+    }
+    // 12 次抽样应至少出现 3 种不同的锚点菜
+    expect(seenAnchors.size, `12 次抽样仅 ${seenAnchors.size} 种锚点: ${[...seenAnchors].join(',')}`).toBeGreaterThanOrEqual(3);
+  });
+
+  it('同 seed → 确定性(便于测试与"重新生成"按钮)', () => {
+    const profile = { ...ZERO_VECTOR, spicy: 80, rich: 70 };
+    const r1 = assembleResult(profile, { seed: 42 });
+    const r2 = assembleResult(profile, { seed: 42 });
+    expect(r1.topDishes.map((d) => d.name)).toEqual(r2.topDishes.map((d) => d.name));
+  });
 });
 
 describe('assembleResult — 5 等级 grade 字段(视觉层)', () => {

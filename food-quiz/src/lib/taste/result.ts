@@ -17,6 +17,18 @@ const EXTREME_THRESHOLD = 90;   // master §三-2
 const DEFAULT_TOP_N_INTERVALS = 3;
 const DEFAULT_TOP_N_DISHES = 5;
 
+/** Mulberry32 PRNG(从 adaptiveSelector 复制,避免跨模块依赖)。 */
+function mulberry32(seed: number): () => number {
+  let a = seed >>> 0;
+  return function () {
+    a = (a + 0x6d2b79f5) >>> 0;
+    let t = a;
+    t = Math.imul(t ^ (t >>> 15), t | 1);
+    t ^= t + Math.imul(t ^ (t >>> 7), t | 61);
+    return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
+  };
+}
+
 // ===== 渲染数据结构 =====
 
 export interface RenderedInterval {
@@ -108,10 +120,14 @@ function pickOne(copy: readonly string[] | string | undefined): string {
  */
 export function assembleResult(
   raw: WeightVector,
-  options?: { topNIntervals?: number; topNDishes?: number; maxAbs?: number },
+  options?: { topNIntervals?: number; topNDishes?: number; maxAbs?: number; seed?: number },
 ): AssembledResult {
   const topNIntervals = options?.topNIntervals ?? DEFAULT_TOP_N_INTERVALS;
   const topNDishes = options?.topNDishes ?? DEFAULT_TOP_N_DISHES;
+  // session seed:同一画像每次进入 result 阶段传不同 seed,推荐菜锚点
+  // 从 Top-K 高分池里加权抽样,避免"两次测试推到一样的菜"。
+  // 若不传,默认用 Math.random,保持调用方不感知;测试需要确定性时显式传值。
+  const rng = options?.seed !== undefined ? mulberry32(options.seed) : Math.random;
 
   const v = normalize(raw, options?.maxAbs);
   const s = std(v);
@@ -213,9 +229,22 @@ export function assembleResult(
     const popular = dishes.filter((d) => d.popular !== false);
     const scored = popular.map((d) => ({ d, score: blendedScore(v, d.vector) }));
     scored.sort((a, b) => b.score - a.score);
-    // 第一道:取最高 blendedScore(锚点)
-    if (scored[0]) topDishes.push(scored[0].d);
-    // 后续:MMR
+    // 第一道:从 Top-K 高分池加权抽样(同画像每次结果不同)
+    const ANCHOR_POOL = Math.min(8, scored.length);
+    const pool = scored.slice(0, ANCHOR_POOL);
+    if (pool.length > 0) {
+      // 软化分数差(避免 Top1 永远胜),再按 score^2 加权
+      const weights = pool.map((p) => Math.max(0.001, p.score) ** 2);
+      const total = weights.reduce((a, b) => a + b, 0);
+      let r = rng() * total;
+      let pickedIdx = 0;
+      for (let i = 0; i < weights.length; i++) {
+        r -= weights[i]!;
+        if (r <= 0) { pickedIdx = i; break; }
+      }
+      topDishes.push(pool[pickedIdx]!.d);
+    }
+    // 后续:MMR(确定性,因为锚点已随机化够了)
     while (topDishes.length < topNDishes) {
       let bestIdx = -1;
       let bestMMR = -Infinity;
