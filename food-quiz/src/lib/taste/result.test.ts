@@ -135,42 +135,26 @@ describe('assembleResult — 推荐菜只取日常/知名菜', () => {
     }
   });
 
-  it('topDishes 跨菜系多样(每菜系最多 1 道)+ 地区不重复', () => {
+  it('topDishes 不重菜名(同菜系/同地区允许)', () => {
     const r = assembleResult({ ...ZERO_VECTOR, spicy: 90, salty: 80, rich: 70 });
     expect(r.topDishes.length).toBeGreaterThan(1);
-    const cuisines = r.topDishes.map((d) => d.cuisine).filter(Boolean);
-    expect(new Set(cuisines).size).toBe(cuisines.length); // 菜系两两不同
-    const regions = r.topDishes.map((d) => d.region).filter(Boolean);
-    expect(new Set(regions).size).toBe(regions.length); // 地区两两不同
+    const names = r.topDishes.map((d) => d.name);
+    expect(new Set(names).size).toBe(names.length); // 菜名两两不同
   });
 
-  it('MMR 软禁:两道菜向量余弦低才同时入选(避免相似菜扎堆)', () => {
-    const r = assembleResult({ ...ZERO_VECTOR, spicy: 90, salty: 80, rich: 70 });
-    expect(r.topDishes.length).toBeGreaterThanOrEqual(2);
-    // 任意两道推荐菜的向量余弦应 < 0.95(显著不同)
-    const vecs = r.topDishes.map((d) => d.vector);
-    for (let i = 0; i < vecs.length; i++) {
-      for (let j = i + 1; j < vecs.length; j++) {
-        const a = vecs[i]!, b = vecs[j]!;
-        const dot = (['sour','sweet','bitter','spicy','salty','rich','crunchy','tender'] as const)
-          .reduce((s, k) => s + (a[k] ?? 0) * (b[k] ?? 0), 0);
-        const ma = Math.sqrt((['sour','sweet','bitter','spicy','salty','rich','crunchy','tender'] as const).reduce((s, k) => s + (a[k] ?? 0) ** 2, 0));
-        const mb = Math.sqrt((['sour','sweet','bitter','spicy','salty','rich','crunchy','tender'] as const).reduce((s, k) => s + (b[k] ?? 0) ** 2, 0));
-        const sim = ma && mb ? dot / (ma * mb) : 0;
-        expect(sim, `两道菜(${r.topDishes[i]!.name} vs ${r.topDishes[j]!.name}) 向量余弦=${sim.toFixed(3)} ≥ 0.95,过相似`).toBeLessThan(0.95);
-      }
-    }
-  });
-
-  it('seed 不同 → 同画像也能推到不同的菜(打破"两次测试推同一道菜")', () => {
+  it('seed 不同 → 同画像推到不同的菜组合(匹配池随机抽样)', () => {
     const profile = { ...ZERO_VECTOR, spicy: 90, salty: 80, rich: 70 };
-    const seenAnchors = new Set<string>();
-    for (let s = 0; s < 12; s++) {
+    const seenFirst = new Set<string>();
+    const seenAll = new Set<string>();
+    for (let s = 0; s < 20; s++) {
       const r = assembleResult(profile, { seed: s * 137 + 1 });
-      if (r.topDishes[0]) seenAnchors.add(r.topDishes[0].name);
+      if (r.topDishes[0]) seenFirst.add(r.topDishes[0].name);
+      for (const d of r.topDishes) seenAll.add(d.name);
     }
-    // 12 次抽样应至少出现 3 种不同的锚点菜
-    expect(seenAnchors.size, `12 次抽样仅 ${seenAnchors.size} 种锚点: ${[...seenAnchors].join(',')}`).toBeGreaterThanOrEqual(3);
+    // 20 次抽样:第一道至少 4 种不同的菜(锚点不固定)
+    expect(seenFirst.size, `20 次仅 ${seenFirst.size} 种第一道: ${[...seenFirst].join(',')}`).toBeGreaterThanOrEqual(4);
+    // 总体应见 ≥ 8 种不同的菜(池足够宽)
+    expect(seenAll.size, `20 次合计仅 ${seenAll.size} 种菜`).toBeGreaterThanOrEqual(8);
   });
 
   it('同 seed → 确定性(便于测试与"重新生成"按钮)', () => {

@@ -1,7 +1,7 @@
 import type { WeightVector, DimensionVector, TasteLetter } from './types';
 import { DIMS, letterToChinese, letterToTierLabel, letterToDim, indexToKey, valueToGrade, type Grade } from './keys';
 import { normalize, std } from './normalize';
-import { blendedScore, cosineSim } from './similarity';
+import { blendedScore } from './similarity';
 import {
   loadInterval,
   loadExtreme,
@@ -217,24 +217,29 @@ export function assembleResult(
 
   // 避雷指南已下线(avoid 字段不再生成;loadAvoid 数据保留以备将来恢复)
 
-  // topDishes —— MMR(最大边际相关性)选菜:
+  // topDishes —— 「匹配池内加权随机抽样」选菜:
   //   - 仅从 popular 库(过滤冷门)
-  //   - 硬禁:同菜系、同地区(彻底避免扎堆)
-  //   - 软禁:与已选菜向量余弦 ≥ 0.85 视为同质化,降权而非直接排除
-  //   - 综合分 = 0.5 × blendedScore + 0.5 × (1 − maxCosineToSelected)
-  //   - 候选耗尽仍不足 topNDishes → 仅硬禁 + 余弦 < 0.95 兜底
+  //   - 候选池 = blendedScore ≥ 0.6 × 最高分 的所有菜(动态阈值,不限定个数)
+  //   - 池太小(< topN) 时放宽到全 popular,保证至少能凑齐 topN
+  //   - 池内按 score² 加权抽样(高分易中、低分仍有机会)
+  //   - 唯一硬约束:不重菜名(同菜系/同地区都允许)
+  //   - 同 seed → 确定性(测试可复现);App.tsx 每次进 result 阶段传新 seed → 每次随机不同
   let topDishes: DishEntry[] = [];
   const dishes = loadDishes();
   if (dishes) {
     const popular = dishes.filter((d) => d.popular !== false);
     const scored = popular.map((d) => ({ d, score: blendedScore(v, d.vector) }));
     scored.sort((a, b) => b.score - a.score);
-    // 第一道:从 Top-K 高分池加权抽样(同画像每次结果不同)
-    const ANCHOR_POOL = Math.min(8, scored.length);
-    const pool = scored.slice(0, ANCHOR_POOL);
-    if (pool.length > 0) {
-      // 软化分数差(避免 Top1 永远胜),再按 score^2 加权
-      const weights = pool.map((p) => Math.max(0.001, p.score) ** 2);
+    const topScore = scored[0]?.score ?? 0;
+    // 匹配池:分数 ≥ 60% 最高分;若池内不足 topN,扩到全库保证可凑齐
+    const MATCH_RATIO = 0.6;
+    let pool = scored.filter((s) => s.score >= topScore * MATCH_RATIO);
+    if (pool.length < topNDishes) pool = scored;
+    // 加权随机抽 topN 道(按 score² 加权,无放回)
+    const seenNames = new Set<string>();
+    const remaining = pool.slice();
+    while (topDishes.length < topNDishes && remaining.length > 0) {
+      const weights = remaining.map((p) => Math.max(0.001, p.score) ** 2);
       const total = weights.reduce((a, b) => a + b, 0);
       let r = rng() * total;
       let pickedIdx = 0;
@@ -242,37 +247,10 @@ export function assembleResult(
         r -= weights[i]!;
         if (r <= 0) { pickedIdx = i; break; }
       }
-      topDishes.push(pool[pickedIdx]!.d);
-    }
-    // 后续:MMR(确定性,因为锚点已随机化够了)
-    while (topDishes.length < topNDishes) {
-      let bestIdx = -1;
-      let bestMMR = -Infinity;
-      for (let i = 0; i < scored.length; i++) {
-        const cand = scored[i]!;
-        if (topDishes.includes(cand.d)) continue;
-        if (cand.d.cuisine && topDishes.some((p) => p.cuisine === cand.d.cuisine)) continue;
-        if (cand.d.region && topDishes.some((p) => p.region === cand.d.region)) continue;
-        let maxSim = 0;
-        for (const p of topDishes) {
-          const s = cosineSim(cand.d.vector, p.vector);
-          if (s > maxSim) maxSim = s;
-        }
-        const mmr = 0.5 * cand.score + 0.5 * (1 - maxSim);
-        if (mmr > bestMMR) { bestMMR = mmr; bestIdx = i; }
-      }
-      if (bestIdx < 0) break;
-      topDishes.push(scored[bestIdx]!.d);
-    }
-    // 兜底:候选被硬禁耗尽(topNDishes 不够)→ 放宽,允许同菜系但要求向量余弦 < 0.95
-    if (topDishes.length < topNDishes) {
-      for (const { d } of scored) {
-        if (topDishes.length >= topNDishes) break;
-        if (topDishes.includes(d)) continue;
-        if (d.region && topDishes.some((p) => p.region === d.region)) continue;
-        const maxSim = topDishes.reduce((m, p) => Math.max(m, cosineSim(d.vector, p.vector)), 0);
-        if (maxSim < 0.95) topDishes.push(d);
-      }
+      const picked = remaining.splice(pickedIdx, 1)[0]!;
+      if (seenNames.has(picked.d.name)) continue; // 去重菜名
+      seenNames.add(picked.d.name);
+      topDishes.push(picked.d);
     }
   }
 
