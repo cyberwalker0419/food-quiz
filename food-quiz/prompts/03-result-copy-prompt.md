@@ -238,7 +238,8 @@
 ```json
 {
   "module": "allround",
-  "files": ["01.json", "02.json", "03.json", "04.json"]
+  "id": "_index",
+  "ids": ["01", "02", "03", "04"]
 }
 ```
 

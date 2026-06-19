@@ -245,7 +245,7 @@ console.log('✅ synergies 11 已润色');
 // ============================================================
 // allround:5 条(手写润色,去 "敞开大门" 翻译腔)
 // ============================================================
-writeJSON('allround/_index.json', { module: 'allround', files: ['01.json', '02.json', '03.json', '04.json'] });
+writeJSON('allround/_index.json', { module: 'allround', id: '_index', ids: ['01', '02', '03', '04'] });
 writeJSON('allround/01.json', { id: '01', label: '随和派食客', copy: [
   '你是那种什么都吃得惯的人，餐桌上很少给别人添麻烦',
   '你大概愿意尝试任何菜，对食物保持着不挑剔的好奇',
