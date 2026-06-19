@@ -2,6 +2,7 @@ import { describe, it, expect } from 'vitest';
 import {
   pickNextQuestion,
   shouldStop,
+  detectPursueDims,
   prunedDimensions,
   sharpnessWeight,
   topicVector,
@@ -17,11 +18,16 @@ import {
   COVER_OVERLAP_THRESHOLD,
   TOPIC_OVERLAP_THRESHOLD,
   GLOBAL_DEDUP_WINDOW,
-  CONTRADICTION_STD_THRESHOLD,
+  THEME_SIM,
+  INCONSISTENCY_GAP,
+  STRONG_W,
+  WEAK_W,
+  CLARIFIED_ABS,
 } from './adaptiveSelector';
 import type { Sharpness, WeightVector } from './types';
 import { normalize, cosineSim } from './normalize';
 import { ZERO_VECTOR } from './types';
+import { questionBank } from '../../content/questions/questions.loader';
 
 function makeState(askedIds: string[], answers: { questionId: string }[], profile: WeightVector) {
   return { askedIds, answers, profile };
@@ -73,7 +79,7 @@ describe('pickNextQuestion', () => {
   });
 
   it('剪枝生效:profile bitter ≤ -30,问 3 题后,后续题不应触发 bitter', () => {
-    const answers: { questionId: string }[] = [];
+    const answers: { questionId: string; weights?: WeightVector }[] = [];
     const askedIds: string[] = [];
     let profile: WeightVector = { ...ZERO_VECTOR };
     for (let i = 0; i < 3; i++) {
@@ -117,7 +123,7 @@ describe('pickNextQuestion', () => {
       for (let t = 0; t < targets.length; t++) {
         const targetVec = targets[t]!;
         const askedIds: string[] = [];
-        const answers: { questionId: string }[] = [];
+        const answers: { questionId: string; weights?: WeightVector }[] = [];
         let profile: WeightVector = { ...ZERO_VECTOR };
         for (let step = 0; step < 60; step++) {
           const q = pickNextQuestion(makeState(askedIds, answers, profile), seed * 1000 + t * 100 + step);
@@ -140,7 +146,7 @@ describe('pickNextQuestion', () => {
           for (const k of Object.keys(profile) as (keyof WeightVector)[]) {
             profile[k] += bestOpt.weights[k] || 0;
           }
-          const stop = shouldStop({ askedIds, profile }, 0.5);
+          const stop = shouldStop({ askedIds, answers, profile });
           if (stop) break;
         }
         // 范围断言
@@ -162,17 +168,17 @@ describe('pickNextQuestion', () => {
   });
 });
 
-describe('shouldStop', () => {
-  it('count < MIN → 不停', () => {
-    expect(shouldStop({ askedIds: new Array(MIN_QUESTIONS - 1).fill('q'), profile: ZERO_VECTOR }, 1)).toBe(false);
+describe('shouldStop(动态 25–45 追问)', () => {
+  it('count < MIN(25) → 不停(基础题必答)', () => {
+    expect(shouldStop({ askedIds: new Array(MIN_QUESTIONS - 1).fill('q'), answers: [], profile: ZERO_VECTOR })).toBe(false);
   });
 
-  it('count >= MAX → 必停', () => {
-    expect(shouldStop({ askedIds: new Array(MAX_QUESTIONS).fill('q'), profile: ZERO_VECTOR }, 1)).toBe(true);
+  it('count >= MAX(45) → 必停(硬上限)', () => {
+    expect(shouldStop({ askedIds: new Array(MAX_QUESTIONS).fill('q'), answers: [], profile: ZERO_VECTOR })).toBe(true);
   });
 
-  it('gain < ε → 停', () => {
-    expect(shouldStop({ askedIds: new Array(MIN_QUESTIONS).fill('q'), profile: ZERO_VECTOR }, 0.1)).toBe(true);
+  it('count = MIN + 无答题历史(无追问维) → 停', () => {
+    expect(shouldStop({ askedIds: new Array(MIN_QUESTIONS).fill('q'), answers: [], profile: ZERO_VECTOR })).toBe(true);
   });
 });
 
@@ -184,23 +190,23 @@ describe('P6.2 sharpnessWeight', () => {
   it('early (count<10) sharp → 低于 smooth(差距大,匹配差)', () => {
     expect(sharpnessWeight(0, 'sharp')).toBeLessThan(sharpnessWeight(0, 'smooth'));
   });
-  it('late (count≥20) sharp → 高于 smooth(匹配好)', () => {
+  it('late (count≥25) sharp → 高于 smooth(匹配好)', () => {
     expect(sharpnessWeight(25, 'sharp')).toBeGreaterThan(sharpnessWeight(25, 'smooth'));
   });
-  it('mid (10≤count<20) 过渡:接近 0.25(对称中点)', () => {
-    // count=15 → target=0.5, sharp/smooth 距 0.5 各 0.5 → weight=0.25
-    expect(sharpnessWeight(15, 'smooth')).toBeCloseTo(0.25, 1);
-    expect(sharpnessWeight(15, 'sharp')).toBeCloseTo(0.25, 1);
+  it('mid (12≤count<25) 过渡:接近 0.25(对称中点)', () => {
+    // earlyEnd=⌊25/2⌋=12, lateStart=25;中点≈18.5 → count=18 时 target≈0.49,sharp/smooth 接近 0.25
+    expect(sharpnessWeight(18, 'smooth')).toBeCloseTo(0.25, 1);
+    expect(sharpnessWeight(18, 'sharp')).toBeCloseTo(0.25, 1);
   });
   it('边界:count=9 (early) 仍 dominant smooth', () => {
     // count=9 → target=0.4,smooth=0 → diff=0.4 → weight=0.4
     // sharp=1 → diff=0.6 → weight=max(0,1-0.9)=0.1
     expect(sharpnessWeight(9, 'smooth')).toBeGreaterThan(sharpnessWeight(9, 'sharp'));
   });
-  it('边界:count=20 (late) 仍 dominant sharp', () => {
-    // count=20 → target=0.6,sharp=1 → diff=0.4 → weight=0.4
+  it('边界:count=26 (late,≥25) 仍 dominant sharp', () => {
+    // count=26 ≥ lateStart=25 → target=0.6;sharp=1 → diff=0.4 → weight=0.4
     // smooth=0 → diff=0.6 → weight=0.1
-    expect(sharpnessWeight(20, 'sharp')).toBeGreaterThan(sharpnessWeight(20, 'smooth'));
+    expect(sharpnessWeight(26, 'sharp')).toBeGreaterThan(sharpnessWeight(26, 'smooth'));
   });
   it('返回值 ∈ [0, 1]', () => {
     for (const c of [0, 5, 10, 15, 20, 25, 40]) {
@@ -271,7 +277,7 @@ describe('P6.2 犀利度分层(集成测试)', () => {
     // 模拟 25 题
     const askedIds: string[] = [];
     let profile: WeightVector = { ...ZERO_VECTOR };
-    const answers: { questionId: string }[] = [];
+    const answers: { questionId: string; weights?: WeightVector }[] = [];
     for (let step = 0; step < 25; step++) {
       const q = pickNextQuestion(makeState(askedIds, answers, profile), 200 + step);
       if (!q) break;
@@ -299,11 +305,11 @@ describe('P6.2 完全重复判定', () => {
 });
 
 describe('P6.2 追问策略(集成)', () => {
-  it('完整 20 题流程不出错', () => {
+  it('完整 25 题流程不出错', () => {
     const askedIds: string[] = [];
     let profile: WeightVector = { ...ZERO_VECTOR };
-    const answers: { questionId: string }[] = [];
-    for (let step = 0; step < 20; step++) {
+    const answers: { questionId: string; weights?: WeightVector }[] = [];
+    for (let step = 0; step < 25; step++) {
       const q = pickNextQuestion(makeState(askedIds, answers, profile), 300 + step);
       if (!q) break;
       askedIds.push(q.id);
@@ -348,23 +354,66 @@ describe('P7.1 四级全局去重', () => {
   });
 });
 
-describe('P7.1 矛盾追问豁免', () => {
-  it('CONTRADICTION_STD_THRESHOLD 在合理范围', () => {
-    expect(CONTRADICTION_STD_THRESHOLD).toBeGreaterThan(0);
-    expect(CONTRADICTION_STD_THRESHOLD).toBeLessThan(100);
+describe('detectPursueDims(追问维度:同主题不一致 ∪ 同维强弱波动)', () => {
+  it('常量合理', () => {
+    expect(THEME_SIM).toBeGreaterThan(0);
+    expect(INCONSISTENCY_GAP).toBeGreaterThan(0);
+    expect(STRONG_W).toBeGreaterThan(WEAK_W);
+    expect(CLARIFIED_ABS).toBeGreaterThan(STRONG_W);
   });
 
-  it('跨维 delta 剧烈波动时 pickNextQuestion 不抛错', () => {
+  it('无答题历史 → 空集(不会假阳性)', () => {
+    expect(detectPursueDims([], ZERO_VECTOR).size).toBe(0);
+  });
+
+  it('answers 缺 questionId/weights 时安全降级(返回空集)', () => {
+    const answers: { questionId?: string; weights?: WeightVector }[] = [{}, {}];
+    expect(detectPursueDims(answers, ZERO_VECTOR).size).toBe(0);
+  });
+
+  it('机制 A:真实题库同主题题对不抛错', () => {
+    const q0 = questionBank.questions[0]!;
+    const q1 = questionBank.questions[1]!;
     const answers = [
-      { questionId: 'a0', weights: { ...ZERO_VECTOR, sour: 50 } },
-      { questionId: 'a1', weights: { ...ZERO_VECTOR, sweet: -50 } },
-      { questionId: 'a2', weights: { ...ZERO_VECTOR, bitter: 50 } },
-      { questionId: 'a3', weights: { ...ZERO_VECTOR, spicy: -50 } },
-      { questionId: 'a4', weights: { ...ZERO_VECTOR, salty: 50 } },
+      { questionId: q0.id, weights: q0.options[0]!.weights },
+      { questionId: q1.id, weights: q1.options[0]!.weights },
     ];
-    const askedIds = answers.map((a) => a.questionId);
-    const state = makeState(askedIds, answers, { ...ZERO_VECTOR });
-    expect(() => pickNextQuestion(state, 12345)).not.toThrow();
+    expect(() => detectPursueDims(answers, ZERO_VECTOR)).not.toThrow();
+  });
+
+  it('收敛保证:profile 推到 ≥ CLARIFIED_ABS 后,该维不应再被标记', () => {
+    // 用真实题库构造同主题题对触发机制 A,然后 profile 推过澄清线
+    const q0 = questionBank.questions[0]!;
+    const q1 = questionBank.questions[1]!;
+    const answers = [
+      { questionId: q0.id, weights: q0.options[0]!.weights },
+      { questionId: q1.id, weights: q1.options[q1.options.length - 1]!.weights },
+    ];
+    // profile 全部推过 CLARIFIED_ABS → 任何维都不该出现在追问集
+    const clarified: WeightVector = {
+      sour: CLARIFIED_ABS, sweet: CLARIFIED_ABS, bitter: CLARIFIED_ABS, spicy: CLARIFIED_ABS,
+      salty: CLARIFIED_ABS, rich: CLARIFIED_ABS, crunchy: CLARIFIED_ABS, tender: CLARIFIED_ABS,
+    };
+    expect(detectPursueDims(answers, clarified).size).toBe(0);
+  });
+});
+
+describe('追问阶段:全 session 不重复', () => {
+  it('跑满 MAX 题,所有 id 唯一', () => {
+    const askedIds: string[] = [];
+    const answers: { questionId: string; weights?: WeightVector }[] = [];
+    let profile: WeightVector = { ...ZERO_VECTOR };
+    for (let step = 0; step < MAX_QUESTIONS; step++) {
+      const q = pickNextQuestion(makeState(askedIds, answers, profile), 5000 + step);
+      if (!q) break;
+      askedIds.push(q.id);
+      const opt = q.options[0]!;
+      answers.push({ questionId: q.id, weights: opt.weights });
+      for (const k of Object.keys(profile) as (keyof WeightVector)[]) {
+        profile[k] += opt.weights[k] || 0;
+      }
+    }
+    expect(new Set(askedIds).size).toBe(askedIds.length);
   });
 });
 
@@ -395,7 +444,7 @@ describe('P7.1 回归:5 目标 × 3 seed 出题数 ∈ [20, 45]', () => {
     for (let seed = 1; seed <= 3; seed++) {
       for (let t = 0; t < targets.length; t++) {
         const askedIds: string[] = [];
-        const answers: { questionId: string }[] = [];
+        const answers: { questionId: string; weights?: WeightVector }[] = [];
         let profile: WeightVector = { ...ZERO_VECTOR };
         const target = targets[t]!;
         for (let step = 0; step < 60; step++) {
@@ -408,7 +457,7 @@ describe('P7.1 回归:5 目标 × 3 seed 出题数 ∈ [20, 45]', () => {
           for (const k of Object.keys(profile) as (keyof WeightVector)[]) {
             profile[k] += opt.weights[k] || 0;
           }
-          if (shouldStop({ askedIds, profile }, 0.5)) break;
+          if (shouldStop({ askedIds, answers, profile })) break;
         }
         expect(askedIds.length).toBeGreaterThanOrEqual(MIN_QUESTIONS);
         expect(askedIds.length).toBeLessThanOrEqual(MAX_QUESTIONS);
@@ -451,7 +500,7 @@ describe('P8.1 stem 全 session 软惩罚', () => {
 
   it('软惩罚使 30 题 session 内同 stem 累计 ≤ 3 次(最高频)', () => {
     const askedIds: string[] = [];
-    const answers: { questionId: string }[] = [];
+    const answers: { questionId: string; weights?: WeightVector }[] = [];
     let profile: WeightVector = { ...ZERO_VECTOR };
     for (let step = 0; step < 30; step++) {
       const q = pickNextQuestion(makeState(askedIds, answers, profile), 8000 + step);

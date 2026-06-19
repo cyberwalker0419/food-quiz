@@ -7,11 +7,9 @@ const DIMS: readonly TasteDimension[] = [
   'salty', 'rich', 'crunchy', 'tender',
 ] as const;
 
-/** 题目区间常量(master plan)。 */
-export const MIN_QUESTIONS = 20;
+/** 题目区间常量(master plan):动态 25–45,基础 25 题,自相矛盾才追问至 45。 */
+export const MIN_QUESTIONS = 25;
 export const MAX_QUESTIONS = 45;
-/** 信息增益阈值:累计 < ε 时停止(默认 0.5)。 */
-export const STOP_EPSILON = 0.5;
 /** 剪枝阈值:某维 raw 落入拒绝区的边界。 */
 export const PRUNE_THRESHOLD = -30;
 
@@ -26,8 +24,16 @@ export const COVER_OVERLAP_THRESHOLD = 3;
 export const TOPIC_OVERLAP_THRESHOLD = 0.7;
 /** 四级全局去重:最近 N 题窗口内,同一题最多出现 1 次。 */
 export const GLOBAL_DEDUP_WINDOW = 10;
-/** 矛盾追问豁免阈值:最近 LOW_RESPONSE_WINDOW 题 profile |delta| std 跨维均值 > 此值时,跳过四级去重。 */
-export const CONTRADICTION_STD_THRESHOLD = 40;
+/** 追问机制 A(同主题强弱不一致):两题主题向量余弦 ≥ 此值视为同主题。 */
+export const THEME_SIM = 0.6;
+/** 追问机制 A:同主题两题,用户在某维的归一化表态强度差 ≥ 此值视为强弱背离。 */
+export const INCONSISTENCY_GAP = 0.5;
+/** 追问机制 B(强弱波动):某维强信号阈值,|w| ≥ 此值视为用户在该维明确表态。 */
+export const STRONG_W = 20;
+/** 追问机制 B:某维弱信号阈值,|w| ≤ 此值视为用户在该维淡漠;同时题里需有强选项可选(题本身能强表态)。 */
+export const WEAK_W = 5;
+/** 追问机制 B:用户既强又弱,但 profile 推到 |值| ≥ 此值后视为已澄清,该维脱离追问集合(收敛)。 */
+export const CLARIFIED_ABS = 100;
 /** 低响应维度窗口:基于最近 N 题的 profile 增量。 */
 const LOW_RESPONSE_WINDOW = 5;
 /** P8.1 stem 全 session 软惩罚:累计出现 n 次 → 评分 × penalty[n](capped at 4)。 */
@@ -224,35 +230,76 @@ export function getSessionStemCounts(askedIds: readonly string[]): Map<string, n
   return out;
 }
 
+/** 题在某维上 options 的最大 |权重|(用于归一化用户表态强度)。 */
+function maxOptionWeight(q: QuizQuestion, d: TasteDimension): number {
+  let m = 0;
+  for (const o of q.options) {
+    const w = Math.abs(o.weights[d] || 0);
+    if (w > m) m = w;
+  }
+  return m;
+}
+
 /**
- * 矛盾追问豁免:当最近 LOW_RESPONSE_WINDOW 题里 profile 跨维 |delta| std 均值 > 阈值,
- * 说明用户在多维之间反复横跳,允许跳过四级去重,优先暴露低响应维相关题。
+ * 追问维度检测(动态 25–45 模型核心,≥25 后决定是否继续追问)。
+ * 两套机制都不依赖负权重,规避"题库各维权重几乎全正"的偏态:
+ *
+ * 机制 A(同主题强弱不一致):用户在主题相近的两道题上,对共同主维的归一化表态强度
+ *   差 ≥ INCONSISTENCY_GAP → 该维判为摇摆。
+ * 机制 B(同维强弱波动):用户在某维既给过强信号(|w|≥STRONG_W),又在能强表态的题上
+ *   选了弱选项(|w|≤WEAK_W,且题里其他选项 ≥STRONG_W) → 该维判为自相矛盾。
+ *
+ * 收敛保证:profile 推到 |值| ≥ CLARIFIED_ABS 后该维脱离追问集合,不会卡满 45。
  */
-function isContradictionPursuit(state: {
-  askedIds: string[];
-  answers: { weights?: WeightVector }[];
-}): boolean {
-  const lastN = state.answers.slice(-LOW_RESPONSE_WINDOW);
-  if (lastN.length < 3) return false;
-  // 收集每个维在最近 N 题里 |delta| 序列 → 求跨题维度的 std
-  const perDimAbs: Record<string, number[]> = {};
-  for (const d of DIMS) perDimAbs[d] = [];
-  for (const a of lastN) {
-    if (!a.weights) continue;
-    for (const d of DIMS) {
-      perDimAbs[d]!.push(Math.abs(a.weights[d] || 0));
+export function detectPursueDims(
+  answers: { questionId?: string; weights?: WeightVector }[],
+  profile: WeightVector,
+): Set<TasteDimension> {
+  const out = new Set<TasteDimension>();
+
+  const answered = answers
+    .map((a) => ({
+      q: a.questionId ? questionBank.questions.find((qq) => qq.id === a.questionId) : undefined,
+      w: a.weights,
+    }))
+    .filter((x): x is { q: QuizQuestion; w: WeightVector } => !!x.q && !!x.w);
+
+  // 机制 A:同主题题对,共同主维上归一化表态强度严重背离
+  for (let i = 0; i < answered.length; i++) {
+    for (let j = i + 1; j < answered.length; j++) {
+      const A = answered[i]!;
+      const B = answered[j]!;
+      const tvA = topicVector(A.q);
+      const tvB = topicVector(B.q);
+      if (signatureSim(tvA, tvB) < THEME_SIM) continue; // 非同主题
+      for (const d of DIMS) {
+        if ((tvA[d] || 0) <= 0 || (tvB[d] || 0) <= 0) continue; // 非共同主维
+        if (Math.abs(profile[d] || 0) >= CLARIFIED_ABS) continue; // 已澄清
+        const maxA = maxOptionWeight(A.q, d);
+        const maxB = maxOptionWeight(B.q, d);
+        if (maxA <= 0 || maxB <= 0) continue;
+        const nwA = (A.w[d] || 0) / maxA;
+        const nwB = (B.w[d] || 0) / maxB;
+        if (Math.abs(nwA - nwB) >= INCONSISTENCY_GAP) out.add(d);
+      }
     }
   }
-  // 每维求 std → 取均值作为"波动剧烈度"
-  const stds: number[] = DIMS.map((d) => {
-    const arr = perDimAbs[d]!;
-    if (arr.length === 0) return 0;
-    const m = arr.reduce((s, v) => s + v, 0) / arr.length;
-    const v = arr.reduce((s, x) => s + (x - m) ** 2, 0) / arr.length;
-    return Math.sqrt(v);
-  });
-  const mean = stds.reduce((s, v) => s + v, 0) / stds.length;
-  return mean > CONTRADICTION_STD_THRESHOLD;
+
+  // 机制 B:某维既有强信号又有"能强表态却没强表态"的弱信号
+  for (const d of DIMS) {
+    if (Math.abs(profile[d] || 0) >= CLARIFIED_ABS) continue; // 已澄清
+    let hi = false;
+    let lo = false;
+    for (const a of answered) {
+      const w = Math.abs(a.w[d] || 0);
+      if (w >= STRONG_W) { hi = true; continue; }
+      const maxQ = maxOptionWeight(a.q, d);
+      if (maxQ >= STRONG_W && w <= WEAK_W) lo = true;
+    }
+    if (hi && lo) out.add(d);
+  }
+
+  return out;
 }
 
 /**
@@ -310,9 +357,9 @@ export function pickNextQuestion(
   if (noCoverDup.length > 0) pool = noCoverDup;
   // 兜底:全被过滤 → 退回原 pool
 
-  // 四级全局去重:窗口 10 题内同题只能出现 1 次(矛盾追问豁免时跳过)
-  const contradictionPursuit = isContradictionPursuit(state);
-  if (!contradictionPursuit) {
+  // 四级全局去重:窗口 10 题内同题只能出现 1 次(检测到追问维度时放宽,让相关题更易入选)
+  const hasPursue = detectPursueDims(state.answers, state.profile).size > 0;
+  if (!hasPursue) {
     const noGlobalDup = pool.filter(
       (q) => recentOccurrences(q.id, state.askedIds) === 0,
     );
@@ -350,8 +397,9 @@ export function pickNextQuestion(
     return topK[0]!.q;
   }
 
-  // 后期(count ≥ MIN_QUESTIONS):犀利度分层 + 追问 + 信息增益
+  // 后期(count ≥ MIN_QUESTIONS):犀利度分层 + 追问 + 信息增益 + 追问维度澄清
   const lowResDims = lowResponseDims(state);
+  const pursueDims = detectPursueDims(state.answers, state.profile);
   const scored = pool.map((q) => {
     // 1) 信息增益:profile 越大的维,被该题改动后信息量越大
     let gain = 0;
@@ -389,10 +437,20 @@ export function pickNextQuestion(
       stemPenalty *= STEM_DEDUP_LATE_DOUBLE_PENALTY;
     }
 
-    // 综合分:gain 主项 + 犀利度加成 + 追问加成,再乘以 topicPenalty / stemPenalty
+    // 7) 追问加成(≥25 且有追问维度):覆盖追问维度 + sharp 题(2 选项强澄清)
+    let contraBoost = 0;
+    if (pursueDims.size > 0) {
+      let cover = 0;
+      for (const d of pursueDims) cover += tv[d] || 0;
+      const coverNorm = Math.min(1, cover / 80);
+      const sharpBonus = sharpnessOf(q) === 'sharp' ? 1 : 0.4;
+      contraBoost = coverNorm * 40 * sharpBonus;
+    }
+
+    // 综合分:gain 主项 + 犀利度加成 + 低响应追问 + 矛盾追问加成,再乘 topic/stem 惩罚
     return {
       q,
-      score: (gain * (0.6 + 0.4 * sw) + gain * 0.3 * lowCoverNorm + lowCoverNorm * 5) * topicPenalty * stemPenalty,
+      score: (gain * (0.6 + 0.4 * sw) + gain * 0.3 * lowCoverNorm + lowCoverNorm * 5 + contraBoost) * topicPenalty * stemPenalty,
     };
   });
   scored.sort((a, b) => b.score - a.score);
@@ -409,23 +467,20 @@ export function pickNextQuestion(
 }
 
 /**
- * 停止判定:返回是否应该停止(由 App.tsx 在每题答完后调用)。
- * - 已达 MAX → 必须停
- * - 已达 MIN 且最近 1 题 gain < ε → 停
- * - 归一化后 std < 5 → 停(用户扁平)
+ * 停止判定(动态 25–45 追问模型,由 App.tsx 在每题答完后调用):
+ *   - count ≥ MAX(45) → 必停(硬上限)
+ *   - count < MIN(25) → 必继续(基础 25 题必答)
+ *   - count ≥ MIN → 仅当无追问维度(同主题不一致 ∪ 信息不足)才停
+ *
+ * 取代旧 App 本地 shouldContinue(std<5)。追问维度随 profile 被推高而收敛,不卡满 45。
  */
-export function shouldStop(
-  state: { askedIds: string[]; profile: WeightVector },
-  lastGain: number,
-): boolean {
+export function shouldStop(state: {
+  askedIds: string[];
+  answers: { questionId?: string; weights?: WeightVector }[];
+  profile: WeightVector;
+}): boolean {
   const count = state.askedIds.length;
   if (count >= MAX_QUESTIONS) return true;
   if (count < MIN_QUESTIONS) return false;
-  if (lastGain < STOP_EPSILON) return true;
-  // std in [0, 50];< 5 表示非常扁
-  // 简化:不调 normalize,直接对 raw profile 估算 std
-  const values = DIMS.map((d) => state.profile[d] || 0);
-  const mean = values.reduce((s, v) => s + v, 0) / values.length;
-  const variance = values.reduce((s, v) => s + (v - mean) ** 2, 0) / values.length;
-  return Math.sqrt(variance) < 5;
+  return detectPursueDims(state.answers, state.profile).size === 0;
 }

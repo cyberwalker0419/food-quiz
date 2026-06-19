@@ -1,6 +1,6 @@
 import { useState, useCallback, useEffect } from 'react'
 import { initialState, applyAnswer, undoLast, type QuizState } from './lib/taste/state'
-import { pickNextQuestion, MIN_QUESTIONS, MAX_QUESTIONS } from './lib/taste/adaptiveSelector'
+import { pickNextQuestion, shouldStop, MIN_QUESTIONS, MAX_QUESTIONS } from './lib/taste/adaptiveSelector'
 import { assembleResult, type AssembledResult } from './lib/taste/result'
 import { downloadShareCard, preloadShareCardFonts } from './utils/shareImage'
 import { ResultCard } from './components/ResultCard'
@@ -67,7 +67,11 @@ function App() {
     setAskedQuestions(newAsked)
 
     setTimeout(() => {
-      const stop = newAsked.length >= MAX_QUESTIONS || !shouldContinue(newState)
+      const stop = shouldStop({
+        askedIds: newState.askedIds,
+        answers: newState.answers,
+        profile: newState.profile,
+      })
       if (!stop) {
         const nextQ = pickNextQuestion(
           { askedIds: newState.askedIds, answers: newState.answers, profile: newState.profile },
@@ -204,7 +208,7 @@ function App() {
           <p className="calculating-subtext">
             {['品味你的偏好...', '探索味觉地图...', '寻找你的菜系灵魂...', '即将揭晓...', '🍽️'][Math.floor(Math.random() * 5)]}
           </p>
-          <p className="calculating-mode">自适应 {MIN_QUESTIONS}–{MAX_QUESTIONS} 题</p>
+          <p className="calculating-mode">自适应 {MIN_QUESTIONS} 题 · 矛盾追问至 {MAX_QUESTIONS}</p>
         </div>
       </div>
     )
@@ -246,7 +250,6 @@ function App() {
     ? q.options.findIndex((o) => o.id === priorAnswer.optionId)
     : -1
   const optionLabels = ['A', 'B', 'C', 'D']
-  const progress = Math.min(100, (askedQuestions.length / MAX_QUESTIONS) * 100)
 
   return (
     <div className="app quiz-screen">
@@ -263,10 +266,15 @@ function App() {
             </button>
           )}
           <div className="progress-track">
-            <div className="progress-fill" style={{ width: `${progress}%` }} />
+            <div className="progress-fill" style={{ width: `${Math.min(askedQuestions.length, MIN_QUESTIONS) / MAX_QUESTIONS * 100}%` }} />
+            {askedQuestions.length > MIN_QUESTIONS && (
+              <div className="progress-fill-extra" style={{ left: `${MIN_QUESTIONS / MAX_QUESTIONS * 100}%`, width: `${(askedQuestions.length - MIN_QUESTIONS) / MAX_QUESTIONS * 100}%` }} />
+            )}
           </div>
           <span className="progress-text">
-            {askedQuestions.length + 1} / {MIN_QUESTIONS}–{MAX_QUESTIONS}
+            {askedQuestions.length >= MIN_QUESTIONS
+              ? <>第 {askedQuestions.length + 1} 题 <span className="progress-pursue">· 追问</span></>
+              : <>第 {askedQuestions.length + 1} 题 / {MIN_QUESTIONS}</>}
           </span>
         </div>
       </div>
@@ -297,19 +305,6 @@ function App() {
       </div>
     </div>
   )
-}
-
-/**
- * 是否继续出题:达到 MIN 且"最近一题没新信息"。
- * 简化:用 raw profile 的 std < 5 作为"用户已饱和"。
- */
-function shouldContinue(s: QuizState): boolean {
-  if (s.askedIds.length < MIN_QUESTIONS) return true
-  if (s.askedIds.length >= MAX_QUESTIONS) return false
-  const vs = Object.values(s.profile)
-  const mean = vs.reduce((a, b) => a + b, 0) / vs.length
-  const v = Math.sqrt(vs.reduce((acc, x) => acc + (x - mean) ** 2, 0) / vs.length)
-  return v >= 5
 }
 
 function Confetti() {
