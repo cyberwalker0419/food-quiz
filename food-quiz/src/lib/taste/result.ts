@@ -1,7 +1,7 @@
 import type { WeightVector, DimensionVector, TasteLetter } from './types';
 import { DIMS, letterToChinese, letterToTierLabel, letterToDim, indexToKey, valueToGrade, type Grade } from './keys';
 import { normalize, std } from './normalize';
-import { blendedScore } from './similarity';
+import { blendedScore, cosineSim } from './similarity';
 import {
   loadInterval,
   loadExtreme,
@@ -201,33 +201,48 @@ export function assembleResult(
 
   // 避雷指南已下线(avoid 字段不再生成;loadAvoid 数据保留以备将来恢复)
 
-  // topDishes —— 从日常/知名菜(popular)推荐;每菜系最多 1 道、每地区最多 1 道,
-  // 避免同类菜(同菜系/同省份)挤占 Top N,实现跨菜系多样性。
+  // topDishes —— MMR(最大边际相关性)选菜:
+  //   - 仅从 popular 库(过滤冷门)
+  //   - 硬禁:同菜系、同地区(彻底避免扎堆)
+  //   - 软禁:与已选菜向量余弦 ≥ 0.85 视为同质化,降权而非直接排除
+  //   - 综合分 = 0.5 × blendedScore + 0.5 × (1 − maxCosineToSelected)
+  //   - 候选耗尽仍不足 topNDishes → 仅硬禁 + 余弦 < 0.95 兜底
   let topDishes: DishEntry[] = [];
   const dishes = loadDishes();
   if (dishes) {
     const popular = dishes.filter((d) => d.popular !== false);
-    const scored = popular
-      .map((d) => ({ d, score: blendedScore(v, d.vector) }))
-      .sort((x, y) => y.score - x.score);
-    const usedCuisines = new Set<string>();
-    const usedRegions = new Set<string>();
-    for (const { d } of scored) {
-      if (topDishes.length >= topNDishes) break;
-      if (d.cuisine && usedCuisines.has(d.cuisine)) continue;
-      if (d.region && usedRegions.has(d.region)) continue;
-      topDishes.push(d);
-      if (d.cuisine) usedCuisines.add(d.cuisine);
-      if (d.region) usedRegions.add(d.region);
+    const scored = popular.map((d) => ({ d, score: blendedScore(v, d.vector) }));
+    scored.sort((a, b) => b.score - a.score);
+    // 第一道:取最高 blendedScore(锚点)
+    if (scored[0]) topDishes.push(scored[0].d);
+    // 后续:MMR
+    while (topDishes.length < topNDishes) {
+      let bestIdx = -1;
+      let bestMMR = -Infinity;
+      for (let i = 0; i < scored.length; i++) {
+        const cand = scored[i]!;
+        if (topDishes.includes(cand.d)) continue;
+        if (cand.d.cuisine && topDishes.some((p) => p.cuisine === cand.d.cuisine)) continue;
+        if (cand.d.region && topDishes.some((p) => p.region === cand.d.region)) continue;
+        let maxSim = 0;
+        for (const p of topDishes) {
+          const s = cosineSim(cand.d.vector, p.vector);
+          if (s > maxSim) maxSim = s;
+        }
+        const mmr = 0.5 * cand.score + 0.5 * (1 - maxSim);
+        if (mmr > bestMMR) { bestMMR = mmr; bestIdx = i; }
+      }
+      if (bestIdx < 0) break;
+      topDishes.push(scored[bestIdx]!.d);
     }
-    // 若多样性约束下数量不足(topNDishes),放宽到仅菜系约束再补
+    // 兜底:候选被硬禁耗尽(topNDishes 不够)→ 放宽,允许同菜系但要求向量余弦 < 0.95
     if (topDishes.length < topNDishes) {
       for (const { d } of scored) {
         if (topDishes.length >= topNDishes) break;
         if (topDishes.includes(d)) continue;
-        if (d.cuisine && usedCuisines.has(d.cuisine)) continue;
-        topDishes.push(d);
-        if (d.cuisine) usedCuisines.add(d.cuisine);
+        if (d.region && topDishes.some((p) => p.region === d.region)) continue;
+        const maxSim = topDishes.reduce((m, p) => Math.max(m, cosineSim(d.vector, p.vector)), 0);
+        if (maxSim < 0.95) topDishes.push(d);
       }
     }
   }

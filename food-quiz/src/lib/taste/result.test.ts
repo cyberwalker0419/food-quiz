@@ -143,6 +143,24 @@ describe('assembleResult — 推荐菜只取日常/知名菜', () => {
     const regions = r.topDishes.map((d) => d.region).filter(Boolean);
     expect(new Set(regions).size).toBe(regions.length); // 地区两两不同
   });
+
+  it('MMR 软禁:两道菜向量余弦低才同时入选(避免相似菜扎堆)', () => {
+    const r = assembleResult({ ...ZERO_VECTOR, spicy: 90, salty: 80, rich: 70 });
+    expect(r.topDishes.length).toBeGreaterThanOrEqual(2);
+    // 任意两道推荐菜的向量余弦应 < 0.95(显著不同)
+    const vecs = r.topDishes.map((d) => d.vector);
+    for (let i = 0; i < vecs.length; i++) {
+      for (let j = i + 1; j < vecs.length; j++) {
+        const a = vecs[i]!, b = vecs[j]!;
+        const dot = (['sour','sweet','bitter','spicy','salty','rich','crunchy','tender'] as const)
+          .reduce((s, k) => s + (a[k] ?? 0) * (b[k] ?? 0), 0);
+        const ma = Math.sqrt((['sour','sweet','bitter','spicy','salty','rich','crunchy','tender'] as const).reduce((s, k) => s + (a[k] ?? 0) ** 2, 0));
+        const mb = Math.sqrt((['sour','sweet','bitter','spicy','salty','rich','crunchy','tender'] as const).reduce((s, k) => s + (b[k] ?? 0) ** 2, 0));
+        const sim = ma && mb ? dot / (ma * mb) : 0;
+        expect(sim, `两道菜(${r.topDishes[i]!.name} vs ${r.topDishes[j]!.name}) 向量余弦=${sim.toFixed(3)} ≥ 0.95,过相似`).toBeLessThan(0.95);
+      }
+    }
+  });
 });
 
 describe('assembleResult — 5 等级 grade 字段(视觉层)', () => {
