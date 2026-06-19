@@ -8,17 +8,22 @@ export type ShareCardData = {
   questionCount: number
 }
 
-// P6.4 画布尺寸缩小:720×1280 → 540×960
+// P6.4 画布尺寸:720×1280 → 540×960
 const CARD_W = 540
 const CARD_H = 960
 
-// Canvas can only render text in fonts that are actually loaded into the
-// document. The CSS @import for Noto Sans SC is async — if we draw the card
-// before the font finishes loading, every text call silently falls through
-// to a font that doesn't have the CJK glyphs we need, and the result looks
-// "blank" (the squares are invisible against the cream background).
-const FONT_FAMILY =
-  '"Noto Sans SC", "PingFang SC", "Microsoft YaHei", "Hiragino Sans GB", "Heiti SC", system-ui, sans-serif'
+// ── 国风色板(对齐 styles/App.css :root,米纸·墨·朱砂) ──
+const PAPER = '#F5EFE0'
+const INK = '#1F1A17'
+const INK_2 = '#5A4D40'
+const INK_3 = '#9A8B75'
+const CINNABAR = '#9E2B25'
+const SEAL = '#B23A30'
+const LINE = '#C9BFA8'
+
+// ── 字体(思源宋体为主,毛笔体点缀;宋体未就绪会画空白方块,故预载) ──
+const FONT_SERIF = '"Noto Serif SC", "Songti SC", "STSong", serif'
+const FONT_BRUSH = '"Ma Shan Zheng", "Noto Serif SC", cursive'
 
 // P6.4 字体加载加 2.5s 超时,网络慢时不再永远阻塞
 const FONT_LOAD_TIMEOUT_MS = 2500
@@ -38,13 +43,18 @@ function ensureFonts(): Promise<void> {
   }
   const weights = ['400', '500', '600', '700']
   const docFonts = (document as unknown as { fonts: { load(spec: string): Promise<unknown>; ready: Promise<unknown> } }).fonts
-  const loadAll = Promise.all(
-    weights.map(w => docFonts.load(`${w} 24px "Noto Sans SC"`)),
-  ).then(() => docFonts.ready).then(() => undefined)
-  const timeout = new Promise<void>(resolve => setTimeout(resolve, FONT_LOAD_TIMEOUT_MS))
+  // 宋体(主体)+ 毛笔体(标语)+ 黑体(雷达轴数值兜底)全部预载
+  const loadAll = Promise.all([
+    ...weights.map((w) => docFonts.load(`${w} 24px "Noto Sans SC"`)),
+    ...weights.map((w) => docFonts.load(`${w} 24px "Noto Serif SC"`)),
+    docFonts.load('400 24px "Ma Shan Zheng"'),
+  ]).then(() => docFonts.ready).then(() => undefined)
+  const timeout = new Promise<void>((resolve) => setTimeout(resolve, FONT_LOAD_TIMEOUT_MS))
   fontsReady = Promise.race([loadAll, timeout])
   return fontsReady
 }
+
+// ── 绘制 helpers ──
 
 /** Rounded rectangle path */
 function roundRect(ctx: CanvasRenderingContext2D, x: number, y: number, w: number, h: number, r: number) {
@@ -79,7 +89,48 @@ function wrapText(ctx: CanvasRenderingContext2D, text: string, maxWidth: number)
   return lines
 }
 
-/** P8.3 8 维档位明细:每行 "酸  重辣 ⚡极  [A] 92" 4 列右对齐。 */
+/** 米纸 radial 纹理一笔(底色已先铺 paper,三层叠加出温润纸感)。 */
+function paintRadial(
+  ctx: CanvasRenderingContext2D,
+  W: number,
+  H: number,
+  cx: number,
+  cy: number,
+  r: number,
+  innerColor: string,
+) {
+  const g = ctx.createRadialGradient(cx, cy, 0, cx, cy, r)
+  g.addColorStop(0, innerColor)
+  g.addColorStop(1, 'rgba(255,255,255,0)')
+  ctx.fillStyle = g
+  ctx.fillRect(0, 0, W, H)
+}
+
+/** 细线分隔(横贯,左右留边;+0.5 半像素对齐 1px 描边)。 */
+function drawDivider(ctx: CanvasRenderingContext2D, W: number, y: number, inset = 40) {
+  ctx.strokeStyle = LINE
+  ctx.lineWidth = 1
+  ctx.beginPath()
+  ctx.moveTo(inset, y + 0.5)
+  ctx.lineTo(W - inset, y + 0.5)
+  ctx.stroke()
+}
+
+/** 朱砂方印 + 白字(右上角视觉锚点)。 */
+function drawSeal(ctx: CanvasRenderingContext2D, x: number, y: number, size: number, char: string, font: string) {
+  ctx.save()
+  ctx.fillStyle = SEAL
+  roundRect(ctx, x, y, size, size, 5)
+  ctx.fill()
+  ctx.fillStyle = PAPER
+  ctx.font = `700 ${Math.round(size * 0.56)}px ${font}`
+  ctx.textAlign = 'center'
+  ctx.textBaseline = 'middle'
+  ctx.fillText(char, x + size / 2, y + size / 2 + size * 0.04)
+  ctx.restore()
+}
+
+/** 八维档位明细:每行 "中文 / tierLabel / [grade] / value",右对齐数值。 */
 function drawDimensionList(
   ctx: CanvasRenderingContext2D,
   intervals: readonly RenderedInterval[],
@@ -88,45 +139,45 @@ function drawDimensionList(
   w: number,
   fontFamily: string,
 ): void {
-  const rowH = 18;
-  const colChineseX = x;             // 中文列起点
-  const colTierX = x + 50;           // tierLabel 列起点
-  const colGradeX = x + 250;         // grade 徽章列起点
-  const colValueX = x + w;           // value 列终点(右对齐)
+  const rowH = 18
+  const colChineseX = x // 中文列起点
+  const colTierX = x + 50 // tierLabel 列起点
+  const colGradeX = x + 250 // grade 徽章列起点
+  const colValueX = x + w // value 列终点(右对齐)
   for (let i = 0; i < intervals.length; i++) {
-    const iv = intervals[i]!;
-    const ly = y + i * rowH;
-    // 列 1:中文
-    ctx.textAlign = 'left';
-    ctx.textBaseline = 'middle';
-    ctx.fillStyle = '#2d1b14';
-    ctx.font = `500 13px ${fontFamily}`;
-    ctx.fillText(letterToChinese(iv.letter), colChineseX, ly);
-    // 列 2:tierLabel
-    ctx.fillStyle = '#6b5b50';
-    ctx.font = `400 12px ${fontFamily}`;
-    ctx.fillText(iv.tierLabel, colTierX, ly);
-    // 列 3:grade 徽章
-    const badgeW = 18;
-    const badgeH = 14;
-    const bx = colGradeX;
-    const by = ly - badgeH / 2;
-    ctx.fillStyle = GRADE_COLORS[iv.grade];
-    roundRect(ctx, bx, by, badgeW, badgeH, 4);
-    ctx.fill();
-    ctx.fillStyle = '#ffffff';
-    ctx.font = `700 11px ${fontFamily}`;
-    ctx.textAlign = 'center';
-    ctx.fillText(iv.grade, bx + badgeW / 2, ly + 1);
-    // 列 4:value 右对齐
-    ctx.textAlign = 'right';
-    ctx.fillStyle = '#2d1b14';
-    ctx.font = `600 12px ${fontFamily}`;
-    ctx.fillText(iv.value.toFixed(0), colValueX, ly);
+    const iv = intervals[i]!
+    const ly = y + i * rowH
+    // 列 1:中文(墨)
+    ctx.textAlign = 'left'
+    ctx.textBaseline = 'middle'
+    ctx.fillStyle = INK
+    ctx.font = `500 13px ${fontFamily}`
+    ctx.fillText(letterToChinese(iv.letter), colChineseX, ly)
+    // 列 2:tierLabel(墨灰)
+    ctx.fillStyle = INK_2
+    ctx.font = `400 12px ${fontFamily}`
+    ctx.fillText(iv.tierLabel, colTierX, ly)
+    // 列 3:grade 徽章(GRADE_COLORS 档位色,白字)
+    const badgeW = 18
+    const badgeH = 14
+    const bx = colGradeX
+    const by = ly - badgeH / 2
+    ctx.fillStyle = GRADE_COLORS[iv.grade]
+    roundRect(ctx, bx, by, badgeW, badgeH, 4)
+    ctx.fill()
+    ctx.fillStyle = PAPER
+    ctx.font = `700 11px ${fontFamily}`
+    ctx.textAlign = 'center'
+    ctx.fillText(iv.grade, bx + badgeW / 2, ly + 1)
+    // 列 4:value 右对齐(墨)
+    ctx.textAlign = 'right'
+    ctx.fillStyle = INK
+    ctx.font = `600 12px ${fontFamily}`
+    ctx.fillText(iv.value.toFixed(0), colValueX, ly)
   }
 }
 
-/** P8.3 推荐菜 3 道:每行 "🍴 菜名 · 菜系",菜名截断至 8 字。 */
+/** 推荐菜 3 道:菜名(墨)·菜系(朱砂)左对齐,地区(墨灰)右对齐;菜名截断 8 字。 */
 function drawTopDishes(
   ctx: CanvasRenderingContext2D,
   dishes: readonly DishEntry[],
@@ -135,38 +186,43 @@ function drawTopDishes(
   w: number,
   fontFamily: string,
 ): void {
-  const items = dishes.slice(0, 3);
-  const rowH = 18;
+  const items = dishes.slice(0, 3)
+  const rowH = 18
   for (let i = 0; i < items.length; i++) {
-    const d = items[i]!;
-    const ly = y + i * rowH;
-    const name = d.name.length > 8 ? d.name.slice(0, 8) + '…' : d.name;
-    const text = `🍴 ${name} · ${d.cuisine}`;
-    ctx.textAlign = 'left';
-    ctx.textBaseline = 'middle';
-    ctx.fillStyle = '#6b5b50';
-    ctx.font = `400 12px ${fontFamily}`;
-    ctx.fillText(text, x, ly);
-    // 副文本(地域,放右侧)
+    const d = items[i]!
+    const ly = y + i * rowH
+    const name = d.name.length > 8 ? d.name.slice(0, 8) + '…' : d.name
+    ctx.textAlign = 'left'
+    ctx.textBaseline = 'middle'
+    // 菜名(墨)
+    ctx.fillStyle = INK
+    ctx.font = `500 13px ${fontFamily}`
+    ctx.fillText(name, x, ly)
+    const nameW = ctx.measureText(name).width
+    // 菜系(朱砂,紧跟菜名)
+    ctx.fillStyle = CINNABAR
+    ctx.font = `400 11px ${fontFamily}`
+    ctx.fillText(` · ${d.cuisine}`, x + nameW, ly)
+    // 地区(墨灰,右对齐)
     if (d.region) {
-      ctx.textAlign = 'right';
-      ctx.fillStyle = '#a89689';
-      ctx.font = `400 11px ${fontFamily}`;
-      ctx.fillText(d.region, x + w, ly);
+      ctx.textAlign = 'right'
+      ctx.fillStyle = INK_3
+      ctx.font = `400 11px ${fontFamily}`
+      ctx.fillText(d.region, x + w, ly)
     }
   }
 }
 
-/** P8.3 在 mainCopy 上方画一行 section 标题:全能味觉 / 味觉共振 / 味觉特征。 */
+/** mainCopy 上方 section 标题:全能味觉 / 味觉共振 / 味觉特征。 */
 function pickSectionTitle(r: AssembledResult): string {
-  if (r.allround) return '全能味觉';
-  if (r.synergy) return '味觉共振';
-  return '味觉特征';
+  if (r.allround) return '全能味觉'
+  if (r.synergy) return '味觉共振'
+  return '味觉特征'
 }
 
 /**
- * Draw the share card on the given canvas (P6.4 尺寸 540×960)。
- * 8 维图改为 Canvas 雷达图(P6.3)。P8.3 重排:加 section 标题、8 维档位明细、推荐菜。
+ * 绘制国风分享卡(540×960,米纸·墨·朱砂·宋体·印章)。
+ * 信息层级与 ResultCard.tsx §9 一致;Canvas 视觉无法单测,靠逐色值对齐 :root。
  */
 export function drawShareCard(canvas: HTMLCanvasElement, data: ShareCardData) {
   const ctx = canvas.getContext('2d')
@@ -176,177 +232,138 @@ export function drawShareCard(canvas: HTMLCanvasElement, data: ShareCardData) {
   const H = canvas.height
   const r = data.result
 
-  // ─── Background gradient ──────────────────────────────────────
-  const bg = ctx.createLinearGradient(0, 0, W, H)
-  bg.addColorStop(0, '#fff9f3')
-  bg.addColorStop(0.5, '#fff5f0')
-  bg.addColorStop(1, '#ffe8e0')
-  ctx.fillStyle = bg
+  // ── 米纸底 + 三层 radial 纹理(复刻 body 背景:金/朱砂/白) ──
+  ctx.fillStyle = PAPER
   ctx.fillRect(0, 0, W, H)
+  paintRadial(ctx, W, H, W * 0.2, H * 0.1, 420, 'rgba(166,124,46,0.06)')
+  paintRadial(ctx, W, H, W * 0.8, H * 0.9, 460, 'rgba(158,43,37,0.05)')
+  paintRadial(ctx, W, H, W * 0.5, H * 0.5, 520, 'rgba(255,255,255,0.35)')
 
-  // Decorative blobs(按新尺寸等比缩放)
-  const blob = (cx: number, cy: number, rad: number, color: string, alpha: number) => {
-    const g = ctx.createRadialGradient(cx, cy, 0, cx, cy, rad)
-    g.addColorStop(0, `${color}${Math.round(alpha * 255).toString(16).padStart(2, '0')}`)
-    g.addColorStop(1, `${color}00`)
-    ctx.fillStyle = g
-    ctx.beginPath()
-    ctx.arc(cx, cy, rad, 0, Math.PI * 2)
-    ctx.fill()
-  }
-  blob(W * 0.1, H * 0.05, 210, '#ff6b6b', 0.4)
-  blob(W * 0.95, H * 0.4, 240, '#f39c12', 0.3)
-  blob(W * 0.1, H * 0.95, 270, '#e91e93', 0.25)
-
-  // ─── Header ──────────────────────────────────────
+  // ── 顶部小标题 + 右上印章 ──
   ctx.textAlign = 'center'
-  ctx.fillStyle = '#a89689'
-  ctx.font = `600 18px ${FONT_FAMILY}`
-  ctx.fillText('你的味觉灵魂图谱', W / 2, 60)
+  ctx.textBaseline = 'alphabetic'
+  ctx.fillStyle = INK_3
+  ctx.font = `500 15px ${FONT_SERIF}`
+  ctx.fillText('你的味觉灵魂图谱', W / 2, 52)
+  drawSeal(ctx, W - 82, 28, 48, '鉴', FONT_BRUSH)
 
-  // 题数 chip
-  const chipText = `🧠 自适应 · ${data.questionCount} 题`
-  ctx.font = `500 14px ${FONT_FAMILY}`
-  const chipWidth = ctx.measureText(chipText).width
-  const chipX = (W - chipWidth) / 2 - 14
-  const chipY = 76
-  const chipW = chipWidth + 28
-  const chipH = 28
-  ctx.fillStyle = '#ffffff'
-  ctx.strokeStyle = 'rgba(255, 107, 107, 0.4)'
-  ctx.lineWidth = 1
-  roundRect(ctx, chipX, chipY, chipW, chipH, 14)
-  ctx.fill()
-  ctx.stroke()
-  ctx.fillStyle = '#e74c3c'
-  ctx.fillText(chipText, W / 2, chipY + 19)
+  // 细线分隔
+  drawDivider(ctx, W, 92)
 
-  // ─── 主标签:取 allIntervals 第一条的 tierLabel ─────────
+  // ── 主标签(top.tierLabel,大宋体) ──
   const top = r.allIntervals[0]
   const headerLabel = top ? top.tierLabel : '味觉独特'
-  ctx.textBaseline = 'alphabetic'
-  ctx.fillStyle = '#2d1b14'
-  ctx.font = `700 38px ${FONT_FAMILY}`
-  // P9.x v2 字号 42→38(顶端 ≈ y=110,距 chipText y=95 留 15px 缓冲)
-  ctx.fillText(headerLabel, W / 2, 148)
+  ctx.fillStyle = INK
+  ctx.font = `700 42px ${FONT_SERIF}`
+  ctx.fillText(headerLabel, W / 2, 150)
 
-  // P8.3 section 标题(主标签 + mainCopy 之间)
-  // P9.x v2 字号 13→12,下移到 y=176(middle),文字 y=170-182
-  ctx.textAlign = 'center'
+  // section 标题(主标签 + mainCopy 之间)
   ctx.textBaseline = 'middle'
-  ctx.fillStyle = '#a89689'
-  ctx.font = `500 12px ${FONT_FAMILY}`
-  ctx.fillText(pickSectionTitle(r), W / 2, 176)
+  ctx.fillStyle = INK_3
+  ctx.font = `500 12px ${FONT_SERIF}`
+  ctx.fillText(pickSectionTitle(r), W / 2, 178)
 
-  // 联动文案 / 全能文案 / 区间文案首句
+  // synergy / allround 副标签(朱砂)
+  if (r.synergy || r.allround) {
+    ctx.fillStyle = CINNABAR
+    ctx.font = `600 13px ${FONT_SERIF}`
+    ctx.fillText((r.synergy || r.allround)!.label, W / 2, 200)
+  }
+
+  // mainCopy(墨灰,最多 2 行)
   let mainCopy = ''
-  if (r.allround) {
-    mainCopy = r.allround.copy
-  } else if (r.synergy) {
-    mainCopy = r.synergy.copy
-  } else if (top) {
-    mainCopy = top.copy
-  }
-  // P9.x v2 synergy/allround 副标题:y=198(middle 13px),文字 y=192-204
-  if (r.synergy) {
-    ctx.textAlign = 'center'
-    ctx.textBaseline = 'middle'
-    ctx.fillStyle = '#e74c3c'
-    ctx.font = `600 13px ${FONT_FAMILY}`
-    ctx.fillText(r.synergy.label, W / 2, 198)
-  } else if (r.allround) {
-    ctx.textAlign = 'center'
-    ctx.textBaseline = 'middle'
-    ctx.fillStyle = '#e74c3c'
-    ctx.font = `600 13px ${FONT_FAMILY}`
-    ctx.fillText(r.allround.label, W / 2, 198)
-  }
-  // P9.x v2 mainCopy:字号 13→12,行高 18→16,互斥 y,严格保证 y<260(雷达顶端)
-  //   无副标题 → 起始 y=194(距 section title 12px),末行 y=210 → 距雷达 50px ✓
-  //   有副标题 → 起始 y=222(距 synergy.label 14px),末行 y=238 → 距雷达 22px ✓
-  ctx.font = `400 12px ${FONT_FAMILY}`
-  ctx.fillStyle = '#6b5b50'
+  if (r.allround) mainCopy = r.allround.copy
+  else if (r.synergy) mainCopy = r.synergy.copy
+  else if (top) mainCopy = top.copy
   const hasSubLabel = !!(r.synergy || r.allround)
-  const mainCopyStartY = hasSubLabel ? 222 : 194
-  const descLineH = 16
-  const descLines = wrapText(ctx, mainCopy, W - 90)
+  const mainCopyStartY = hasSubLabel ? 224 : 196
+  ctx.fillStyle = INK_2
+  ctx.font = `400 12px ${FONT_SERIF}`
+  const descLines = wrapText(ctx, mainCopy, W - 96)
   descLines.slice(0, 2).forEach((line, i) => {
-    ctx.fillText(line, W / 2, mainCopyStartY + i * descLineH)
+    ctx.fillText(line, W / 2, mainCopyStartY + i * 16)
   })
 
-  // ─── 8 维雷达图(P6.3;P8.3 缩 320→280) ─────────────────
+  // ── 八维雷达图(中心 y=400) ──
   const radarSize = 280
   const radarY = 400
   ctx.save()
   ctx.translate((W - radarSize) / 2, radarY - radarSize / 2)
-  drawRadarChart(ctx, r.allIntervals, radarSize, { fontFamily: FONT_FAMILY })
+  drawRadarChart(ctx, r.allIntervals, radarSize, { fontFamily: FONT_SERIF })
   ctx.restore()
 
-  // P8.3 8 维档位明细小标题
-  ctx.font = `500 14px ${FONT_FAMILY}`
-  ctx.fillStyle = '#a89689'
+  // ── 八维档位明细 ──
+  drawDivider(ctx, W, 548)
   ctx.textAlign = 'center'
-  ctx.fillText('8 维档位明细', W / 2, 560)
+  ctx.textBaseline = 'alphabetic'
+  ctx.fillStyle = INK_3
+  ctx.font = `500 13px ${FONT_SERIF}`
+  ctx.fillText('八维档位', W / 2, 566)
+  drawDimensionList(ctx, r.allIntervals, 40, 584, W - 80, FONT_SERIF)
 
-  // P8.3 8 维档位明细
-  drawDimensionList(ctx, r.allIntervals, 40, 580, W - 80, FONT_FAMILY)
-
-  // ─── 极档警告(P8.3 1 条) ──────────────────────────────────────
+  // ── 极档警告(朱砂) ──
   if (r.extremes.length > 0) {
-    const extremeTop = 740
+    const exY = 740
     ctx.textAlign = 'left'
     ctx.textBaseline = 'middle'
-    ctx.font = `500 13px ${FONT_FAMILY}`
-    ctx.fillStyle = '#a89689'
-    ctx.fillText('极档警告', 40, extremeTop)
+    ctx.fillStyle = INK_3
+    ctx.font = `500 13px ${FONT_SERIF}`
+    ctx.fillText('极档警告', 40, exY)
     const ex = r.extremes[0]!
-    ctx.font = `600 13px ${FONT_FAMILY}`
-    ctx.fillStyle = '#e74c3c'
-    ctx.fillText(ex.label, 40, extremeTop + 20)
-    ctx.font = `400 11px ${FONT_FAMILY}`
-    ctx.fillStyle = '#6b5b50'
-    const text = (ex.copy[0] || '').slice(0, 28)
-    ctx.fillText(text, 40, extremeTop + 38)
+    ctx.fillStyle = CINNABAR
+    ctx.font = `600 13px ${FONT_SERIF}`
+    ctx.fillText(ex.label, 130, exY)
+    ctx.fillStyle = INK_2
+    ctx.font = `400 11px ${FONT_SERIF}`
+    ctx.fillText((ex.copy[0] || '').slice(0, 24), 40, exY + 20)
   }
 
-  // ─── 避雷指南(P8.3 单行,y=790) ───────────────────────────
+  // ── 避雷指南 ──
   if (r.avoid) {
-    const avoidTop = 790
+    const avY = 788
     ctx.textAlign = 'left'
     ctx.textBaseline = 'middle'
-    ctx.font = `500 13px ${FONT_FAMILY}`
-    ctx.fillStyle = '#a89689'
-    ctx.fillText('避雷指南', 40, avoidTop)
-    ctx.font = `600 13px ${FONT_FAMILY}`
-    ctx.fillStyle = '#2d1b14'
-    ctx.fillText(r.avoid.label, 100, avoidTop)
-    ctx.font = `400 11px ${FONT_FAMILY}`
-    ctx.fillStyle = '#6b5b50'
+    ctx.fillStyle = INK_3
+    ctx.font = `500 13px ${FONT_SERIF}`
+    ctx.fillText('避雷指南', 40, avY)
+    ctx.fillStyle = INK
+    ctx.font = `600 13px ${FONT_SERIF}`
+    ctx.fillText(r.avoid.label, 130, avY)
+    ctx.fillStyle = INK_2
+    ctx.font = `400 11px ${FONT_SERIF}`
     const lines = wrapText(ctx, r.avoid.copy, W - 80)
-    ctx.fillText((lines[0] || '').slice(0, 32), 40, avoidTop + 20)
+    ctx.fillText((lines[0] || '').slice(0, 30), 40, avY + 20)
   }
 
-  // ─── P8.3 推荐菜 ──────────────────────────────────────
+  // ── 推荐菜 ──
   if (r.topDishes.length > 0) {
     ctx.textAlign = 'center'
-    ctx.textBaseline = 'middle'
-    ctx.font = `500 13px ${FONT_FAMILY}`
-    ctx.fillStyle = '#a89689'
-    ctx.fillText('为你推荐', W / 2, 830)
-    drawTopDishes(ctx, r.topDishes, 40, 850, W - 80, FONT_FAMILY)
+    ctx.textBaseline = 'alphabetic'
+    ctx.fillStyle = INK_3
+    ctx.font = `500 13px ${FONT_SERIF}`
+    ctx.fillText('为你推荐', W / 2, 832)
+    drawTopDishes(ctx, r.topDishes, 40, 852, W - 80, FONT_SERIF)
   }
 
-  // ─── Footer ──────────────────────────────────────
+  // ── footer(双线 + 毛笔标语) ──
+  drawDivider(ctx, W, H - 110)
+  ctx.strokeStyle = LINE
+  ctx.lineWidth = 1
+  ctx.beginPath()
+  ctx.moveTo(40, H - 104.5)
+  ctx.lineTo(W - 40, H - 104.5)
+  ctx.stroke()
   ctx.textAlign = 'center'
-  ctx.font = `500 12px ${FONT_FAMILY}`
-  ctx.fillStyle = '#a89689'
-  ctx.fillText(`基于 ${data.questionCount} 道题 · 8 维向量分析`, W / 2, H - 80)
-  ctx.font = `700 16px ${FONT_FAMILY}`
-  ctx.fillStyle = '#e74c3c'
-  ctx.fillText('🍽️ 测测你的味觉灵魂', W / 2, H - 56)
-  ctx.font = `400 11px ${FONT_FAMILY}`
-  ctx.fillStyle = '#a89689'
-  ctx.fillText('扫码或搜索「味觉灵魂」参与测试', W / 2, H - 32)
+  ctx.textBaseline = 'alphabetic'
+  ctx.fillStyle = INK_3
+  ctx.font = `400 11px ${FONT_SERIF}`
+  ctx.fillText(`基于 ${data.questionCount} 道 · 八维味觉分析`, W / 2, H - 78)
+  ctx.fillStyle = CINNABAR
+  ctx.font = `400 17px ${FONT_BRUSH}`
+  ctx.fillText('测 测 你 的 味 觉 灵 魂', W / 2, H - 50)
+  ctx.fillStyle = INK_3
+  ctx.font = `400 10px ${FONT_SERIF}`
+  ctx.fillText('扫码或搜索「味觉灵魂」参与测试', W / 2, H - 28)
 }
 
 /** P6.4 渲染为 JPEG 并触发下载(尺寸 540×960,jpeg 0.85)。 */
