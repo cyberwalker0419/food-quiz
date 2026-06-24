@@ -1,6 +1,6 @@
 # 是啊，吃什么呢 — 味觉灵魂测试
 
-> 25–45 道动态自适应问题，揭开你 8 维味觉偏好；雷达图 + 五类文案 + 推荐菜 + 国风分享卡。
+> 25–45 道动态自适应问题，揭开你 8 维味觉偏好；雷达图 + 味觉特征长评价 + 推荐菜 + 国风分享卡。
 > 纯前端、零网络请求、生产依赖只有 `react` 与 `react-dom`。
 
 线上：你部署的域名（见下方部署章节）
@@ -11,7 +11,7 @@
 
 - **动态 25–45 题**：基础 25 题必答；检测到「同主题不一致 / 同维强弱波动」矛盾时追加追问，最多 45 题。
 - **8 维味觉向量**：酸 / 甜 / 苦 / 辣 / 咸 / 浓 / 脆 / 嫩，单字母 S T K L I X C N。
-- **国风结果页**：米纸 / 朱砂 / 思源宋体；雷达图 + 八维明细 + 联动 / 区间 / 极档 / 全能四类文案 + 跨菜系推荐菜。
+- **国风结果页**：米纸 / 朱砂 / 思源宋体；雷达图 + 八维明细 + 味觉特征长评价（区间画像 / 联动 / 全能）+ 跨菜系推荐菜。
 - **推荐菜匹配池随机抽样**：blendedScore ≥ 60% 最高分的菜按 score² 加权随机；同画像每次推荐都不一样，但都"够匹配"。
 - **国风分享卡**：540×960 JPEG，米纸纹理 + 印章「鉴」+ 毛笔标语；离线生成，可直接保存。
 - **「吃什么啊？」随机菜页**：从 popular 库（104 道日常知名菜）随机抽，"换一个"不重复上一道。
@@ -44,7 +44,7 @@ npm run dev          # Vite dev server（默认端口见控制台）
 npm run build        # tsc -b && vite build → dist/
 npm run preview      # 预览 dist/
 
-# 验证（CLAUDE.md §2 规定的三件套）
+# 验证（AGENTS.md §2 规定的三件套）
 npx vitest run       # 单测
 npx tsc -b --noEmit  # 类型检查
 npm run build        # 构建
@@ -259,7 +259,7 @@ ossutil cp -r food-quiz/dist/ oss://你的-bucket/ --update
 
 ## 项目架构
 
-完整设计文档见 [`CLAUDE.md`](CLAUDE.md)（项目规约，优先级最高）和 [`pro.md`](pro.md)（历史规划）。
+完整设计文档见 [`AGENTS.md`](AGENTS.md)（项目规约，优先级最高）和 [`pro.md`](pro.md)（历史规划）。
 
 ### 三层架构
 
@@ -310,10 +310,11 @@ food-quiz/src/
 |:--|:--|:--|
 | `MIN_QUESTIONS` | 25 | 基础题必答 |
 | `MAX_QUESTIONS` | 45 | 硬上限 |
-| `STRONG_W` / `WEAK_W` | 20 / 5 | 机制 B：某维既强又弱才判矛盾 |
-| `CLARIFIED_ABS` | 100 | profile 推到此值视为该维澄清，脱离追问 |
-| `HIGH_THRESHOLD` | 60 | 高档 / 区间文案 / 联动触发线 |
-| `EXTREME_THRESHOLD` | 90 | 极档文案触发线 |
+| `STRONG_W` / `WEAK_W` | 18 / 5 | 机制 B：某维既强又弱才判矛盾 |
+| `CLARIFIED_ABS` | 140 | profile 推到此值视为该维澄清，脱离追问 |
+| `COVERAGE_FLOOR` | 180 | 机制 C：某维累计 \|weight\| < 此值视为欠探索 |
+| `BANK_MIN_DENSITY` | 25 | 机制 C：题库某维密度低于此值则跳过（苦维自动排除） |
+| `HIGH_THRESHOLD` | 60 | 高档 / 区间画像 / 联动触发线 |
 | `STD_ALLROUND` | 15 | std < 15 → 触发"全能味觉" |
 | `PRUNE_THRESHOLD` | -30 | raw ≤ −30 → 该维剪枝（极度排斥） |
 
@@ -331,15 +332,15 @@ food-quiz/src/
 ### 渲染顺序（结果页与分享卡一致）
 
 ```
-1. 联动文案 synergy        ← 仅 Top1+Top2 都 >60
-2. 8 维雷达图              ← 永远显示
-3. 区间 / 全能文案         ← std<15 显示 allround，否则 intervals
-4. 极档警告 extremes       ← 仅 value ≥90
-5. 推荐菜 topDishes        ← 永远显示（默认折叠）
-6. 操作按钮                ← 重新测试 / 复制文案 / 保存结果图
+1. 味觉特征              ← std<15 显示 allround 独立分支；否则显示 profileCopy 长评价
+                            （= 区间整体画像 + 联动浓缩句 + 口气收尾，联动不再单独成块）
+2. 8 维雷达图 + 档位明细  ← 永远显示；明细按 |value−50| 降序
+3. 推荐菜 topDishes      ← 永远显示（默认展开，可折叠）
+4. 操作按钮              ← 重新测试 / 复制文案 / 保存结果图
 ```
 
-避雷指南已下线（数据保留以备恢复，详见 commit `69df620`）。
+> 已下线的区块：极档警告（2026-06 合并入高档，两档制）、避雷指南（2026-06 下线，
+> 数据保留以备恢复，详见 commit `69df620`）。
 
 ---
 
@@ -348,11 +349,11 @@ food-quiz/src/
 ```
 food-quiz/src/content/
 ├── questions/questions.json     # 200 题总库 + schema（加载期校验）
-├── intervals/                   # 256 条区间文案（000.json … 255.json）
-├── extreme/{s,t,k,l,i,x,c,n}.json   # 8 条极档文案
-├── synergies/                   # 10 个字母对 + 1 个 _fallback
-├── allround/                    # _index.json + 01..04（std<15 抽一条）
-├── avoid/                       # _index.json + s..n.json（数据保留，已不再消费）
+├── intervals/                   # 256 条区间文案（000.json … 255.json）→ profileLabel / profileCopy
+├── synergies/                   # 10 个字母对 + 1 个 _fallback → 并入 profileCopy
+├── allround/                    # _index.json + 01..04（std<15 独立分支）
+├── avoid/                       # _index.json + s..n.json（**2026-06 已下线**，数据保留）
+├── extreme/{s,t,k,l,i,x,c,n}.json  # **死资产**（极档已合并入高档，保留备查）
 └── dishes.json                  # 196 道菜（104 popular + 92 冷门地方菜）
 ```
 
@@ -375,7 +376,7 @@ food-quiz/src/content/
 
 ## 工作流约定
 
-详见 [`CLAUDE.md`](CLAUDE.md)。重点：
+详见 [`AGENTS.md`](AGENTS.md)。重点：
 
 - 算法 / 数据 / 类型改动**必须配单测**，不靠浏览器肉眼。
 - 验证三件套：`npx vitest run` + `npx tsc -b --noEmit` + `npm run build` **全过**才算完成。
