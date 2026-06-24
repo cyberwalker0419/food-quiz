@@ -23,6 +23,8 @@ import {
   STRONG_W,
   WEAK_W,
   CLARIFIED_ABS,
+  COVERAGE_FLOOR,
+  BANK_MIN_DENSITY,
 } from './adaptiveSelector';
 import type { Sharpness, WeightVector } from './types';
 import { normalize, cosineSim } from './normalize';
@@ -168,7 +170,7 @@ describe('pickNextQuestion', () => {
   });
 });
 
-describe('shouldStop(动态 25–45 追问)', () => {
+describe('shouldStop(渐进式 25–45 追问)', () => {
   it('count < MIN(25) → 不停(基础题必答)', () => {
     expect(shouldStop({ askedIds: new Array(MIN_QUESTIONS - 1).fill('q'), answers: [], profile: ZERO_VECTOR })).toBe(false);
   });
@@ -177,8 +179,99 @@ describe('shouldStop(动态 25–45 追问)', () => {
     expect(shouldStop({ askedIds: new Array(MAX_QUESTIONS).fill('q'), answers: [], profile: ZERO_VECTOR })).toBe(true);
   });
 
-  it('count = MIN + 无答题历史(无追问维) → 停', () => {
-    expect(shouldStop({ askedIds: new Array(MIN_QUESTIONS).fill('q'), answers: [], profile: ZERO_VECTOR })).toBe(true);
+  it('count = MIN + 无追问维 → 停', () => {
+    // 构造高覆盖度答案:每维累计 > COVERAGE_FLOOR,使机制 C 不触发
+    const highCovWeights: WeightVector = {
+      sour: 30, sweet: 30, bitter: 30, spicy: 30,
+      salty: 30, rich: 30, crunchy: 30, tender: 30,
+    };
+    const answers = Array.from({ length: MIN_QUESTIONS }, (_, i) => ({
+      questionId: `q${i + 1}`,
+      weights: highCovWeights,
+    }));
+    const profile: WeightVector = {
+      sour: 150, sweet: 150, bitter: 150, spicy: 150,
+      salty: 150, rich: 150, crunchy: 150, tender: 150,
+    };
+    expect(shouldStop({
+      askedIds: Array.from({ length: MIN_QUESTIONS }, (_, i) => `q${i + 1}`),
+      answers,
+      profile,
+    })).toBe(true);
+  });
+
+  it('count = 25-32 + 有追问维 → 不停(严格要求)', () => {
+    // 低覆盖度答案(机制 C 触发),但 profile 未澄清
+    const lowCovWeights: WeightVector = { ...ZERO_VECTOR, spicy: 5, salty: 5 };
+    const answers = Array.from({ length: 25 }, (_, i) => ({
+      questionId: `q${i + 1}`,
+      weights: lowCovWeights,
+    }));
+    expect(shouldStop({
+      askedIds: new Array(25).fill('q'),
+      answers,
+      profile: ZERO_VECTOR,
+    })).toBe(false); // count=25 < 33, 必须全部澄清才停
+  });
+
+  it('count = 33 + 仅 1 个追问维 → 停(渐进容忍)', () => {
+    // 构造只有 1 个欠探索维的状态
+    const profile: WeightVector = {
+      sour: 150, sweet: 150, bitter: 0, spicy: 150,
+      salty: 150, rich: 150, crunchy: 150, tender: 150,
+    };
+    // sour 低覆盖,其他维高覆盖
+    const mixedWeights: WeightVector = {
+      sour: 2, sweet: 30, bitter: 0, spicy: 30,
+      salty: 30, rich: 30, crunchy: 30, tender: 30,
+    };
+    const answers = Array.from({ length: 33 }, (_, i) => ({
+      questionId: `q${i + 1}`,
+      weights: mixedWeights,
+    }));
+    // sour 累计 = 33*2 = 66 < 180 → 机制 C 标记 sour;其他维 > 180 → 仅 1 个追问维
+    const result = shouldStop({
+      askedIds: new Array(33).fill('q'),
+      answers,
+      profile,
+    });
+    expect(result).toBe(true); // count=33, pursueCount=1 ≤ 1 → 停
+  });
+
+  it('count = 37 + 仅 1 个追问维 → 停(渐进容忍)', () => {
+    // 构造只有 1 个欠探索维的状态
+    const mixedWeights: WeightVector = {
+      sour: 2, sweet: 30, bitter: 0, spicy: 30,
+      salty: 30, rich: 30, crunchy: 30, tender: 30,
+    };
+    const answers = Array.from({ length: 37 }, (_, i) => ({
+      questionId: `q${i + 1}`,
+      weights: mixedWeights,
+    }));
+    const profile: WeightVector = {
+      sour: 150, sweet: 150, bitter: 0, spicy: 150,
+      salty: 150, rich: 150, crunchy: 150, tender: 150,
+    };
+    // sour 累计 = 37*2 = 74 < 180 → 机制 C 标记;其他 > 180 → 仅 1 个追问维
+    expect(shouldStop({
+      askedIds: new Array(37).fill('q'),
+      answers,
+      profile,
+    })).toBe(true); // count=37 ∈ [37,41), pursueCount=1 ≤ 2 → 停
+  });
+
+  it('count = 41+ → 必停(不论追问维)', () => {
+    // 即使有多个追问维,count >= 41 也应停
+    const lowWeights: WeightVector = { ...ZERO_VECTOR, sour: 1, sweet: 1 };
+    const answers = Array.from({ length: 41 }, (_, i) => ({
+      questionId: `q${i + 1}`,
+      weights: lowWeights,
+    }));
+    expect(shouldStop({
+      askedIds: new Array(41).fill('q'),
+      answers,
+      profile: ZERO_VECTOR,
+    })).toBe(true);
   });
 });
 
@@ -354,21 +447,31 @@ describe('P7.1 四级全局去重', () => {
   });
 });
 
-describe('detectPursueDims(追问维度:同主题不一致 ∪ 同维强弱波动)', () => {
+describe('detectPursueDims(追问维度:A同主题不一致 ∪ B强弱波动 ∪ C覆盖度不足)', () => {
   it('常量合理', () => {
     expect(THEME_SIM).toBeGreaterThan(0);
     expect(INCONSISTENCY_GAP).toBeGreaterThan(0);
     expect(STRONG_W).toBeGreaterThan(WEAK_W);
     expect(CLARIFIED_ABS).toBeGreaterThan(STRONG_W);
+    expect(COVERAGE_FLOOR).toBeGreaterThan(0);
+    expect(BANK_MIN_DENSITY).toBeGreaterThan(0);
   });
 
-  it('无答题历史 → 空集(不会假阳性)', () => {
-    expect(detectPursueDims([], ZERO_VECTOR).size).toBe(0);
+  it('无答题历史 + 无 profile → 机制 C 标记欠探索维(排除苦维)', () => {
+    // 空答案时机制 C 会将题库密度 ≥ BANK_MIN_DENSITY 的维度标为欠探索
+    const pursue = detectPursueDims([], ZERO_VECTOR);
+    // bitter 密度 ≈ 14.4 < 25 → 不应被标记
+    expect(pursue.has('bitter')).toBe(false);
+    // 其他维度应被标记(题库密度充足 + 累计 = 0 < COVERAGE_FLOOR)
+    expect(pursue.has('sour')).toBe(true);
   });
 
-  it('answers 缺 questionId/weights 时安全降级(返回空集)', () => {
+  it('answers 缺 questionId/weights 时机制 A/B 安全降级', () => {
+    // 无有效答案时机制 A/B 不触发,但机制 C 仍会标记欠探索维
     const answers: { questionId?: string; weights?: WeightVector }[] = [{}, {}];
-    expect(detectPursueDims(answers, ZERO_VECTOR).size).toBe(0);
+    const pursue = detectPursueDims(answers, ZERO_VECTOR);
+    // 机制 A/B 不抛错,机制 C 仍会标记(因为 answered 也为空)
+    expect(pursue.has('bitter')).toBe(false);
   });
 
   it('机制 A:真实题库同主题题对不抛错', () => {
@@ -395,6 +498,42 @@ describe('detectPursueDims(追问维度:同主题不一致 ∪ 同维强弱波�
       salty: CLARIFIED_ABS, rich: CLARIFIED_ABS, crunchy: CLARIFIED_ABS, tender: CLARIFIED_ABS,
     };
     expect(detectPursueDims(answers, clarified).size).toBe(0);
+  });
+
+  it('机制 C: 高覆盖度答案使该维脱离追问集', () => {
+    // 构造每维累计 > COVERAGE_FLOOR(180) 的答案
+    const q0 = questionBank.questions[0]!;
+    const highWeights: WeightVector = {
+      sour: 30, sweet: 30, bitter: 30, spicy: 30,
+      salty: 30, rich: 30, crunchy: 30, tender: 30,
+    };
+    // 7 题 * 30 = 210 > 180 → 所有非苦维都应脱离追问集
+    const answers = Array.from({ length: 7 }, () => ({
+      questionId: q0.id,
+      weights: highWeights,
+    }));
+    const pursue = detectPursueDims(answers, ZERO_VECTOR);
+    // sour 累计 = 210 > 180 → 不标记
+    expect(pursue.has('sour')).toBe(false);
+    expect(pursue.has('sweet')).toBe(false);
+  });
+
+  it('机制 C: 低覆盖度维被标记为欠探索', () => {
+    // 构造 sour 低覆盖、其他维高覆盖的答案
+    const q0 = questionBank.questions[0]!;
+    const mixedWeights: WeightVector = {
+      sour: 2, sweet: 30, bitter: 0, spicy: 30,
+      salty: 30, rich: 30, crunchy: 30, tender: 30,
+    };
+    // 10 题: sour 累计 = 20 < 180, 其他 = 300 > 180
+    const answers = Array.from({ length: 10 }, () => ({
+      questionId: q0.id,
+      weights: mixedWeights,
+    }));
+    const pursue = detectPursueDims(answers, ZERO_VECTOR);
+    expect(pursue.has('sour')).toBe(true);
+    expect(pursue.has('sweet')).toBe(false);
+    expect(pursue.has('bitter')).toBe(false); // 题库密度不足,跳过
   });
 });
 

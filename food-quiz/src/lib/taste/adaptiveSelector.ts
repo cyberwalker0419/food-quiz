@@ -27,13 +27,17 @@ export const GLOBAL_DEDUP_WINDOW = 10;
 /** 追问机制 A(同主题强弱不一致):两题主题向量余弦 ≥ 此值视为同主题。 */
 export const THEME_SIM = 0.6;
 /** 追问机制 A:同主题两题,用户在某维的归一化表态强度差 ≥ 此值视为强弱背离。 */
-export const INCONSISTENCY_GAP = 0.5;
+export const INCONSISTENCY_GAP = 0.45;
 /** 追问机制 B(强弱波动):某维强信号阈值,|w| ≥ 此值视为用户在该维明确表态。 */
-export const STRONG_W = 20;
+export const STRONG_W = 18;
 /** 追问机制 B:某维弱信号阈值,|w| ≤ 此值视为用户在该维淡漠;同时题里需有强选项可选(题本身能强表态)。 */
 export const WEAK_W = 5;
 /** 追问机制 B:用户既强又弱,但 profile 推到 |值| ≥ 此值后视为已澄清,该维脱离追问集合(收敛)。 */
-export const CLARIFIED_ABS = 100;
+export const CLARIFIED_ABS = 140;
+/** 追问机制 C(覆盖度追问):某维累计 |weight| 总和 < 此值视为欠探索。 */
+export const COVERAGE_FLOOR = 180;
+/** 追问机制 C:题库中某维平均 |weight|/题 < 此值时,跳过该维(题库本身无法充分探索,如苦维)。 */
+export const BANK_MIN_DENSITY = 25;
 /** 低响应维度窗口:基于最近 N 题的 profile 增量。 */
 const LOW_RESPONSE_WINDOW = 5;
 /** P8.1 stem 全 session 软惩罚:累计出现 n 次 → 评分 × penalty[n](capped at 4)。 */
@@ -42,6 +46,22 @@ export const STEM_DEDUP_SOFT_PENALTY: readonly number[] = [1.0, 0.3, 0.1, 0.03, 
 export const STEM_DEDUP_LATE_DOUBLE_PENALTY = 0.3;
 /** P8.1 后期 stem 去重启动阈值:已答 ≥ 此值才启用硬折扣(避免早期题池饿死)。 */
 export const STEM_DEDUP_LATE_THRESHOLD = 20;
+
+/**
+ * 题库各维平均信号密度(模块级缓存,避免 detectPursueDims 重复计算)。
+ * 用于机制 C:密度 < BANK_MIN_DENSITY 的维度(如苦维 ≈ 14.4)被跳过,避免永久追问。
+ */
+const BANK_DENSITY: Record<TasteDimension, number> = (() => {
+  const out = {} as Record<TasteDimension, number>;
+  for (const d of DIMS) {
+    let total = 0;
+    for (const q of questionBank.questions) {
+      for (const o of q.options) total += Math.abs(o.weights[d] || 0);
+    }
+    out[d] = total / questionBank.questions.length;
+  }
+  return out;
+})();
 
 const TOP_K = 5;
 const TOP_K_WEIGHTS = [0.34, 0.24, 0.18, 0.14, 0.10];
@@ -241,15 +261,18 @@ function maxOptionWeight(q: QuizQuestion, d: TasteDimension): number {
 }
 
 /**
- * 追问维度检测(动态 25–45 模型核心,≥25 后决定是否继续追问)。
- * 两套机制都不依赖负权重,规避"题库各维权重几乎全正"的偏态:
+ * 追问维度检测(渐进式 25–45 模型核心,≥25 后决定是否继续追问)。
+ * 三套机制都不依赖负权重,规避"题库各维权重几乎全正"的偏态:
  *
  * 机制 A(同主题强弱不一致):用户在主题相近的两道题上,对共同主维的归一化表态强度
  *   差 ≥ INCONSISTENCY_GAP → 该维判为摇摆。
  * 机制 B(同维强弱波动):用户在某维既给过强信号(|w|≥STRONG_W),又在能强表态的题上
  *   选了弱选项(|w|≤WEAK_W,且题里其他选项 ≥STRONG_W) → 该维判为自相矛盾。
+ * 机制 C(覆盖度不足):某维累计信号总量 < COVERAGE_FLOOR → 该维视为欠探索。
+ *   题库密度 < BANK_MIN_DENSITY 的维度(如苦维)被自动跳过。
  *
- * 收敛保证:profile 推到 |值| ≥ CLARIFIED_ABS 后该维脱离追问集合,不会卡满 45。
+ * 收敛保证:profile 推到 |值| ≥ CLARIFIED_ABS 或累计信号 ≥ COVERAGE_FLOOR 后
+ * 该维脱离追问集合,不会卡满 45。
  */
 export function detectPursueDims(
   answers: { questionId?: string; weights?: WeightVector }[],
@@ -297,6 +320,17 @@ export function detectPursueDims(
       if (maxQ >= STRONG_W && w <= WEAK_W) lo = true;
     }
     if (hi && lo) out.add(d);
+  }
+
+  // 机制 C: 覆盖度不足 — 某维累计信号总量低于 COVERAGE_FLOOR
+  for (const d of DIMS) {
+    if (Math.abs(profile[d] || 0) >= CLARIFIED_ABS) continue; // 已澄清
+    if (BANK_DENSITY[d] < BANK_MIN_DENSITY) continue;         // 题库无法充分探索(如苦维)
+    let userTotal = 0;
+    for (const a of answered) {
+      userTotal += Math.abs(a.w[d] || 0);
+    }
+    if (userTotal < COVERAGE_FLOOR) out.add(d);
   }
 
   return out;
@@ -467,12 +501,12 @@ export function pickNextQuestion(
 }
 
 /**
- * 停止判定(动态 25–45 追问模型,由 App.tsx 在每题答完后调用):
+ * 停止判定(渐进式 25–45 追问模型,由 App.tsx 在每题答完后调用):
  *   - count ≥ MAX(45) → 必停(硬上限)
  *   - count < MIN(25) → 必继续(基础 25 题必答)
- *   - count ≥ MIN → 仅当无追问维度(同主题不一致 ∪ 信息不足)才停
+ *   - count ≥ MIN → 渐进放宽:题数越多,越容忍残余追问维度
  *
- * 取代旧 App 本地 shouldContinue(std<5)。追问维度随 profile 被推高而收敛,不卡满 45。
+ * 追问维度随 profile 被推高和覆盖度积累而收敛,不卡满 45。
  */
 export function shouldStop(state: {
   askedIds: string[];
@@ -482,5 +516,13 @@ export function shouldStop(state: {
   const count = state.askedIds.length;
   if (count >= MAX_QUESTIONS) return true;
   if (count < MIN_QUESTIONS) return false;
-  return detectPursueDims(state.answers, state.profile).size === 0;
+
+  const pursueCount = detectPursueDims(state.answers, state.profile).size;
+  if (pursueCount === 0) return true; // 无追问维 → 必停
+
+  // 渐进放宽:题数越多,越容忍残余追问维
+  if (count < 33) return false;            // 25-32: 必须全部澄清才停
+  if (count < 37) return pursueCount <= 1;  // 33-36: 容忍 1 个残余维
+  if (count < 41) return pursueCount <= 2;  // 37-40: 容忍 2 个残余维
+  return true;                              // 41+: 足够数据,停
 }

@@ -61,6 +61,8 @@ export interface AssembledResult {
   raw: WeightVector;
   /** 8 维标准差 */
   std: number;
+  /** 个性头衔:整体组合画像名(如「嗜辣派」「辣咸浓」「味觉全才」),每组合唯一 */
+  profileLabel: string;
   /** 一段长综合评价(~100 字整体人格定性;联动信息已并入)。allround 分支下 UI 走 allround,此字段仍生成备分享卡之外的场景使用 */
   profileCopy: string;
   /** 全 8 维(按 |value-50| 降序;雷达图 + 8 维明细的数据源) */
@@ -202,6 +204,7 @@ export function assembleResult(
 
   // 整体组合画像(已 humanize 的 intervals/<index>.json)
   const overallEntry = loadInterval(intervalIndex);
+  const overallLabel = overallEntry?.label ?? '味觉画像';
   const overallCopy = overallEntry?.copy ?? '你的口味在各种味道之间自成一格';
 
   // allIntervals:全 8 维,按 |value-50| 降序(雷达图 + 8 维明细数据源)
@@ -280,6 +283,7 @@ export function assembleResult(
     vector: v,
     raw,
     std: s,
+    profileLabel: overallLabel,
     profileCopy,
     allIntervals,
     synergy,
