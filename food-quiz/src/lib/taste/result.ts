@@ -1,20 +1,17 @@
 import type { WeightVector, DimensionVector, TasteLetter } from './types';
-import { DIMS, letterToChinese, letterToTierLabel, letterToDim, indexToKey, valueToGrade, type Grade } from './keys';
+import { DIMS, letterToChinese, letterToTierLabel, letterToDim, valueToGrade, type Grade } from './keys';
 import { normalize, std } from './normalize';
 import { blendedScore } from './similarity';
 import {
   loadInterval,
-  loadExtreme,
   loadSynergy,
   loadAllround,
   loadDishes,
   type DishEntry,
 } from './loaders';
 
-const STD_ALLROUND = 15;        // master §三-8 全能文案触发
-const HIGH_THRESHOLD = 60;      // master §三-2
-const EXTREME_THRESHOLD = 90;   // master §三-2
-const DEFAULT_TOP_N_INTERVALS = 3;
+const STD_ALLROUND = 15;        // master §7 全能文案触发
+const HIGH_THRESHOLD = 60;      // master §7
 const DEFAULT_TOP_N_DISHES = 5;
 
 /** Mulberry32 PRNG(从 adaptiveSelector 复制,避免跨模块依赖)。 */
@@ -31,25 +28,17 @@ function mulberry32(seed: number): () => number {
 
 // ===== 渲染数据结构 =====
 
+/**
+ * 单维渲染项:雷达图 + 8 维档位明细的数据源。
+ * 只保留被消费的字段(letter/value/tierLabel/grade/isHigh);
+ * 旧多卡片机制用的 label/copy/index/key 已随重构移除。
+ */
 export interface RenderedInterval {
   letter: TasteLetter;
-  index: number;
-  key: string;
-  label: string;
-  copy: string;
   value: number;
-  /** 文案档位标签:低X / 重X / 重X ⚡极(浓维:清淡 / 浓 / 口味重 ⚡极) */
   tierLabel: string;
-  /** 视觉档位:A/B/C/D/E(每档 20 分);仅用于雷达 / bar / 数值标注层 */
   grade: Grade;
   isHigh: boolean;
-  isExtreme: boolean;
-}
-
-export interface RenderedExtreme {
-  letter: TasteLetter;
-  label: string;
-  copy: string[];
 }
 
 export interface RenderedSynergy {
@@ -72,20 +61,89 @@ export interface AssembledResult {
   raw: WeightVector;
   /** 8 维标准差 */
   std: number;
-  /** 默认视图(前 3 高档位文案) */
-  intervals: RenderedInterval[];
-  /** 完整版(全 8 维) */
+  /** 一段长综合评价(~100 字整体人格定性;联动信息已并入)。allround 分支下 UI 走 allround,此字段仍生成备分享卡之外的场景使用 */
+  profileCopy: string;
+  /** 全 8 维(按 |value-50| 降序;雷达图 + 8 维明细的数据源) */
   allIntervals: RenderedInterval[];
-  /** 极档特殊文案(≥ 90) */
-  extremes: RenderedExtreme[];
-  /** 联动文案(仅 Top1 + Top2 都 > 60 触发) */
+  /** 联动文案(仅 Top1 + Top2 都 > 60 触发);UI 已并入 profileCopy,字段保留供内部/分享卡 */
   synergy: RenderedSynergy | null;
-  /** 全能文案(std < 15 触发,替换 256 区间文案分支) */
+  /** 全能文案(std < 15 触发,独立分支) */
   allround: RenderedAllround | null;
-  /** 推荐菜(Phase 5 才有 dishes.json;每菜系最多 1 道,跨菜系多样) */
+  /** 推荐菜 */
   topDishes: DishEntry[];
   /** 8 维档位标签,供雷达图轴标注 */
   tierLabels: Record<TasteLetter, string>;
+}
+
+// ===== 长评价素材池(humanizer-zh 润色) =====
+// 两套句池按高档维度数分桶 + index 散列选取:
+//   - SCENE:吃饭场景句(无联动时填补,使段落成 3 句)
+//   - TAIL :口味态度收尾句
+// 都不点维度名,只写场景/态度;"清淡型/适中型/重口型"各自落到气质相符的句子。
+
+const SCENE_LIGHT = [ // highCount <= 1:清淡 / 单一突出
+  '下馆子你也不爱点大菜，一份顺口的就够',
+  '你吃饭图省心，调料堆太狠的菜反倒把你绕晕',
+  '外卖翻半天，最后点的还是那几样老菜',
+  '别人研究新店，你认准家门口那家懒得换',
+];
+const SCENE_MID = [ // highCount 2-3
+  '工作日你吃得随便，周末才想整点重的',
+  '朋友问吃什么，你张口就能报出菜名',
+  '不是什么都吃，但合你口的那几道绝不凑合',
+  '冰箱里常备你的招牌食材，饿了随时开火',
+];
+const SCENE_HEAVY = [ // highCount >= 4
+  '一桌菜你恨不得每样都夹两筷子，单吃一道你觉得亏',
+  '重油重辣的馆子你最熟，清淡的你记不住几家',
+  '夜宵摊是你的主场，烤串小龙虾越晚越精神',
+  '出门吃饭你专挑味重的店，白水煮的你坐不住',
+];
+
+const TAIL_LIGHT = [
+  '说到底，你对吃的不较真，但合胃口的那几样，你认得死死的',
+  '花里胡哨的菜你反倒吃不惯，一碗热汤下肚就踏实',
+  '外食也好家里也好，你要的从来就是个舒服',
+  '你的舌头不刁，但凡对上味的，你能记很久',
+];
+const TAIL_MID = [
+  '点菜你心里有谱，不该上的绝不多嘴',
+  '对味的多吃两口，不对味的碰都不碰，你这人干脆',
+  '你不跟风点网红菜，吃的就是自己那套准',
+  '味道上的事你有脾气，但不折腾',
+];
+const TAIL_HEAVY = [
+  '说白了，凑合的饭局你宁可饿着回家煮面',
+  '桌上味道越杂你越来劲，单打独斗的菜你觉得没劲',
+  '酸甜苦辣咸你都接得住，换个人早受不了',
+  '你这嘴惯得刁，糊弄不过去，得有真东西才咽得下',
+];
+
+/** highCount → 气质桶(scene 池, tail 池) */
+function pickBuckets(highCount: number): { scene: readonly string[]; tail: readonly string[] } {
+  if (highCount <= 1) return { scene: SCENE_LIGHT, tail: TAIL_LIGHT };
+  if (highCount <= 3) return { scene: SCENE_MID, tail: TAIL_MID };
+  return { scene: SCENE_HEAVY, tail: TAIL_HEAVY };
+}
+
+/**
+ * 拼装一段整体人格定性长评价(~80–100 字)。
+ * = 整体组合画像 + 中段(联动浓缩句,否则吃饭场景句) + 口味态度收尾;不逐维罗列。
+ * 各素材均已 humanize;中段与收尾按 highCount 分桶、用不同散列独立选取,避免撞同一句。
+ */
+function buildProfileCopy(
+  overallCopy: string,
+  synergyCopy: string | null,
+  highCount: number,
+  hash: number,
+): string {
+  const { scene, tail } = pickBuckets(highCount);
+  const parts: string[] = [];
+  if (overallCopy) parts.push(overallCopy);
+  // 中段:有联动用联动浓缩句,否则用场景句补足(保证段落始终 3 句)
+  parts.push(synergyCopy ?? scene[Math.abs(hash) % scene.length]!);
+  parts.push(tail[Math.abs(hash >> 3) % tail.length]!);
+  return parts.filter(Boolean).join('。') + '。';
 }
 
 // ===== 工具 =====
@@ -115,18 +173,16 @@ function pickOne(copy: readonly string[] | string | undefined): string {
 
 /**
  * 8 维归一化向量 → 完整渲染结构。
+ *
+ * 文案形态(重构后):「味觉特征」是一段 ~100 字长综合评价(profileCopy),
+ * 由整体组合画像 + 联动浓缩 + 口气质收尾拼成,不再逐维罗列卡片。
  * - 任一文案/菜品模块缺失 → 该字段为 null/空数组,**不抛错**。
- * - 极档文案随 8 维一起排序出现(共享 allIntervals)。
  */
 export function assembleResult(
   raw: WeightVector,
-  options?: { topNIntervals?: number; topNDishes?: number; maxAbs?: number; seed?: number },
+  options?: { topNDishes?: number; maxAbs?: number; seed?: number },
 ): AssembledResult {
-  const topNIntervals = options?.topNIntervals ?? DEFAULT_TOP_N_INTERVALS;
   const topNDishes = options?.topNDishes ?? DEFAULT_TOP_N_DISHES;
-  // session seed:同一画像每次进入 result 阶段传不同 seed,推荐菜锚点
-  // 从 Top-K 高分池里加权抽样,避免"两次测试推到一样的菜"。
-  // 若不传,默认用 Math.random,保持调用方不感知;测试需要确定性时显式传值。
   const rng = options?.seed !== undefined ? mulberry32(options.seed) : Math.random;
 
   const v = normalize(raw, options?.maxAbs);
@@ -139,74 +195,34 @@ export function assembleResult(
     tierLabels[letter] = letterToTierLabel(letter, v[letterToDim(letter)]);
   }
 
-  // 8 个字母位是否高档
+  // 8 个字母位是否高档(决定 256 组合 index)
   const isHighBit: boolean[] = DIMS.map((l) => v[letterToDim(l as TasteLetter)] > HIGH_THRESHOLD);
   const intervalIndex = parseInt(isHighBit.map((b) => (b ? '1' : '0')).join(''), 2);
-  const intervalKey = indexToKey(intervalIndex);
+  const highCount = isHighBit.filter(Boolean).length;
 
-  // allIntervals:8 维全排序
-  const allIntervals: RenderedInterval[] = [];
-  for (let i = 0; i < 8; i++) {
-    const letter = DIMS[i] as TasteLetter;
-    const value = v[letterToDim(letter)];
-    const tierLabel = tierLabels[letter]!;
-    const isHigh = isHighBit[i]!;
-    const isExtreme = value >= EXTREME_THRESHOLD;
-    let label: string;
-    let copy: string;
-    if (isHigh) {
-      const entry = loadInterval(intervalIndex);
-      if (entry) {
-        label = entry.label;
-        copy = entry.copy;
-      } else {
-        label = tierLabel;
-        copy = `${tierLabel}的代表,你可能爱这一口`;
-      }
-    } else {
-      label = tierLabel;
-      copy = `${tierLabel},日常口味`;
-    }
-    allIntervals.push({
+  // 整体组合画像(已 humanize 的 intervals/<index>.json)
+  const overallEntry = loadInterval(intervalIndex);
+  const overallCopy = overallEntry?.copy ?? '你的口味在各种味道之间自成一格';
+
+  // allIntervals:全 8 维,按 |value-50| 降序(雷达图 + 8 维明细数据源)
+  const allIntervals: RenderedInterval[] = DIMS
+    .map((l, i) => ({
+      letter: l as TasteLetter,
+      value: v[letterToDim(l as TasteLetter)],
+      isHigh: isHighBit[i]!,
+    }))
+    .sort((x, y) => Math.abs(y.value - 50) - Math.abs(x.value - 50))
+    .map(({ letter, value, isHigh }) => ({
       letter,
-      index: isHigh ? intervalIndex : -1,
-      key: isHigh ? intervalKey : '',
-      label,
-      copy,
       value,
-      tierLabel,
+      tierLabel: tierLabels[letter]!,
       grade: valueToGrade(value),
       isHigh,
-      isExtreme,
-    });
-  }
-  // 按"与 50 绝对距离"降序(master §三-7)
-  allIntervals.sort((x, y) => Math.abs(y.value - 50) - Math.abs(x.value - 50));
-  const intervals = allIntervals.slice(0, topNIntervals);
+    }));
 
-  // 味觉特征去重:所有高档维度共享同一条 interval 文案(整体组合的 label+copy),
-  // top1 保留整体文案,其余高档维度改用 tierLabel + 维度独立描述,
-  // 避免 ResultCard「味觉特征」top3 显示三条一模一样。
-  const topLabel = intervals[0]?.label ?? '';
-  const topCopy = intervals[0]?.copy ?? '';
-  for (let i = 1; i < intervals.length; i++) {
-    const iv = intervals[i]!;
-    if (!iv.isHigh) continue;
-    if (iv.label === topLabel) iv.label = iv.tierLabel;
-    if (iv.copy === topCopy) iv.copy = `${letterToChinese(iv.letter)}味偏好突出，${iv.tierLabel}`;
-  }
-
-  // extremes
-  const extremes: RenderedExtreme[] = [];
-  for (const r of allIntervals) {
-    if (!r.isExtreme) continue;
-    const ex = loadExtreme(r.letter.toLowerCase());
-    if (!ex) continue;
-    extremes.push({ letter: r.letter, label: ex.label, copy: ex.copy });
-  }
-
-  // synergy
+  // synergy(Top1 + Top2 都 > 60 才触发);其 copy 并入 profileCopy
   let synergy: RenderedSynergy | null = null;
+  let synergyCopyForProfile: string | null = null;
   const top2 = pickTop2High(v);
   if (top2) {
     const entry = loadSynergy(top2.a, top2.b);
@@ -218,24 +234,20 @@ export function assembleResult(
       copy = entry.template.replace(/\{a\}/g, aName).replace(/\{b\}/g, bName);
     }
     synergy = { label: entry.label, copy, a: top2.a, b: top2.b, source };
+    synergyCopyForProfile = copy;
   }
 
-  // allround(std < 15)
+  // allround(std < 15,独立分支)
   let allround: RenderedAllround | null = null;
   if (s < STD_ALLROUND) {
     const entry = loadAllround();
     if (entry) allround = { label: entry.label, copy: pickOne(entry.copy) };
   }
 
-  // 避雷指南已下线(avoid 字段不再生成;loadAvoid 数据保留以备将来恢复)
+  // 一段长综合评价
+  const profileCopy = buildProfileCopy(overallCopy, synergyCopyForProfile, highCount, intervalIndex);
 
-  // topDishes —— 「匹配池内加权随机抽样」选菜:
-  //   - 仅从 popular 库(过滤冷门)
-  //   - 候选池 = blendedScore ≥ 0.6 × 最高分 的所有菜(动态阈值,不限定个数)
-  //   - 池太小(< topN) 时放宽到全 popular,保证至少能凑齐 topN
-  //   - 池内按 score² 加权抽样(高分易中、低分仍有机会)
-  //   - 唯一硬约束:不重菜名(同菜系/同地区都允许)
-  //   - 同 seed → 确定性(测试可复现);App.tsx 每次进 result 阶段传新 seed → 每次随机不同
+  // topDishes(匹配池内加权随机抽样,同 seed 确定性)
   let topDishes: DishEntry[] = [];
   const dishes = loadDishes();
   if (dishes) {
@@ -243,11 +255,9 @@ export function assembleResult(
     const scored = popular.map((d) => ({ d, score: blendedScore(v, d.vector) }));
     scored.sort((a, b) => b.score - a.score);
     const topScore = scored[0]?.score ?? 0;
-    // 匹配池:分数 ≥ 60% 最高分;若池内不足 topN,扩到全库保证可凑齐
     const MATCH_RATIO = 0.6;
-    let pool = scored.filter((s) => s.score >= topScore * MATCH_RATIO);
+    let pool = scored.filter((p) => p.score >= topScore * MATCH_RATIO);
     if (pool.length < topNDishes) pool = scored;
-    // 加权随机抽 topN 道(按 score² 加权,无放回)
     const seenNames = new Set<string>();
     const remaining = pool.slice();
     while (topDishes.length < topNDishes && remaining.length > 0) {
@@ -260,7 +270,7 @@ export function assembleResult(
         if (r <= 0) { pickedIdx = i; break; }
       }
       const picked = remaining.splice(pickedIdx, 1)[0]!;
-      if (seenNames.has(picked.d.name)) continue; // 去重菜名
+      if (seenNames.has(picked.d.name)) continue;
       seenNames.add(picked.d.name);
       topDishes.push(picked.d);
     }
@@ -270,9 +280,8 @@ export function assembleResult(
     vector: v,
     raw,
     std: s,
-    intervals,
+    profileCopy,
     allIntervals,
-    extremes,
     synergy,
     allround,
     topDishes,

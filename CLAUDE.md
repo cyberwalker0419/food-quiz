@@ -6,7 +6,7 @@
 ## 0. 一句话定位
 
 纯前端、零网络请求的「中国味觉性格测试」：用户答 20–45 道自适应题 → 8 维味觉向量 → 雷达图 +
-区间/极档/联动/全能/避雷五类文案 + 菜品推荐 + Canvas 分享卡。生产依赖只有 `react` 和 `react-dom`。
+区间/联动/全能/避雷四类文案 + 菜品推荐 + Canvas 分享卡。生产依赖只有 `react` 和 `react-dom`。
 
 ---
 
@@ -136,7 +136,7 @@ src/
 - 中文字名（「浓」而非「鲜」）只允许出现在 `keys.ts` 与测试里，不要散落到文案 JSON 或组件。
 
 **大小写编码（256 文件名的来源）：**
-- **大写 = 高档（>60），小写 = 低档（≤60）。** 极档（≥90）不改大小写，只额外叠加极档文案。
+- **大写 = 高档（>60），小写 = 低档（≤60）。**
 - 索引串顺序固定为 `S T K L I X C N`，如 `StKliXcN`。
 - `keyToIndex(key)`：S 是 bit7（MSB）… N 是 bit0，大写→1、小写→0，拼成 8 位二进制 → 0–255。
 - 存储文件名用 **3 位十进制** `000.json`–`255.json`（**Windows NTFS 大小写不敏感，必须用数字名，
@@ -146,13 +146,13 @@ src/
 
 ## 6. 两套并行的档位系统（极易混淆，务必分清）
 
-| | **三档文案层** | **五档视觉层** |
+| | **两档文案层** | **五档视觉层** |
 |:--|:--|:--|
 | 函数 | `letterToTierLabel(letter, score)` | `valueToGrade(value)` |
 | 类型 | 返回 `string` | 返回 `Grade`（`'A'.. 'E'`） |
 | 用途 | **驱动文案选择**与文案里的档位标签 | **驱动雷达 / bar / 徽章的颜色**（`GRADE_COLORS`） |
-| 分档 | 低档 ≤60 / 高档 (60,90) / 极档 ≥90 | A[80,100] B[60,80) C[40,60) D[20,40) E[0,20] |
-| 浓维(X)特例 | 清淡 / 浓 / 口味重 ⚡极（其余维：低X / 重X / 重X ⚡极） | 无特例 |
+| 分档 | 低档 ≤60 / 高档 >60 | A[80,100] B[60,80) C[40,60) D[20,40) E[0,20] |
+| 浓维(X)特例 | 清淡 / 浓（其余维：低X / 重X） | 无特例 |
 
 **二者并行存在，互不替代。** 改其中一个的阈值时，想清楚影响的是文案还是颜色。
 
@@ -165,7 +165,6 @@ src/
 | `MIN_QUESTIONS` | 20 | adaptiveSelector | 最少题数 |
 | `MAX_QUESTIONS` | 45 | adaptiveSelector | 最多题数 |
 | `HIGH_THRESHOLD` | 60 | result | 高档 / 区间文案 / 联动触发线 |
-| `EXTREME_THRESHOLD` | 90 | result | 极档文案触发线 |
 | `STD_ALLROUND` | 15 | result | std < 15 → 触发「全能味觉」文案，替换 256 区间分支 |
 | `DEFAULT_TOP_N_INTERVALS` | 3 | result | 默认显示前 3 条区间文案 |
 | `DEFAULT_TOP_N_DISHES` | 5 | result / 卡片实际画 3 | 推荐菜 Top N |
@@ -185,12 +184,14 @@ src/
 src/content/
 ├── questions/questions.json     # 200 题总库 + schema + loader（加载期即校验，失败 fail-fast）
 ├── intervals/                   # 256 条区间文案（000.json … 255.json，对应 8 位高低组合）
-├── extreme/{s,t,k,l,i,x,c,n}.json   # 8 条极档文案
 ├── synergies/                   # 10 个字母对 + 1 个 _fallback（未命中走兜底模板，永不 null）
 ├── allround/                    # _index.json + 01..04（std<15 时随机抽一条）
 ├── avoid/                       # _index.json + s..n.json（永远显示）
 └── dishes.json                  # 菜品向量库（196 道，~30 个菜系/区域）
 ```
+
+> 注：`extreme/` 目录曾是极档文案资产（≥90 触发额外警告区），2026-06 已将极档合并入高档、去除
+> 极档警告子系统，该目录文件保留为死资产不再被代码引用；`scripts/` 生成逻辑同步未再使用。
 
 **解耦铁律（来自 master plan）：**
 - 5 个文案目录 + `dishes.json` **互不引用**，统一通过 `keys.ts` 共享单字母体系。
@@ -210,10 +211,9 @@ src/content/
 1. 联动文案 synergy        ← 仅 Top1+Top2 都 >60（未命中则不渲染）
 2. 8 维雷达图              ← 永远显示；轴标签 = 中文 + grade 徽章
 3. 区间文案 / 全能文案     ← std<15 显示 allround，否则显示 intervals（默认前 3，可展开全 8）
-4. 极档警告 extremes       ← 仅 value ≥90（与 intervals 共享排序）
-5. 避雷指南 avoid          ← 永远显示（最低分维）
-6. 推荐菜 topDishes        ← 永远显示（默认折叠）
-7. 操作按钮                ← 重新测试 / 复制文案 / 保存结果图
+4. 避雷指南 avoid          ← 永远显示（最低分维）
+5. 推荐菜 topDishes        ← 永远显示（默认折叠）
+6. 操作按钮                ← 重新测试 / 复制文案 / 保存结果图
 ```
 
 分享卡（Canvas 540×960，JPEG 0.85）按相同信息层级绘制，两处改动要同步。分享卡字体

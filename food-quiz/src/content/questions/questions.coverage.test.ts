@@ -28,12 +28,12 @@ describe('questions.json 形状与硬约束', () => {
     }
   });
 
-  it('约束 2: 每维 ≥ 1 个极档探针 (weights[dim] ≥ 80)', () => {
+  it('约束 2: 每维 ≥ 1 个高分探针 (weights[dim] ≥ 80,自适应选题需推到高档)', () => {
     for (const dim of DIMS) {
       const hasProbe = bank.questions.some((q) =>
         q.options.some((o) => o.weights[dim] >= 80)
       );
-      expect(hasProbe, `dim ${dim} lacks extreme probe (>= 80)`).toBe(true);
+      expect(hasProbe, `dim ${dim} lacks high-score probe (>= 80)`).toBe(true);
     }
   });
 

@@ -2,28 +2,50 @@ import { describe, it, expect } from 'vitest';
 import { assembleResult } from './result';
 import { ZERO_VECTOR, type WeightVector } from './types';
 
-describe('assembleResult — 味觉特征去重', () => {
-  it('多维高档时,top3 的 copy 不全相同(高档维度不再共享 interval 文案)', () => {
-    // spicy/salty/rich 三维高档:归一化后都 > 60,top3 即这三维
+describe('assembleResult — profileCopy 长综合评价', () => {
+  const BANNED = ['凑在一起', '同时在线', '够劲的一顿', '比一般人复杂', '随便挑两样', '共振', '让你觉得'];
+
+  it('非空且落到合理字数区间(60–140 字)', () => {
     const r = assembleResult({ ...ZERO_VECTOR, spicy: 90, salty: 85, rich: 80 });
-    expect(r.intervals.length).toBe(3);
-    const copies = r.intervals.map((iv) => iv.copy);
-    const unique = new Set(copies).size;
-    expect(unique, `top3 copy 重复: ${copies.join(' | ')}`).toBeGreaterThan(1);
-    // label 同样不应全相同
-    const labels = r.intervals.map((iv) => iv.label);
-    expect(new Set(labels).size, `top3 label 重复: ${labels.join(' | ')}`).toBeGreaterThan(1);
+    expect(r.profileCopy.length).toBeGreaterThanOrEqual(60);
+    expect(r.profileCopy.length).toBeLessThanOrEqual(140);
+  });
+
+  it('多维高档:联动信息并入 profileCopy,以句号收尾的一段连续文字', () => {
+    const r = assembleResult({ ...ZERO_VECTOR, spicy: 90, salty: 85, rich: 80 });
+    expect(r.synergy).not.toBeNull();
+    expect(r.profileCopy).toMatch(/。$/);
+  });
+
+  it('全低档(highCount=0):走清淡收尾,仍是非空长评价,无 synergy', () => {
+    const r = assembleResult({ ...ZERO_VECTOR, sour: -10, sweet: -5 });
+    expect(r.profileCopy.length).toBeGreaterThan(0);
+    expect(r.synergy).toBeNull();
+  });
+
+  it('不含 humanizer 禁词', () => {
+    const cases = [
+      { ...ZERO_VECTOR, spicy: 90, salty: 85, rich: 80 },
+      { ...ZERO_VECTOR, spicy: 95 },
+      { ...ZERO_VECTOR, sour: 90, bitter: 90 },
+      { ...ZERO_VECTOR },
+    ];
+    for (const v of cases) {
+      const r = assembleResult(v);
+      for (const w of BANNED) {
+        expect(r.profileCopy, `命中禁词 "${w}": ${r.profileCopy}`).not.toContain(w);
+      }
+    }
   });
 });
 
 describe('assembleResult — 4 典型输入', () => {
-  it('全低:无 synergy,无 extremes,渲染管线不崩', () => {
+  it('全低:无 synergy,渲染管线不崩', () => {
     const v: WeightVector = { ...ZERO_VECTOR, sour: -10, sweet: -5 };
     const r = assembleResult(v);
     expect(r.synergy).toBeNull();
-    expect(r.extremes).toEqual([]);
-    expect(r.intervals.length).toBeGreaterThan(0);
-    expect(r.intervals.length).toBeLessThanOrEqual(3);
+    expect(r.allIntervals.length).toBe(8);
+    expect(r.profileCopy.length).toBeGreaterThan(0);
   });
 
   it('全高(>= 60):归一化后 8 维接近 75,std=0(allround 触发);有 synergy', () => {
@@ -35,8 +57,9 @@ describe('assembleResult — 4 典型输入', () => {
     const r = assembleResult(v);
     expect(r.synergy).not.toBeNull();
     expect(r.std).toBe(0); // 完全均匀
-    // 全 80 归一化后 = 100,8 维全 ≥ 90,触发 8 条 extreme
-    expect(r.extremes.length).toBe(8);
+    // 全 80 归一化后 = 100,8 维全为高档,isHigh=true
+    const highCount = r.allIntervals.filter((iv) => iv.isHigh).length;
+    expect(highCount).toBe(8);
   });
 
   it('8 维混合高(差别大):std>0,无 allround,有 synergy', () => {
@@ -50,15 +73,15 @@ describe('assembleResult — 4 典型输入', () => {
     expect(r.allround).toBeNull();
   });
 
-  it('极档 1 维(spicy=95):归一化后 = 100,≥ 90 触发;文件缺 → extremes 为空(容错)', () => {
+  it('单维极大(spicy=95):归一化后 = 100,isHigh=true,grade=A,tierLabel=重辣', () => {
     // 归一化后 spicy = 100,其他 = 50,8 维 std > 0
     const v: WeightVector = { ...ZERO_VECTOR, spicy: 95 };
     const r = assembleResult(v);
-    // 文件齐全 → spicy 归一化 100 ≥ 90,触发 1 条 extreme
-    expect(r.extremes.length).toBe(1);
-    // 且 allIntervals 标记了 isExtreme
     const spicyIv = r.allIntervals.find((iv) => iv.letter === 'L');
-    expect(spicyIv?.isExtreme).toBe(true);
+    expect(spicyIv?.isHigh).toBe(true);
+    expect(spicyIv?.grade).toBe('A');
+    expect(spicyIv?.tierLabel).toBe('重辣');
+    expect(r.tierLabels.L).toBe('重辣');
   });
 
   it('方差 < 15:allround 路径触发(文案已落盘)', () => {
@@ -69,22 +92,24 @@ describe('assembleResult — 4 典型输入', () => {
   });
 });
 
-describe('assembleResult — 极档边界 89.9/90.0/90.1(归一化后 [0,100] 边界)', () => {
+describe('assembleResult — 旧极档临界(90)现已并入高档', () => {
   // 用 maxAbs=200 固定刻度,raw=160 → v = 50+50·160/200 = 90 临界
-  it('sour=159, maxAbs=200(归一化 ≈ 89.75)→ isExtreme=false', () => {
+  it('sour=159, maxAbs=200(归一化 ≈ 89.75)→ tierLabel=重酸(高档)', () => {
     const r = assembleResult({ ...ZERO_VECTOR, sour: 159 }, { maxAbs: 200 });
     const iv = r.allIntervals.find((i) => i.letter === 'S');
-    expect(iv?.isExtreme).toBe(false);
+    expect(iv?.tierLabel).toBe('重酸');
+    expect(iv?.isHigh).toBe(true);
   });
-  it('sour=160, maxAbs=200(归一化 = 90)→ isExtreme=true', () => {
+  it('sour=160, maxAbs=200(归一化 = 90)→ tierLabel=重酸(旧极档线现已归高档)', () => {
     const r = assembleResult({ ...ZERO_VECTOR, sour: 160 }, { maxAbs: 200 });
     const iv = r.allIntervals.find((i) => i.letter === 'S');
-    expect(iv?.isExtreme).toBe(true);
+    expect(iv?.tierLabel).toBe('重酸');
+    expect(iv?.isHigh).toBe(true);
   });
-  it('sour=161, maxAbs=200(归一化 ≈ 90.25)→ isExtreme=true', () => {
+  it('sour=161, maxAbs=200(归一化 ≈ 90.25)→ tierLabel=重酸', () => {
     const r = assembleResult({ ...ZERO_VECTOR, sour: 161 }, { maxAbs: 200 });
     const iv = r.allIntervals.find((i) => i.letter === 'S');
-    expect(iv?.isExtreme).toBe(true);
+    expect(iv?.tierLabel).toBe('重酸');
   });
 });
 
@@ -100,18 +125,17 @@ describe('assembleResult — 联动未命中走 _fallback', () => {
 });
 
 describe('assembleResult — 维度档位标签', () => {
-  it('spicy 单维 95 → normalize 后 100 → tierLabels.L = "重辣 ⚡极"', () => {
+  it('spicy 单维 95 → normalize 后 100 → tierLabels.L = "重辣"(高档,无 ⚡极)', () => {
     const r = assembleResult({ ...ZERO_VECTOR, spicy: 95 });
-    expect(r.tierLabels.L).toBe('重辣 ⚡极');
+    expect(r.tierLabels.L).toBe('重辣');
   });
 
-  it('浓维 rich 单维 95 → "口味重 ⚡极"', () => {
+  it('浓维 rich 单维 95 → "浓"(高档,无 ⚡极)', () => {
     const r = assembleResult({ ...ZERO_VECTOR, rich: 95 });
-    expect(r.tierLabels.X).toBe('口味重 ⚡极');
+    expect(r.tierLabels.X).toBe('浓');
   });
 
-  // 使用显式 maxAbs 来测试中档场景
-  it('spicy=70,maxAbs=200 → v=67.5 → "重辣"(高档但非极档)', () => {
+  it('spicy=70,maxAbs=200 → v=67.5 → "重辣"(高档)', () => {
     const r = assembleResult({ ...ZERO_VECTOR, spicy: 70 }, { maxAbs: 200 });
     expect(r.tierLabels.L).toBe('重辣');
   });
@@ -121,7 +145,7 @@ describe('assembleResult — 维度档位标签', () => {
     expect(r.tierLabels.L).toBe('低辣');
   });
 
-  it('浓维 rich=70,maxAbs=200 → v=67.5 → "浓"(浓维高档但非极档)', () => {
+  it('浓维 rich=70,maxAbs=200 → v=67.5 → "浓"(浓维高档)', () => {
     const r = assembleResult({ ...ZERO_VECTOR, rich: 70 }, { maxAbs: 200 });
     expect(r.tierLabels.X).toBe('浓');
   });
@@ -218,6 +242,6 @@ describe('assembleResult — 5 等级 grade 字段(视觉层)', () => {
     const r = assembleResult({ ...ZERO_VECTOR, spicy: 95 });
     const spicyIv = r.allIntervals.find((i) => i.letter === 'L')!;
     expect(spicyIv.grade).toBe('A');
-    expect(spicyIv.tierLabel).toBe('重辣 ⚡极');
+    expect(spicyIv.tierLabel).toBe('重辣');
   });
 });

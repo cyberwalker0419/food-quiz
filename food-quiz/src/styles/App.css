@@ -401,6 +401,9 @@ body::before {
 .allround-section { text-align: center; }
 .allround-copy { font-size: 15px; color: var(--ink-2); line-height: 1.9; letter-spacing: 0.03em; }
 
+/* 味觉特征:一段长综合评价 */
+.profile-copy { font-size: 15px; color: var(--ink-2); line-height: 1.9; margin: 0; letter-spacing: 0.03em; }
+
 .interval-item { padding: 12px 0; border-bottom: 1px dashed var(--line); }
 .interval-item:last-child { border-bottom: none; }
 .interval-label { font-weight: 600; font-size: 15px; color: var(--ink); margin: 0 0 4px; letter-spacing: 0.04em; }
@@ -420,18 +423,6 @@ body::before {
   transition: border-color 0.2s, color 0.2s;
 }
 .expand-btn:hover { border-color: var(--cinnabar); color: var(--cinnabar); }
-
-.extreme-item {
-  display: flex;
-  justify-content: space-between;
-  align-items: baseline;
-  gap: 12px;
-  padding: 10px 0;
-  border-bottom: 1px dashed var(--line);
-}
-.extreme-item:last-child { border-bottom: none; }
-.extreme-label { font-weight: 700; font-size: 14px; color: var(--cinnabar); white-space: nowrap; letter-spacing: 0.05em; }
-.extreme-copy  { font-size: 13px; color: var(--ink-2); text-align: right; }
 
 /* 避雷指南功能已下线(2026-06);若未来恢复,解开下方注释即可。
 .avoid-section { background: var(--paper-2); padding: 22px 20px; border-left: 3px solid var(--ink); }

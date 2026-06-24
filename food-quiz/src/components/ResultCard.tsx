@@ -13,21 +13,16 @@ interface Props {
 
 /**
  * P3 结果页主组件。消费 assembleResult() 返回的完整结构。
- * 渲染顺序(master plan §三-7):
- *   1. 联动文案(若 Top1+Top2 都 > 60)
- *   2. 8 维图(bar 列表,后续可换雷达图)
- *   3. 区间文案 / 全能文案(默认仅前 3,展开看全 8)
- *   4. 极档特殊文案
- *   5. 避雷指南
- *   6. 推荐菜(可折叠,Phase 5 才有数据)
- *   7. 操作按钮
+ * 渲染顺序:
+ *   1. 味觉特征:一段长综合评价(allround 独立分支)
+ *   2. 8 维雷达图 + 档位明细
+ *   3. 推荐菜(可折叠)
+ *   4. 操作按钮
  *
  * 解耦:任意文案模块缺文件 → assembleResult 返回 null/[] → 本组件相应 section 不渲染。
  */
 export function ResultCard({ result, questionCount, onRestart, onCopy, onDownload }: Props) {
-  const [expanded, setExpanded] = useState(false);
   const [dishesOpen, setDishesOpen] = useState(true);
-  const visibleIntervals = expanded ? result.allIntervals : result.intervals;
 
   // P7.2 挂载时预渲染分享卡 dataURL 并缓存 — 用户点「保存结果图」时直接走 <a download>,绕过 toBlob 异步
   const cachedDataUrlRef = useRef<string | null>(null);
@@ -71,12 +66,16 @@ export function ResultCard({ result, questionCount, onRestart, onCopy, onDownloa
           <span className="result-mode"> · 自适应 · {questionCount} 题</span>
         </div>
 
-        {/* 1. 联动文案 */}
-        {result.synergy && (
-          <section className="profile-section synergy-section">
-            <h2 className="section-title">味觉共振</h2>
-            <p className="synergy-label">{result.synergy.label}</p>
-            <p className="synergy-copy">{result.synergy.copy}</p>
+        {/* 1. 味觉特征:一段长综合评价(allround 独立分支) */}
+        {result.allround ? (
+          <section className="profile-section allround-section">
+            <h2 className="section-title">{result.allround.label}</h2>
+            <p className="allround-copy">{result.allround.copy}</p>
+          </section>
+        ) : (
+          <section className="profile-section intervals-section">
+            <h2 className="section-title">味觉特征</h2>
+            <p className="profile-copy">{result.profileCopy}</p>
           </section>
         )}
 
@@ -100,49 +99,7 @@ export function ResultCard({ result, questionCount, onRestart, onCopy, onDownloa
           </details>
         </section>
 
-        {/* 3. 区间文案 / 全能文案 */}
-        {result.allround ? (
-          <section className="profile-section allround-section">
-            <h2 className="section-title">{result.allround.label}</h2>
-            <p className="allround-copy">{result.allround.copy}</p>
-          </section>
-        ) : (
-          <section className="profile-section intervals-section">
-            <h2 className="section-title">味觉特征</h2>
-            {visibleIntervals.map((iv) => (
-              <div key={iv.letter} className="interval-item">
-                <p className="interval-label">{iv.label}</p>
-                <p className="interval-copy">{iv.copy}</p>
-              </div>
-            ))}
-            {result.allIntervals.length > result.intervals.length && (
-              <button
-                type="button"
-                className="expand-btn"
-                onClick={() => setExpanded(!expanded)}
-              >
-                {expanded ? '收起 ▲' : '展开完整解读 ▼'}
-              </button>
-            )}
-          </section>
-        )}
-
-        {/* 4. 极档警告 */}
-        {result.extremes.length > 0 && (
-          <section className="profile-section extremes-section">
-            <h2 className="section-title">极档警告</h2>
-            {result.extremes.map((ex) => (
-              <div key={ex.letter} className="extreme-item">
-                <span className="extreme-label">{ex.label}</span>
-                <span className="extreme-copy">{ex.copy[0]}</span>
-              </div>
-            ))}
-          </section>
-        )}
-
-        {/* 5. 避雷指南(已下线) */}
-
-        {/* 6. 推荐菜(可折叠) */}
+        {/* 3. 推荐菜(可折叠) */}
         {result.topDishes.length > 0 && (
           <section className="profile-section dishes-section">
             <button
@@ -166,7 +123,7 @@ export function ResultCard({ result, questionCount, onRestart, onCopy, onDownloa
           </section>
         )}
 
-        {/* 7. 操作按钮 */}
+        {/* 4. 操作按钮 */}
         <div className="result-actions">
           <button className="action-btn primary" onClick={onRestart}>
             <span>🔄</span> 重新测试
@@ -189,6 +146,6 @@ export function ResultCard({ result, questionCount, onRestart, onCopy, onDownloa
 function generateShareText(r: AssembledResult): string {
   const top = r.allIntervals[0];
   const tag = top ? top.tierLabel : '味觉独特';
-  const copy = r.allround?.copy || r.synergy?.copy || top?.copy || '';
+  const copy = r.allround?.copy || r.profileCopy || '';
   return `我的味觉灵魂是【${tag}】!${copy.slice(0, 40)} 你也来测一下?`;
 }

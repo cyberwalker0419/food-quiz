@@ -1,4 +1,4 @@
-import type { TasteDimension, TasteLetter } from './types';
+﻿import type { TasteDimension, TasteLetter } from './types';
 
 /**
  * 8 维单字母常量(顺序固定,不可重排)
@@ -85,19 +85,19 @@ export function isHigh(letter: string): boolean {
 }
 
 /**
- * 三档中文渲染标签。
- * - 除「浓」维外,高档 = 重<中文名>,极档 = 重<中文名> ⚡极
- * - 「浓」维(letter = X)三档:清淡 / 浓 / 口味重 ⚡极
- * - score 阈值: ≤ 60 低档, 60 < score < 90 高档, score ≥ 90 极档
+ * 两档中文渲染标签(原三档中的极档已合并入高档,文案不再区分)。
+ * - 除「浓」维外:低档 = 低<中文名>,高档 = 重<中文名>
+ * - 「浓」维(letter = X):低档 = 清淡,高档 = 浓
+ * - score 阈值: ≤ 60 低档, > 60 高档
+ *
+ * 注:本函数与 valueToGrade 互不替换,前者驱动文案选择,
+ * 后者仅用于雷达 / bar / 徽章颜色(五等级 A/B/C/D/E)。
  */
 export function letterToTierLabel(letter: TasteLetter, score: number): string {
   if (!Number.isFinite(score)) {
     throw new Error(`score must be a finite number, got ${score}`);
   }
   const isX = letter === 'X';
-  if (score >= 90) {
-    return isX ? '口味重 ⚡极' : `重${letterToChinese(letter)} ⚡极`;
-  }
   if (score > 60) {
     return isX ? '浓' : `重${letterToChinese(letter)}`;
   }
@@ -106,7 +106,7 @@ export function letterToTierLabel(letter: TasteLetter, score: number): string {
 
 /**
  * 五等级视觉档位(A/B/C/D/E,每档 20 分)。
- * 仅用于"8 维图视觉层"(雷达 / bar / 数值标注),**不**取代低/重/极文案触发。
+ * 仅用于"8 维图视觉层"(雷达 / bar / 数值标注),**不**取代低/重文案触发。
  *
  * 阈值(归一化后 [0, 100]):
  * | 档 | 区间        | 含义       |

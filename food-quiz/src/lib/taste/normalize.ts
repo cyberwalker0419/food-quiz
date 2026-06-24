@@ -11,7 +11,7 @@ const DIMS: readonly TasteDimension[] = [
  * - raw =  maxAbs → v = 100
  * - raw = -maxAbs → v = 0
  * - raw = 0       → v = 50
- * 单测覆盖边界;P3 极档(≥ 90)与高档(> 60)能正确触发。
+ * 单测覆盖边界;P3 高档(> 60)能正确触发。
  */
 export function normalize(raw: WeightVector, maxAbs?: number): DimensionVector {
   const m =

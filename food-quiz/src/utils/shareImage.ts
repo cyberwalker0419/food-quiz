@@ -213,10 +213,9 @@ function drawTopDishes(
   }
 }
 
-/** mainCopy 上方 section 标题:全能味觉 / 味觉共振 / 味觉特征。 */
+/** mainCopy 上方 section 标题:全能味觉 / 味觉特征(共振已并入长评价)。 */
 function pickSectionTitle(r: AssembledResult): string {
   if (r.allround) return '全能味觉'
-  if (r.synergy) return '味觉共振'
   return '味觉特征'
 }
 
@@ -263,24 +262,13 @@ export function drawShareCard(canvas: HTMLCanvasElement, data: ShareCardData) {
   ctx.font = `500 12px ${FONT_SERIF}`
   ctx.fillText(pickSectionTitle(r), W / 2, 178)
 
-  // synergy / allround 副标签(朱砂)
-  if (r.synergy || r.allround) {
-    ctx.fillStyle = CINNABAR
-    ctx.font = `600 13px ${FONT_SERIF}`
-    ctx.fillText((r.synergy || r.allround)!.label, W / 2, 200)
-  }
-
-  // mainCopy(墨灰,最多 2 行)
-  let mainCopy = ''
-  if (r.allround) mainCopy = r.allround.copy
-  else if (r.synergy) mainCopy = r.synergy.copy
-  else if (top) mainCopy = top.copy
-  const hasSubLabel = !!(r.synergy || r.allround)
-  const mainCopyStartY = hasSubLabel ? 224 : 196
+  // mainCopy = 一段长综合评价(allround 分支用 allround.copy,否则 profileCopy);墨灰,最多 3 行
+  const mainCopy = r.allround?.copy ?? r.profileCopy ?? ''
+  const mainCopyStartY = 198
   ctx.fillStyle = INK_2
   ctx.font = `400 12px ${FONT_SERIF}`
   const descLines = wrapText(ctx, mainCopy, W - 96)
-  descLines.slice(0, 2).forEach((line, i) => {
+  descLines.slice(0, 3).forEach((line, i) => {
     ctx.fillText(line, W / 2, mainCopyStartY + i * 16)
   })
 
@@ -300,23 +288,6 @@ export function drawShareCard(canvas: HTMLCanvasElement, data: ShareCardData) {
   ctx.font = `500 13px ${FONT_SERIF}`
   ctx.fillText('八维档位', W / 2, 566)
   drawDimensionList(ctx, r.allIntervals, 40, 584, W - 80, FONT_SERIF)
-
-  // ── 极档警告(朱砂) ──
-  if (r.extremes.length > 0) {
-    const exY = 768
-    ctx.textAlign = 'left'
-    ctx.textBaseline = 'middle'
-    ctx.fillStyle = INK_3
-    ctx.font = `500 13px ${FONT_SERIF}`
-    ctx.fillText('极档警告', 40, exY)
-    const ex = r.extremes[0]!
-    ctx.fillStyle = CINNABAR
-    ctx.font = `600 13px ${FONT_SERIF}`
-    ctx.fillText(ex.label, 130, exY)
-    ctx.fillStyle = INK_2
-    ctx.font = `400 11px ${FONT_SERIF}`
-    ctx.fillText((ex.copy[0] || '').slice(0, 24), 40, exY + 20)
-  }
 
   // ── 推荐菜 ──
   if (r.topDishes.length > 0) {

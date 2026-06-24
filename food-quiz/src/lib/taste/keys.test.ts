@@ -132,16 +132,13 @@ describe('letterToTierLabel', () => {
     expect(letterToTierLabel('N', 30)).toBe('低嫩');
   });
 
-  it('非浓维高档 (60 < score < 90) → "重<中文名>"', () => {
+  it('非浓维高档 (score > 60) → "重<中文名>"(90 及以上归高档,无 ⚡极)', () => {
     expect(letterToTierLabel('S', 61)).toBe('重酸');
     expect(letterToTierLabel('L', 89.9)).toBe('重辣');
     expect(letterToTierLabel('K', 75)).toBe('重苦');
-  });
-
-  it('非浓维极档 (score ≥ 90) → "重<中文名> ⚡极"', () => {
-    expect(letterToTierLabel('S', 90)).toBe('重酸 ⚡极');
-    expect(letterToTierLabel('L', 100)).toBe('重辣 ⚡极');
-    expect(letterToTierLabel('N', 95)).toBe('重嫩 ⚡极');
+    expect(letterToTierLabel('S', 90)).toBe('重酸');
+    expect(letterToTierLabel('L', 100)).toBe('重辣');
+    expect(letterToTierLabel('N', 95)).toBe('重嫩');
   });
 
   it('浓维低档 → "清淡"', () => {
@@ -149,31 +146,25 @@ describe('letterToTierLabel', () => {
     expect(letterToTierLabel('X', 60)).toBe('清淡');
   });
 
-  it('浓维高档 → "浓"', () => {
+  it('浓维高档 → "浓"(90 及以上归高档,无 ⚡极)', () => {
     expect(letterToTierLabel('X', 61)).toBe('浓');
     expect(letterToTierLabel('X', 89.9)).toBe('浓');
+    expect(letterToTierLabel('X', 90)).toBe('浓');
+    expect(letterToTierLabel('X', 100)).toBe('浓');
   });
 
-  it('浓维极档 → "口味重 ⚡极"', () => {
-    expect(letterToTierLabel('X', 90)).toBe('口味重 ⚡极');
-    expect(letterToTierLabel('X', 100)).toBe('口味重 ⚡极');
-  });
-
-  it('边界 60.0 → 低档,60.0001 → 高档', () => {
+  it('边界 60.0 → 低档,60.0001 → 高档,90.0 → 高档', () => {
     expect(letterToTierLabel('S', 60.0)).toBe('低酸');
     expect(letterToTierLabel('S', 60.0001)).toBe('重酸');
+    expect(letterToTierLabel('S', 90.0)).toBe('重酸');
+    expect(letterToTierLabel('X', 90.0)).toBe('浓');
   });
 
-  it('边界 90.0 极档触发', () => {
-    expect(letterToTierLabel('S', 90.0)).toBe('重酸 ⚡极');
-    expect(letterToTierLabel('X', 90.0)).toBe('口味重 ⚡极');
-  });
-
-  it('所有 7 个非浓维字母的低/高/极三档 21 种组合均可', () => {
+  it('所有 7 个非浓维字母的低/高两档 14 种组合均可', () => {
     for (const l of nonX) {
       expect(letterToTierLabel(l, 10)).toMatch(/^低[酸甜苦辣咸脆嫩]$/);
       expect(letterToTierLabel(l, 75)).toMatch(/^重[酸甜苦辣咸脆嫩]$/);
-      expect(letterToTierLabel(l, 95)).toMatch(/^重[酸甜苦辣咸脆嫩] ⚡极$/);
+      expect(letterToTierLabel(l, 95)).toMatch(/^重[酸甜苦辣咸脆嫩]$/);
     }
   });
 

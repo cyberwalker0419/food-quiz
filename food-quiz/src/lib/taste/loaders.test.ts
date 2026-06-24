@@ -1,7 +1,6 @@
 import { describe, it, expect } from 'vitest';
 import {
   loadInterval,
-  loadExtreme,
   loadSynergy,
   loadAllround,
   loadAvoid,
@@ -20,18 +19,6 @@ describe('loadInterval', () => {
     expect(loadInterval(-1)).toBeNull();
     expect(loadInterval(256)).toBeNull();
     expect(loadInterval(1.5)).toBeNull();
-  });
-});
-
-describe('loadExtreme', () => {
-  it('字母 s → 酸极档文案', () => {
-    const r = loadExtreme('s');
-    expect(r).toBeTruthy();
-    expect(r?.letter).toBe('s');
-  });
-
-  it('任意字母输入不抛错', () => {
-    expect(() => loadExtreme('z')).not.toThrow();
   });
 });
 

@@ -9,22 +9,20 @@ import type { Grade } from '../lib/taste/keys';
 function makeInterval(letter: any, value: number, grade: Grade): RenderedInterval {
   return {
     letter, value, tierLabel: `${letter}-tier`, grade,
-    label: `${letter}-label`, copy: `${letter}-copy`,
-    index: 0, key: letter.toLowerCase(),
-    isHigh: value > 60, isExtreme: value >= 90,
+    isHigh: value > 60,
   };
 }
 function makeResult(): AssembledResult {
   return {
     allIntervals: DIMS.map((l, i) => makeInterval(l, 30 + i * 8, 'B')),
-    intervals: DIMS.slice(0, 3).map((l, i) => makeInterval(l, 30 + i * 8, 'B')),
+    profileCopy: '你偏爱厚味，重口是你的底色，桌上味道越杂你越来劲。',
     tierLabels: { S: '', T: '', K: '', L: '', I: '', X: '', C: '', N: '' },
     topDishes: [
       { name: '麻婆豆腐', cuisine: '川菜', region: '四川', vector: { sour: 0, sweet: 0, bitter: 0, spicy: 0, salty: 0, rich: 0, crunchy: 0, tender: 0 } },
       { name: '小笼包', cuisine: '江浙菜', region: '上海', vector: { sour: 0, sweet: 0, bitter: 0, spicy: 0, salty: 0, rich: 0, crunchy: 0, tender: 0 } },
       { name: '北京烤鸭', cuisine: '京菜', region: '北京', vector: { sour: 0, sweet: 0, bitter: 0, spicy: 0, salty: 0, rich: 0, crunchy: 0, tender: 0 } },
     ],
-    extremes: [], synergy: null, allround: null,
+    synergy: null, allround: null,
     vector: { sour: 0, sweet: 0, bitter: 0, spicy: 0, salty: 0, rich: 0, crunchy: 0, tender: 0 },
     raw: { sour: 0, sweet: 0, bitter: 0, spicy: 0, salty: 0, rich: 0, crunchy: 0, tender: 0 },
     std: 0,
@@ -213,17 +211,15 @@ describe('P8.3 分享图文案补全', () => {
     expect(texts).toContain('为你推荐');
   });
 
-  it('drawShareCard 联动文案触发时 section 标题为"味觉共振"', () => {
+  it('drawShareCard 特征分支 section 标题为"味觉特征",mainCopy 取自 profileCopy', () => {
     const data = makeData();
-    data.result.synergy = {
-      label: '辣味共鸣',
-      copy: '辣与 X 联动',
-      a: 'L', b: 'X', source: 'lx.json',
-    };
+    data.result.allround = null;
+    data.result.profileCopy = '你偏爱厚味，重口是你的底色，桌上味道越杂你越来劲。';
     drawShareCard(canvas as unknown as HTMLCanvasElement, data);
     const texts = ctx.fillText.mock.calls.map((c: any[]) => c[0]);
-    expect(texts).toContain('味觉共振');
-    expect(texts).toContain('辣味共鸣');
+    expect(texts).toContain('味觉特征');
+    // mainCopy 来自 profileCopy(wrapText 逐行绘制,mock 下整段一行)
+    expect(texts.some((t: string) => t.includes('厚味'))).toBe(true);
   });
 
   it('drawShareCard 全能文案触发时 section 标题为"全能味觉"', () => {
@@ -241,7 +237,7 @@ describe('P8.3 分享图文案补全', () => {
     expect(texts).toContain('测 测 你 的 味 觉 灵 魂');
   });
 
-  it('P9.x synergy.label 与 mainCopy y 坐标互斥 + mainCopy 不侵入雷达图区域', () => {
+  it('mainCopy 单段长评价不侵入雷达图区域(无副标签)', () => {
     // 替换 fillText mock 以记录 y 参数(默认 vi.fn(noop) 不记录)
     const textCalls: Array<{ text: string; y: number }> = [];
     ctx.fillText = vi.fn((text: string, _x: number, y: number) => {
@@ -249,21 +245,14 @@ describe('P8.3 分享图文案补全', () => {
     });
 
     const data = makeData();
-    data.result.synergy = {
-      label: '辣味共鸣',
-      copy: '辣与 X 联动,你就是那个极端',
-      a: 'L', b: 'X', source: 'lx.json',
-    };
+    data.result.allround = null;
+    data.result.profileCopy = '你偏爱厚味，重口是你的底色，这大概就是你吃饭的样子。';
     drawShareCard(canvas as unknown as HTMLCanvasElement, data);
 
-    const synCall = textCalls.find(c => c.text === '辣味共鸣');
-    const mainCall = textCalls.find(c => c.text.includes('辣与'));
-    expect(synCall).toBeDefined();
-    expect(mainCall).toBeDefined();
-    // P9.x v2: synergy.label y=198, mainCopy 起始 y=222(互斥),差 24
-    expect(Math.abs(synCall!.y - mainCall!.y)).toBeGreaterThanOrEqual(20);
-    // P9.x v2: mainCopy 第二行 y=222+16=238,雷达图区域顶端 y=260,留 22px
-    // (radarChart 标签 "酸" 在 y≈cy-134=400-134=266,给 28px 间距)
-    expect(mainCall!.y).toBeLessThan(250);
+    // mainCopy 来自 profileCopy;重构后无 synergy 副标签,长评价从 y≈198 起
+    const mainCalls = textCalls.filter(c => c.text.includes('厚味'));
+    expect(mainCalls.length).toBeGreaterThan(0);
+    // 雷达图区域顶端约 y=260(mainCopy 起始 198 + 至多 3 行×16=48 → 246),留余量
+    for (const c of mainCalls) expect(c.y).toBeLessThan(250);
   });
 });

@@ -43,7 +43,6 @@ function makeIntervals(values: number[]): RenderedInterval[] {
     tierLabel: `${letter}-tier`,
     grade: gradeOf(values[i] ?? 50),
     isHigh: (values[i] ?? 50) > 60,
-    isExtreme: (values[i] ?? 50) >= 90,
   }));
 }
 

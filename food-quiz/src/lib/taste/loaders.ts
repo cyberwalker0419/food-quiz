@@ -14,14 +14,6 @@ export interface IntervalEntry {
   copy: string;
 }
 
-export interface ExtremeEntry {
-  dim: string;
-  letter: string;
-  label: string;
-  threshold: number;
-  copy: string[];
-}
-
 export interface SynergyEntry {
   pair?: [string, string];
   letters?: [string, string];
@@ -91,15 +83,6 @@ export function loadInterval(index: number): IntervalEntry | null {
   if (!raw || typeof raw !== 'object') return null;
   const e = raw as IntervalEntry;
   if (typeof e.copy !== 'string' || typeof e.label !== 'string' || typeof e.key !== 'string') return null;
-  return e;
-}
-
-/** 8 维极档:按 dim 字母小写 → ExtremeEntry | null */
-export function loadExtreme(letter: string): ExtremeEntry | null {
-  const raw = get(`/extreme/${letter}.json`);
-  if (!raw || typeof raw !== 'object') return null;
-  const e = raw as ExtremeEntry;
-  if (!Array.isArray(e.copy) || typeof e.label !== 'string') return null;
   return e;
 }
 
