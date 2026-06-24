@@ -1,5 +1,5 @@
-import { useState, useEffect, useRef } from 'react';
-import type { AssembledResult } from '../lib/taste/result';
+import { useState, useEffect, useLayoutEffect, useRef } from 'react';
+import type { AssembledResult, RenderedInterval } from '../lib/taste/result';
 import { RadarChart } from './RadarChart';
 import { getShareCardDataUrl } from '../utils/shareImage';
 
@@ -75,6 +75,7 @@ export function ResultCard({ result, questionCount, onRestart, onCopy, onDownloa
         ) : (
           <section className="profile-section intervals-section">
             <h2 className="section-title">味觉特征</h2>
+            <p className="profile-tag">{result.profileLabel}</p>
             <p className="profile-copy">{result.profileCopy}</p>
           </section>
         )}
@@ -82,9 +83,7 @@ export function ResultCard({ result, questionCount, onRestart, onCopy, onDownloa
         {/* 2. 8 维图(P6.3 改为 Canvas 雷达图) */}
         <section className="profile-section">
           <h2 className="section-title">8 维味觉图谱</h2>
-          <div className="radar-wrap">
-            <RadarChart intervals={result.allIntervals} size={320} fontFamily='"Noto Sans SC", "PingFang SC", system-ui, sans-serif' />
-          </div>
+          <ResponsiveRadarChart intervals={result.allIntervals} fontFamily='"Noto Sans SC", "PingFang SC", system-ui, sans-serif' />
           <details className="dimension-list">
             <summary>8 维档位明细</summary>
             <ul className="dim-list">
@@ -148,4 +147,47 @@ function generateShareText(r: AssembledResult): string {
   const tag = top ? top.tierLabel : '味觉独特';
   const copy = r.allround?.copy || r.profileCopy || '';
   return `我的味觉灵魂是【${tag}】!${copy.slice(0, 40)} 你也来测一下?`;
+}
+
+/**
+ * 响应式雷达图包装器：用 ResizeObserver 跟踪容器宽度，
+ * 动态计算 canvas size，避免窄屏下固定 320px 溢出被裁切。
+ */
+function ResponsiveRadarChart({ intervals, fontFamily }: {
+  intervals: RenderedInterval[];
+  fontFamily?: string;
+}) {
+  const wrapRef = useRef<HTMLDivElement>(null);
+  const [size, setSize] = useState(0);
+
+  useLayoutEffect(() => {
+    const el = wrapRef.current;
+    if (!el) return;
+    // 同步读取容器宽度，确保首帧就有正确尺寸（浏览器绘制前）
+    const w = el.clientWidth - 24; // 减去 padding
+    if (w > 0) setSize(Math.min(320, Math.max(160, w)));
+  }, []);
+
+  useEffect(() => {
+    const el = wrapRef.current;
+    if (!el) return;
+    const observer = new ResizeObserver((entries) => {
+      const entry = entries[0];
+      if (!entry) return;
+      const w = entry.contentBoxSize
+        ? entry.contentBoxSize[0]!.inlineSize - 24
+        : entry.contentRect.width - 24;
+      setSize(Math.min(320, Math.max(160, Math.round(w))));
+    });
+    observer.observe(el);
+    return () => observer.disconnect();
+  }, []);
+
+  return (
+    <div className="radar-wrap" ref={wrapRef}>
+      {size >= 160 && (
+        <RadarChart intervals={intervals} size={size} fontFamily={fontFamily} />
+      )}
+    </div>
+  );
 }

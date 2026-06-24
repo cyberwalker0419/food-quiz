@@ -277,7 +277,7 @@ export function drawShareCard(canvas: HTMLCanvasElement, data: ShareCardData) {
   const radarY = 400
   ctx.save()
   ctx.translate((W - radarSize) / 2, radarY - radarSize / 2)
-  drawRadarChart(ctx, r.allIntervals, radarSize, { fontFamily: FONT_SERIF, padding: radarSize * 0.15 })
+  drawRadarChart(ctx, r.allIntervals, radarSize, { fontFamily: FONT_SERIF, padding: radarSize * 0.20 })
   ctx.restore()
 
   // ── 八维档位明细 ──

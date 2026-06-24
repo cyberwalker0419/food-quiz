@@ -15,6 +15,7 @@ function makeInterval(letter: any, value: number, grade: Grade): RenderedInterva
 function makeResult(): AssembledResult {
   return {
     allIntervals: DIMS.map((l, i) => makeInterval(l, 30 + i * 8, 'B')),
+    profileLabel: '重口爱好者',
     profileCopy: '你偏爱厚味，重口是你的底色，桌上味道越杂你越来劲。',
     tierLabels: { S: '', T: '', K: '', L: '', I: '', X: '', C: '', N: '' },
     topDishes: [

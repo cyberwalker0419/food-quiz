@@ -142,14 +142,14 @@ describe('P7.4 雷达图 ABCDE 字母层 + 底色', () => {
     expect(ctx.fillRect).toHaveBeenCalled();
   });
 
-  it('轴标签 fillText 中文 + grade 各 8 次(P8.2:grade 徽章代替维度单字母)', () => {
+  it('轴标签 fillText 中文 + grade 字母各 8 次(纯文本,无徽章)', () => {
     const ctx = createMockCtx();
     const intervals = makeIntervals([50, 50, 50, 50, 50, 50, 50, 50]);
     drawRadarChart(ctx, intervals, 320);
     const fillTextCalls = ctx.fillText.mock.calls.map((c: any[]) => c[0]);
     const chinese = ['酸', '甜', '苦', '辣', '咸', '浓', '脆', '嫩'];
     for (const c of chinese) expect(fillTextCalls).toContain(c);
-    // grade 字母:全部值=50 → grade='C',所以 8 个 'C' 都被 fill
+    // grade 字母:全部值=50 → grade='C',所以 8 个 'C' 都被 fill(纯文本,无颜色徽章)
     const gradeCCount = fillTextCalls.filter((s: string) => s === 'C').length;
     expect(gradeCCount).toBe(8);
   });
@@ -163,8 +163,8 @@ describe('P7.4 雷达图 ABCDE 字母层 + 底色', () => {
   });
 });
 
-describe('P8.2 雷达图 grade 染色徽章', () => {
-  it('GRADE_COLORS 包含 5 个 grade 的颜色', () => {
+describe('P8.3 雷达图 grade 纯文本标签(无颜色徽章)', () => {
+  it('GRADE_COLORS 包含 5 个 grade 的颜色(保留供 ResultCard CSS 对齐)', () => {
     expect(GRADE_COLORS.A).toBe('#c0392b');
     expect(GRADE_COLORS.B).toBe('#e67e22');
     expect(GRADE_COLORS.C).toBe('#3498db');
@@ -172,7 +172,7 @@ describe('P8.2 雷达图 grade 染色徽章', () => {
     expect(GRADE_COLORS.E).toBe('#6b5b50');
   });
 
-  it('grade A 的 fillStyle 含 #c0392b(深红)', () => {
+  it('grade 字母以纯文本绘制,不使用 GRADE_COLORS 填充', () => {
     const ctx = ((): any => {
       const noop = () => {};
       const c: any = {};
@@ -198,45 +198,19 @@ describe('P8.2 雷达图 grade 染色徽章', () => {
     const intervals = makeIntervals([100, 0, 0, 0, 0, 0, 0, 0]);
     drawRadarChart(ctx, intervals, 320);
     const colors = (ctx as any).__colors as string[];
-    expect(colors).toContain(GRADE_COLORS.A);
+    // 不应使用 GRADE_COLORS 填充(无彩色徽章)
+    expect(colors).not.toContain(GRADE_COLORS.A);
+    // 应使用墨灰色(IN_3)绘制 grade 文本
+    expect(colors).toContain('#9A8B75');
   });
 
-  it('grade E 的 fillStyle 含 #6b5b50(灰棕)', () => {
-    const ctx = ((): any => {
-      const noop = () => {};
-      const c: any = {};
-      for (const m of [
-        'clearRect', 'fillRect', 'strokeRect', 'fill', 'stroke',
-        'beginPath', 'closePath', 'moveTo', 'lineTo', 'arc', 'fillText', 'strokeText',
-        'save', 'restore', 'translate', 'scale', 'rotate', 'quadraticCurveTo',
-      ]) c[m] = vi.fn(noop);
-      c.measureText = vi.fn(() => ({ width: 50 }));
-      c.createLinearGradient = vi.fn(() => ({ addColorStop: vi.fn() }));
-      c.createRadialGradient = vi.fn(() => ({ addColorStop: vi.fn() }));
-      const colors: string[] = [];
-      let _fs = '';
-      Object.defineProperty(c, 'fillStyle', {
-        get() { return _fs; },
-        set(v) { colors.push(v); _fs = v; },
-      });
-      c.font = ''; c.strokeStyle = ''; c.lineWidth = 1; c.textAlign = ''; c.textBaseline = '';
-      (c as any).__colors = colors;
-      return c;
-    })();
-    // value=10 → grade='E'
-    const intervals = makeIntervals([10, 10, 10, 10, 10, 10, 10, 10]);
-    drawRadarChart(ctx, intervals, 320);
-    const colors = (ctx as any).__colors as string[];
-    expect(colors).toContain(GRADE_COLORS.E);
-  });
-
-  it('8 维度全 50 → 8 个 C grade 徽章(beginPath 被调 ≥ 8 次)', () => {
+  it('8 维度全 50 → 无 quadraticCurveTo 调用(无圆角徽章)', () => {
     const ctx = createMockCtx();
     const intervals = makeIntervals([50, 50, 50, 50, 50, 50, 50, 50]);
     drawRadarChart(ctx, intervals, 320);
-    // 8 个徽章 + 多边形 + 5 圈网格 = beginPath ≥ 14
-    expect(ctx.beginPath.mock.calls.length).toBeGreaterThanOrEqual(8);
-    // quadraticCurveTo 圆角矩形:每个徽章 4 个,8 个 = 32
-    expect(ctx.quadraticCurveTo.mock.calls.length).toBeGreaterThanOrEqual(8);
+    // 无徽章 → 无 quadraticCurveTo
+    expect(ctx.quadraticCurveTo.mock.calls.length).toBe(0);
+    // beginPath: 5 圈网格 + 8 轴 + 1 多边形 + 8 数据点 = 22
+    expect(ctx.beginPath.mock.calls.length).toBeGreaterThanOrEqual(14);
   });
 });

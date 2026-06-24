@@ -377,6 +377,8 @@ body::before {
   padding: 12px;
   display: flex;
   justify-content: center;
+  max-width: 100%;
+  overflow: hidden;
 }
 .dimension-list { margin-top: 14px; }
 .dimension-list summary {
@@ -402,6 +404,7 @@ body::before {
 .allround-copy { font-size: 15px; color: var(--ink-2); line-height: 1.9; letter-spacing: 0.03em; }
 
 /* 味觉特征:一段长综合评价 */
+.profile-tag { font-family: var(--serif); font-weight: 700; font-size: 26px; color: var(--ink); margin: 0 0 12px; letter-spacing: 0.08em; }
 .profile-copy { font-size: 15px; color: var(--ink-2); line-height: 1.9; margin: 0; letter-spacing: 0.03em; }
 
 .interval-item { padding: 12px 0; border-bottom: 1px dashed var(--line); }
