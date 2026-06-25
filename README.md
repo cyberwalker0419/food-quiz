@@ -227,6 +227,107 @@ sudo certbot --nginx -d your-domain.com
 # 选择 "Redirect" 自动跳 HTTPS；证书 90 天自动续期
 ```
 
+#### 5b：自带证书（已有 `.crt` + `.key`）
+
+如果你已有商业证书 / 内网自签证书，不走 certbot，直接让 Nginx 挂上即可。
+
+**1. 证书上传到服务器**
+
+```bash
+# 本地传
+scp your-domain.crt your-domain.key user@server:/tmp/
+
+# 服务器上归位
+sudo mkdir -p /etc/ssl/food-quiz
+sudo mv /tmp/your-domain.crt /tmp/your-domain.key /etc/ssl/food-quiz/
+sudo chmod 600 /etc/ssl/food-quiz/your-domain.key   # 私钥必须 600
+sudo chown root:root /etc/ssl/food-quiz/*
+```
+
+> **证书链**：CA 一般另给「中间证书（intermediate / chain）」。要把**你的证书 + 中间证书拼成一个 fullchain 文件**（你的在上，中间在下），否则部分客户端报「证书链不完整」：
+> ```bash
+> cat your-domain.crt intermediate.crt > /etc/ssl/food-quiz/fullchain.crt
+> ```
+
+**2. Nginx 配置 `/etc/nginx/sites-available/food-quiz.conf`**
+
+```nginx
+# HTTP → HTTPS 跳转
+server {
+    listen 80;
+    listen [::]:80;
+    server_name your-domain.com;
+    return 301 https://$host$request_uri;
+}
+
+# HTTPS 主站
+server {
+    listen 443 ssl;
+    listen [::]:443 ssl;
+    http2 on;
+    server_name your-domain.com;
+
+    # —— 证书 ——
+    ssl_certificate     /etc/ssl/food-quiz/fullchain.crt;   # 或 your-domain.crt
+    ssl_certificate_key /etc/ssl/food-quiz/your-domain.key;
+
+    # —— TLS 推荐配置（Mozilla intermediate，兼容性好）——
+    ssl_protocols TLSv1.2 TLSv1.3;
+    ssl_ciphers ECDHE-ECDSA-AES128-GCM-SHA256:ECDHE-RSA-AES128-GCM-SHA256:ECDHE-ECDSA-AES256-GCM-SHA384:ECDHE-RSA-AES256-GCM-SHA384:ECDHE-ECDSA-CHACHA20-POLY1305:ECDHE-RSA-CHACHA20-POLY1305;
+    ssl_prefer_server_ciphers off;
+    ssl_session_cache shared:SSL:10m;
+    ssl_session_timeout 1d;
+    ssl_session_tickets off;
+
+    # HSTS（HTTPS 稳定跑 1-2 天后再开，开了回不去 HTTP）
+    # add_header Strict-Transport-Security "max-age=63072000" always;
+
+    root /var/www/food-quiz;
+    index index.html;
+
+    # SPA fallback：刷新任何路径都必须回 index.html
+    location / { try_files $uri $uri/ /index.html; }
+
+    location ~* \.(js|css|woff2|ttf|otf|jpg|jpeg|png|webp|svg)$ {
+        expires 1y;
+        add_header Cache-Control "public, immutable";
+    }
+    location ~* \.json$ {
+        expires 1h;
+        add_header Cache-Control "public";
+    }
+
+    gzip on;
+    gzip_types text/css application/javascript application/json image/svg+xml;
+    gzip_min_length 1024;
+}
+```
+
+**3. 启用 + 校验 + reload**
+
+```bash
+sudo ln -sf /etc/nginx/sites-available/food-quiz.conf /etc/nginx/sites-enabled/
+sudo nginx -t                   # 必须 "syntax is ok / test is successful"
+sudo systemctl reload nginx
+```
+
+**4. 验证**
+
+```bash
+curl -vI https://your-domain.com 2>&1 | grep -E "HTTP|subject|issuer|expire date"
+```
+
+浏览器打开 `https://your-domain.com`，锁标志应为绿色；公开站点可去 [ssllabs.com/ssltest](https://www.ssllabs.com/ssltest/) 跑分（A/A+）。
+
+**常见坑**
+
+| 现象 | 原因 | 解法 |
+|:--|:--|:--|
+| 浏览器「证书链不完整」/ Android 打不开 | `.crt` 没拼中间证书 | `cat your-domain.crt intermediate.crt > fullchain.crt` |
+| 刷新某些路径 404 | 缺 SPA fallback | 确认 `try_files $uri $uri/ /index.html;` |
+| `nginx: PEM_read_bio_X509` 报错 | `.crt`/`.key` 不配对，或被改成 CRLF | `openssl x509 -noout -modulus -in a.crt \| openssl md5` 与 `openssl rsa -noout -modulus -in a.key \| openssl md5` 两值须相等 |
+| 证书过期忘续 | 商业证书一般有效期 1 年 | 提前 2 周换，certbot 不适用于自带证书 |
+
 **5. CDN 加速（可选）**
 
 `dist/` 上传到 OSS / S3 / 七牛 / 又拍，CDN 回源到对象存储。Vite 输出的资产文件名带 hash，永久缓存即可（`Cache-Control: public, max-age=31536000, immutable`）。
