@@ -28,6 +28,7 @@ import {
 } from './adaptiveSelector';
 import type { Sharpness, WeightVector } from './types';
 import { normalize, cosineSim } from './normalize';
+import { centeredCosineSim } from './similarity';
 import { ZERO_VECTOR } from './types';
 import { questionBank } from '../../content/questions/questions.loader';
 
@@ -570,11 +571,11 @@ describe('P7.1 二级 + 三级去重常量', () => {
   it('COVER_OVERLAP_THRESHOLD = 3', () => {
     expect(COVER_OVERLAP_THRESHOLD).toBe(3);
   });
-  it('TOPIC_OVERLAP_THRESHOLD = 0.7', () => {
-    expect(TOPIC_OVERLAP_THRESHOLD).toBe(0.7);
+  it('TOPIC_OVERLAP_THRESHOLD = 0.80(P10 去中心化量纲)', () => {
+    expect(TOPIC_OVERLAP_THRESHOLD).toBe(0.80);
   });
-  it('EXACT_DEDUP_THRESHOLD 已下调至 0.85', () => {
-    expect(EXACT_DEDUP_THRESHOLD).toBe(0.85);
+  it('EXACT_DEDUP_THRESHOLD = 0.95(P10 去中心化量纲,拦 top5%)', () => {
+    expect(EXACT_DEDUP_THRESHOLD).toBe(0.95);
   });
   it('GLOBAL_DEDUP_WINDOW = 10', () => {
     expect(GLOBAL_DEDUP_WINDOW).toBe(10);
@@ -802,6 +803,68 @@ describe('P9/A1 集中度护栏', () => {
     }
     const maxAppear = Math.max(0, ...appearance.values());
     expect(maxAppear / totalSessions).toBeLessThanOrEqual(0.7);
+  });
+});
+
+describe('P10 先决:去中心化 dedup 度量', () => {
+  it('相邻题对 centeredSim < EXACT_DEDUP_THRESHOLD(exact dedup 生效,兜底外罕见违反)', () => {
+    const targets: WeightVector[] = [
+      { sour: 90, sweet: 30, bitter: 80, spicy: 0, salty: 20, rich: 40, crunchy: 60, tender: 30 },
+      { sour: 10, sweet: 20, bitter: 10, spicy: 95, salty: 60, rich: 70, crunchy: 30, tender: 40 },
+      { sour: 20, sweet: 90, bitter: 0, spicy: 10, salty: 30, rich: 80, crunchy: 20, tender: 70 },
+    ];
+    let violations = 0, pairs = 0, maxSim = 0;
+    for (const target of targets) {
+      for (let s = 0; s < 4; s++) {
+        const askedIds: string[] = [];
+        const answers: { questionId: string; weights?: WeightVector }[] = [];
+        let profile: WeightVector = { ...ZERO_VECTOR };
+        const seed = 7000 + s * 37;
+        for (let step = 0; step < MAX_QUESTIONS; step++) {
+          const q = pickNextQuestion(makeState(askedIds, answers, profile), seed + step);
+          if (!q) break;
+          let bestOpt = q.options[0]!;
+          let bestSim = -Infinity;
+          for (const o of q.options) {
+            const sim = cosineSim(o.weights, target);
+            if (sim > bestSim) { bestSim = sim; bestOpt = o; }
+          }
+          askedIds.push(q.id);
+          answers.push({ questionId: q.id });
+          for (const k of Object.keys(profile) as (keyof WeightVector)[]) profile[k] += bestOpt.weights[k] || 0;
+          if (shouldStop(makeState(askedIds, answers, profile))) break;
+        }
+        for (let i = 1; i < askedIds.length; i++) {
+          const qa = questionBank.questions.find((x) => x.id === askedIds[i - 1]);
+          const qb = questionBank.questions.find((x) => x.id === askedIds[i]);
+          if (!qa || !qb) continue;
+          const sim = centeredCosineSim(topicVector(qa) as unknown as never, topicVector(qb) as unknown as never);
+          pairs++;
+          if (sim > maxSim) maxSim = sim;
+          if (sim >= EXACT_DEDUP_THRESHOLD) violations++;
+        }
+      }
+    }
+    expect(pairs).toBeGreaterThan(0);
+    expect(violations / pairs).toBeLessThan(0.05);
+    expect(maxSim).toBeLessThan(0.999);
+  });
+
+  it('去中心化消除全正压缩:题库采样 mean(centered) < mean(signatureSim)', () => {
+    const Q = questionBank.questions;
+    let rawSum = 0, cenSum = 0, n = 0;
+    for (let k = 0; k < 400; k++) {
+      const i = k % Q.length;
+      const j = (k * 7 + 3) % Q.length;
+      if (i === j) continue;
+      const a = topicVector(Q[i]!);
+      const b = topicVector(Q[j]!);
+      rawSum += signatureSim(a, b);
+      cenSum += centeredCosineSim(a as unknown as never, b as unknown as never);
+      n++;
+    }
+    expect(n).toBeGreaterThan(0);
+    expect(cenSum / n).toBeLessThan(rawSum / n);
   });
 });
 

@@ -1,6 +1,7 @@
 import type { QuizQuestion, TasteDimension, WeightVector, Sharpness } from './types';
 import { ZERO_VECTOR, sharpnessOf } from './types';
 import { questionBank } from '../../content/questions/questions.loader';
+import { centeredCosineSim } from './similarity';
 
 const DIMS: readonly TasteDimension[] = [
   'sour', 'sweet', 'bitter', 'spicy',
@@ -16,12 +17,15 @@ export const PRUNE_THRESHOLD = -30;
 /** P6.2 犀利度分层比例:前 10 题 60% 选 smooth,20 题后 60% 选 sharp。 */
 export const EARLY_SMOOTH_RATIO = 0.6;
 export const LATE_SHARP_RATIO = 0.6;
-/** 完全重复阈值:与最近 1 题余弦 ≥ 此值视为雷同,跳过(P7.1 0.98 → 0.85)。 */
-export const EXACT_DEDUP_THRESHOLD = 0.85;
+/** 完全重复阈值:与最近 1 题去中心化余弦 ≥ 此值视为雷同,跳过。
+ *  P10 先决:改用去中心化度量(topicVector 全正压缩 mean 0.801→0.498),
+ *  阈值对齐 p95=0.949,精准拦 top 5% 极相似换皮题(原 0.85 在新量纲拦 20.5% 过狠、靠兜底兜回)。 */
+export const EXACT_DEDUP_THRESHOLD = 0.95;
 /** 二级去重:与最近 2-5 题维度覆盖重合数 > 此值视为覆盖雷同,跳过。 */
 export const COVER_OVERLAP_THRESHOLD = 3;
-/** 三级去重:与最近 5 题主题向量余弦 ≥ 此值的题,评分阶段 × 0.3^n 降权。 */
-export const TOPIC_OVERLAP_THRESHOLD = 0.7;
+/** 三级去重:与最近 5 题主题向量去中心化余弦 ≥ 此值的题,评分阶段 × 0.3^n 降权。
+ *  P10 先决:去中心化量纲,对齐 p73≈0.815,软降权拦 top ~27% 中高相似(比 exact 松)。 */
+export const TOPIC_OVERLAP_THRESHOLD = 0.80;
 /** 四级全局去重:最近 N 题窗口内,同一题最多出现 1 次。 */
 export const GLOBAL_DEDUP_WINDOW = 10;
 /** 追问机制 A(同主题强弱不一致):两题主题向量余弦 ≥ 此值视为同主题。 */
@@ -228,6 +232,14 @@ export function signatureSim(a: WeightVector, b: WeightVector): number {
   return denom < 1e-9 ? 0 : dot / denom;
 }
 
+/** 去中心化相似度(P10 先决:修 topicVector 全正压缩)。
+ *  topicVector=options|w|均值,8 维全正→标准 signatureSim 虚高(实测 mean 0.801);
+ *  去中心化后 mean 0.498,恢复 dedup/penalty 区分力。供 exact dedup + topic penalty 用。
+ *  追问判定(THEME_SIM)暂沿用 signatureSim,属另一战线,不连带改。 */
+function centeredSig(a: WeightVector, b: WeightVector): number {
+  return centeredCosineSim(a as unknown as never, b as unknown as never);
+}
+
 /** 犀利度匹配权重:count 越靠后 + 题目越犀利,得分越高。
  *  返回 [0, 1],仅用于评分时的乘法加权。
  */
@@ -284,7 +296,7 @@ function isExactDuplicate(q: QuizQuestion, recent: QuizQuestion[]): boolean {
   const sig = topicVector(q);
   const last = recent[recent.length - 1];
   if (!last) return false;
-  return signatureSim(sig, topicVector(last)) >= EXACT_DEDUP_THRESHOLD;
+  return centeredSig(sig, topicVector(last)) >= EXACT_DEDUP_THRESHOLD;
 }
 
 /** 维度覆盖重合数:两个 WeightVector 同时非零的维度数。 */
@@ -379,6 +391,7 @@ export function detectPursueDims(
       const B = answered[j]!;
       const tvA = topicVector(A.q);
       const tvB = topicVector(B.q);
+      // P10 先决:追问同主题判定暂保留未去中心化 signatureSim(只动 dedup/penalty,不连带改追问行为)
       if (signatureSim(tvA, tvB) < THEME_SIM) continue; // 非同主题
       for (const d of DIMS) {
         if ((tvA[d] || 0) <= 0 || (tvB[d] || 0) <= 0) continue; // 非共同主维
@@ -559,7 +572,7 @@ export function pickNextQuestion(
     let topicPenalty = 1;
     const last5 = recent.slice(-5);
     for (const r of last5) {
-      if (signatureSim(tv, topicVector(r)) >= TOPIC_OVERLAP_THRESHOLD) {
+      if (centeredSig(tv, topicVector(r)) >= TOPIC_OVERLAP_THRESHOLD) {
         topicPenalty *= 0.3;
       }
     }
