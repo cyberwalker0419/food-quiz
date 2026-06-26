@@ -356,14 +356,24 @@ describe('P6.2 signatureSim', () => {
 });
 
 describe('P6.2 犀利度分层(集成测试)', () => {
-  it('早期 10 题中 ≥ 50% 是 smooth 题(非 2 选项)', () => {
-    const askedIds: string[] = [];
-    for (let step = 0; step < 10; step++) {
-      const q = pickNextQuestion(makeState(askedIds, [], ZERO_VECTOR), 100 + step);
-      if (!q) break;
-      askedIds.push(q.id);
+  it('早期 10 题中 ≥ 50% 是 smooth 题(多 seed 平均,防 A1 分层回归)', () => {
+    // A1:早期犀利度分层应让 smooth(非 2 选项题)占多数。单 seed 偶发,故 12 seed 平均。
+    // 此前仅断言 askedIds.length===10(绿灯假象,jitter 击穿分层时 smooth 实测仅 0.23)。
+    const SEEDS = 12;
+    let smooth = 0;
+    let total = 0;
+    for (let s = 0; s < SEEDS; s++) {
+      const askedIds: string[] = [];
+      for (let step = 0; step < 10; step++) {
+        const q = pickNextQuestion(makeState(askedIds, [], ZERO_VECTOR), s * 1000 + 100 + step);
+        if (!q) break;
+        if (q.options.length !== 2) smooth++;  // smooth = 非 2 选项
+        askedIds.push(q.id);
+        total++;
+      }
     }
-    expect(askedIds.length).toBe(10);
+    expect(total).toBe(SEEDS * 10);
+    expect(smooth / total).toBeGreaterThanOrEqual(0.5);
   });
 
   it('后期 5 题中至少 3 道是 sharp(2 选项)', () => {
@@ -683,3 +693,115 @@ describe('P8.1 stem 全 session 软惩罚', () => {
     expect(inHeavy / total).toBeLessThan(0.5);
   });
 });
+
+describe('P9 跨 session 多样性(seeded 抖动 + 覆盖奖励)', () => {
+  it('首题分布:30 个 seed → ≥ 12 个不同首题,最高频首题占比 ≤ 25%', () => {
+    const N = 30;
+    const firstQ = new Map<string, number>();
+    for (let s = 0; s < N; s++) {
+      const q = pickNextQuestion(makeState([], [], ZERO_VECTOR), 1000 + s * 37);
+      if (q) firstQ.set(q.id, (firstQ.get(q.id) ?? 0) + 1);
+    }
+    const maxRate = Math.max(...firstQ.values()) / N;
+    // 改造前 rank-0 固有占比 ~34%;seeded 抖动后实测 ~10%,留足余量到 25%。
+    expect(firstQ.size).toBeGreaterThanOrEqual(12);
+    expect(maxRate).toBeLessThanOrEqual(0.25);
+  });
+
+  it('题库利用率:30 轮完整测试 → ≥ 90 道不同题被用到(共 214)', () => {
+    const N = 30;
+    const used = new Set<string>();
+    for (let s = 0; s < N; s++) {
+      let askedIds: string[] = [];
+      let profile: WeightVector = { ...ZERO_VECTOR };
+      const answers: { questionId: string }[] = [];
+      const seed = 1000 + s * 37;
+      for (let step = 0; step < MAX_QUESTIONS; step++) {
+        const q = pickNextQuestion(makeState(askedIds, answers, profile), seed);
+        if (!q) break;
+        used.add(q.id);
+        askedIds.push(q.id);
+        answers.push({ questionId: q.id });
+        const opt = q.options[0]!;
+        for (const k of Object.keys(profile) as (keyof WeightVector)[]) {
+          profile[k] += opt.weights[k] || 0;
+        }
+      }
+    }
+    // 改造前题库大量题几乎不出场;实测 30 轮用到 149 道,留余量到 90。
+    expect(used.size).toBeGreaterThanOrEqual(90);
+  });
+
+  it('跨 session 软惩罚生效:把"本会被选中"的题加入 recentSessionIds,会改变选择', () => {
+    // pickNextQuestion 纯函数 → 同 seed 下"默认首选"确定。惩罚它(×0.7)应在某些 seed 改变结果。
+    let changed = 0;
+    for (let seed = 0; seed < 100; seed++) {
+      const s = 5000 + seed;
+      const normal = pickNextQuestion(makeState([], [], ZERO_VECTOR), s);
+      if (!normal) continue;
+      const penalized = pickNextQuestion(makeState([], [], ZERO_VECTOR), s, new Set([normal.id]));
+      if (penalized && penalized.id !== normal.id) changed++;
+    }
+    expect(changed).toBeGreaterThan(0);
+  });
+
+  it('软惩罚是软的:recentSessionIds 含全部题时仍能返回有效题(不硬过滤)', () => {
+    const all = new Set(questionBank.questions.map((q) => q.id));
+    const q = pickNextQuestion(makeState([], [], ZERO_VECTOR), 42, all);
+    expect(q).not.toBeNull();
+    expect(q?.id).toBeTruthy();
+  });
+
+  it('recentSessionIds 默认空集 → 与不传第三参行为一致', () => {
+    const a = pickNextQuestion(makeState([], [], ZERO_VECTOR), 777);
+    const b = pickNextQuestion(makeState([], [], ZERO_VECTOR), 777, new Set());
+    expect(a?.id).toBe(b?.id);
+  });
+});
+
+describe('P9/A1 集中度护栏', () => {
+  it('最高频题出场率 ≤ 0.7(防 A1 优化后回潮;当前实测 0.63)', () => {
+    // 集中度 = 用户原始诉求"不同周期常抽到同几道题"的直接量化:
+    // 5 画像 × 8 seed = 40 session,数每题出场次数,最高频题占比应 ≤ 0.7。
+    const TARGETS: WeightVector[] = [
+      { ...ZERO_VECTOR, spicy: 80, salty: 60 },
+      { ...ZERO_VECTOR, sweet: 80, sour: 30 },
+      { ...ZERO_VECTOR, sour: 80 },
+      { ...ZERO_VECTOR, rich: 80, salty: 60 },
+      { ...ZERO_VECTOR, tender: 80, rich: 50 },
+    ];
+    const appearance = new Map<string, number>();
+    let totalSessions = 0;
+    for (let t = 0; t < TARGETS.length; t++) {
+      const target = TARGETS[t]!;
+      for (let s = 0; s < 8; s++) {
+        const askedIds: string[] = [];
+        const answers: { questionId: string; weights?: WeightVector }[] = [];
+        let profile: WeightVector = { ...ZERO_VECTOR };
+        const seed = 1000 + t * 1000 + s * 37;
+        for (let step = 0; step < MAX_QUESTIONS; step++) {
+          const q = pickNextQuestion(makeState(askedIds, answers, profile), seed + step);
+          if (!q) break;
+          // 贴画像选 option,让不同画像产生不同 session
+          let bestOpt = q.options[0]!;
+          let bestSim = -Infinity;
+          for (const o of q.options) {
+            const sim = cosineSim(o.weights, target);
+            if (sim > bestSim) { bestSim = sim; bestOpt = o; }
+          }
+          askedIds.push(q.id);
+          answers.push({ questionId: q.id });
+          for (const k of Object.keys(profile) as (keyof WeightVector)[]) {
+            profile[k] += bestOpt.weights[k] || 0;
+          }
+          if (shouldStop(makeState(askedIds, answers, profile))) break;
+        }
+        for (const id of askedIds) appearance.set(id, (appearance.get(id) ?? 0) + 1);
+        totalSessions++;
+      }
+    }
+    const maxAppear = Math.max(0, ...appearance.values());
+    expect(maxAppear / totalSessions).toBeLessThanOrEqual(0.7);
+  });
+});
+

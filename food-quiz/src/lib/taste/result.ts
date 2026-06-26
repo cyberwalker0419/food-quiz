@@ -11,7 +11,12 @@ import {
 } from './loaders';
 
 const STD_ALLROUND = 15;        // master §7 全能文案触发
-const HIGH_THRESHOLD = 60;      // master §7
+const HIGH_THRESHOLD = 75;      // master §7。P9:60→75 收紧判高——normalize 后 raw≥0.2×max 即 >60,
+                                // 叠加选项多维正值会让多数画像多维全判高、塌缩到少数 interval(实测 32 样本
+                                // 仅 2 种标题、69% 同标题)。75 实测标题分散到 7 种/最高频 38%;80 过严反弹。
+/** 方案3：标题最多保留 N 个 high 维。high 维 > N 时按 |value-50| 取 top-N 维定标题 index，
+ *  去"浓/嫩"堆砌（normalize 相对缩放把中等维推 >75 → 多维 high）；label/copy 强调主特征维。 */
+const MAX_LABEL_DIMS = 2;
 const DEFAULT_TOP_N_DISHES = 5;
 
 /** Mulberry32 PRNG(从 adaptiveSelector 复制,避免跨模块依赖)。 */
@@ -256,8 +261,21 @@ export function assembleResult(
 
   // 8 个字母位是否高档(决定 256 组合 index)
   const isHighBit: boolean[] = DIMS.map((l) => v[letterToDim(l as TasteLetter)] > HIGH_THRESHOLD);
-  const intervalIndex = parseInt(isHighBit.map((b) => (b ? '1' : '0')).join(''), 2);
   const highCount = isHighBit.filter(Boolean).length;
+  // 方案3：high 维过多（>MAX_LABEL_DIMS）时，只保留 |value-50| 最大的 top-N 维定标题 index，去堆砌
+  // （highCount 仍用全量，供 buildProfileCopy 按 highCount 分桶；仅标题 index 精取主特征维）
+  let labelBits = isHighBit;
+  if (highCount > MAX_LABEL_DIMS) {
+    const keep = new Set(
+      DIMS.map((l, i) => ({ i, dev: Math.abs(v[letterToDim(l as TasteLetter)] - 50) }))
+        .filter((x) => isHighBit[x.i])
+        .sort((a, b) => b.dev - a.dev)
+        .slice(0, MAX_LABEL_DIMS)
+        .map((x) => x.i),
+    );
+    labelBits = DIMS.map((_, i) => keep.has(i));
+  }
+  const intervalIndex = parseInt(labelBits.map((b) => (b ? '1' : '0')).join(''), 2);
 
   // 整体组合画像(已 humanize 的 intervals/<index>.json)
   const overallEntry = loadInterval(intervalIndex);

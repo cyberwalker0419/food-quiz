@@ -63,8 +63,29 @@ const BANK_DENSITY: Record<TasteDimension, number> = (() => {
   return out;
 })();
 
-const TOP_K = 5;
-const TOP_K_WEIGHTS = [0.34, 0.24, 0.18, 0.14, 0.10];
+const TOP_K = 12;
+/** 调平后的 top-12 加权采样权重(和 = 1.0),让候选池前 12 题都有可观命中概率。 */
+const TOP_K_WEIGHTS = [
+  0.15, 0.13, 0.11, 0.10, 0.09, 0.08, 0.07, 0.06, 0.06, 0.05, 0.05, 0.05,
+];
+/** 跨 session 软惩罚:最近 3 轮出过的题,评分 × 此值(轻惩罚,不禁止)。 */
+export const SESSION_SOFT_PENALTY = 0.7;
+/** P9 多样性:早期 seeded 抖动(乘性,只作用于 std+coverage,不动 sw*10 犀利度分层)。 */
+const EARLY_JITTER_LO = 0.3;
+const EARLY_JITTER_HI = 1.7;
+/** P9 多样性:早期 seeded 底噪(加性,小量,让 std 相近的题也能被打散)。 */
+const EARLY_JITTER_BASE = 3;
+/** P9/A1 多样性归一化:std(topicVector 8 维标准差;权重量级 0-100 → std 实测 ~[5,35])归一化上限。 */
+const EARLY_STD_SCALE = 35;
+/** P9/A1 多样性归一化:coverage(covSum = 候选 tv 在欠覆盖维之和,实测 ~[40,300])归一化上限。 */
+const EARLY_COVERAGE_SCALE = 300;
+/** P9/A1 多样性项权重:stdN/covN ∈[0,1] × 此权重。标定使不压过 sw*10 犀利度分层。 */
+/** P9/A1 多样性项权重:stdN/covN ∈[0,1] × 此权重。实测扫描(1.0/0.5/0.3)0.5 最优——
+ *  过大(1.0)stdTerm 固定主导致集中度 0.88;过小(0.3)打散退回 jitterB 致集中度 0.82;0.5 谷底 0.63。 */
+const EARLY_DIV_WEIGHT = 0.5;
+/** P9 多样性:后期 seeded 抖动(乘性,gain 量级大,用小幅度即可打散排名)。 */
+const LATE_JITTER_LO = 0.7;
+const LATE_JITTER_HI = 1.3;
 
 /**
  * Mulberry32(从旧 utils/adaptiveQuiz 移植,避免循环依赖)。
@@ -78,6 +99,70 @@ function mulberry32(seed: number): () => number {
     t ^= t + Math.imul(t ^ (t >>> 7), t | 61);
     return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
   };
+}
+
+/**
+ * 题目 id → 稳定整数 hash(用于 seeded jitter,让不同题在同一 (seed,count) 下拿到不同抖动)。
+ * id 形如 "q1".."q214",直接累加 char code 即可保证散列。
+ */
+function hashQid(id: string): number {
+  let h = 2166136261 >>> 0;
+  for (let i = 0; i < id.length; i++) {
+    h ^= id.charCodeAt(i);
+    h = Math.imul(h, 16777619) >>> 0;
+  }
+  return h >>> 0;
+}
+
+/**
+ * Per-candidate seeded RNG:给定 (seed, count, qid) 产出一个确定的 [0,1) 序列。
+ * 让评分排名本身随 seed 变化(打破"固有最高分题永远排第一"),而非只在 top-K 里采样。
+ * 同一 (seed,count,qid) 永远返回同一序列 → 纯函数,可单测。
+ */
+function jitterRng(seed: number, count: number, qid: string): () => number {
+  return mulberry32((seed * 31 + count * 7919 + hashQid(qid)) >>> 0);
+}
+
+/**
+ * 已答集合的累计主题覆盖:各维 |tv[d]| 在所有已答题上的总和。
+ * 用于早期阶段识别"覆盖最弱的维度",奖励覆盖它们的候选题。
+ */
+function askedCoverage(askedIds: readonly string[]): Record<TasteDimension, number> {
+  const cov = { ...ZERO_VECTOR };
+  for (const id of askedIds) {
+    const q = questionBank.questions.find((qq) => qq.id === id);
+    if (!q) continue;
+    const tv = topicVector(q);
+    for (const d of DIMS) cov[d] += tv[d] || 0;
+  }
+  return cov;
+}
+
+/** 从已答累计覆盖中取覆盖最弱的 N 维,作为早期"欠覆盖"奖励目标。 */
+function undercoveredDims(askedIds: readonly string[], topN: number): Set<TasteDimension> {
+  if (askedIds.length === 0) return new Set(DIMS);
+  const cov = askedCoverage(askedIds);
+  const sorted = [...DIMS].sort((a, b) => cov[a] - cov[b]);
+  return new Set(sorted.slice(0, topN));
+}
+
+/**
+ * top-K 加权采样:按 TOP_K_WEIGHTS 从已排序(降序)候选里抽一道。
+ * 抽出与早期/后期两处采样重复逻辑。
+ */
+function weightedPick(
+  scored: { q: QuizQuestion; score: number }[],
+  rand: () => number,
+): QuizQuestion | null {
+  if (scored.length === 0) return null;
+  const topK = scored.slice(0, Math.min(TOP_K, scored.length));
+  const r = rand();
+  let acc = 0;
+  for (let i = 0; i < topK.length; i++) {
+    acc += TOP_K_WEIGHTS[i] || 0;
+    if (r < acc) return topK[i]!.q;
+  }
+  return topK[0]!.q;
 }
 
 /**
@@ -352,6 +437,8 @@ export function pickNextQuestion(
     profile: WeightVector;
   },
   seed: number,
+  /** P9 跨 session 记忆:最近几轮出过的题 id,评分阶段施轻惩罚(不禁止)。默认空集。 */
+  recentSessionIds: ReadonlySet<string> = new Set(),
 ): QuizQuestion | null {
   const count = state.askedIds.length;
 
@@ -404,31 +491,45 @@ export function pickNextQuestion(
   // 早期(count < MIN_QUESTIONS)走犀利度匹配权重 + 主题向量对全维覆盖的均匀奖励
   // (早期没有 profile 信息,信息增益退化为"主题向量在 DIMS 上的均匀覆盖")
   // P8.1:加 stem 全 session 软惩罚,让同 stem 尽量不复出。
+  // P9:加 seeded 抖动(打散固有排名)+ 已答欠覆盖维奖励(自适应多样性)+ 跨 session 软惩罚。
   const stemCounts = getSessionStemCounts(state.askedIds);
+  const underDims = undercoveredDims(state.askedIds, 4);
   if (count < MIN_QUESTIONS) {
     const scored = pool.map((q) => {
       const sw = sharpnessWeight(count, sharpnessOf(q));
-      // 早期奖励:主题向量在 8 维上分布越均匀越好
-      // std 越大 = 维度越分散 = 越能建立基线
       const tv = topicVector(q);
+      // 早期奖励 1:主题向量在 8 维上分布越均匀越好(std 越大 = 越能建立基线)
       const mean = DIMS.reduce((s, d) => s + (tv[d] || 0), 0) / DIMS.length;
       const variance = DIMS.reduce((s, d) => s + ((tv[d] || 0) - mean) ** 2, 0) / DIMS.length;
       const std = Math.sqrt(variance);
-      // P8.1:stem 软惩罚(全 session 累计)
+      // ① A1:std 归一化到 [0,1](权重量级 0-100 → std 实测 ~[5,35]),与 sw 同量级,使 sw*10 主导分层
+      const stdN = Math.min(1, std / EARLY_STD_SCALE);
+      // 早期奖励 2:覆盖"已答欠覆盖维"的题加分(随已答集合自适应,打破总在同一批高 std 题里打转)
+      let covSum = 0;
+      for (const d of underDims) covSum += tv[d] || 0;
+      // ① A1:coverage 同样归一化到 [0,1](covSum 实测 ~[40,300])
+      const covN = Math.min(1, covSum / EARLY_COVERAGE_SCALE);
+      // ②:stdN(基线建立)固定加分不抖;covN(自适应覆盖)随 jitter 抖动打散固有排名
+      const stdTerm = stdN * EARLY_DIV_WEIGHT;
+      const covTerm = covN * EARLY_DIV_WEIGHT;
+      // ② seeded 抖动:只作用于 covTerm(stdTerm 固定),不动 sw*10 → 保犀利度分层
+      const jr = jitterRng(seed, count, q.id);
+      const jitter = EARLY_JITTER_LO + jr() * (EARLY_JITTER_HI - EARLY_JITTER_LO);
+      const jitterBase = jr() * EARLY_JITTER_BASE;
+      // P8.1 stem 软惩罚(全 session 累计)
       const stemCount = stemCounts.get(q.stem) ?? 0;
       const stemPenaltyIdx = Math.min(stemCount, STEM_DEDUP_SOFT_PENALTY.length - 1);
       const stemPenalty = STEM_DEDUP_SOFT_PENALTY[stemPenaltyIdx]!;
-      return { q, score: (sw * 10 + std) * stemPenalty };
+      // P9 跨 session 软惩罚
+      const sessionPenalty = recentSessionIds.has(q.id) ? SESSION_SOFT_PENALTY : 1;
+      return {
+        q,
+        // ①+②:归一化 + jitter 只碰 covTerm(stdTerm 固定不抖);sw*10 主导分层,covTerm 提供多样性打散
+        score: (sw * 10 + stdTerm + covTerm * jitter + jitterBase) * stemPenalty * sessionPenalty,
+      };
     });
     scored.sort((a, b) => b.score - a.score);
-    const topK = scored.slice(0, Math.min(TOP_K, scored.length));
-    const r = rand();
-    let acc = 0;
-    for (let i = 0; i < topK.length; i++) {
-      acc += TOP_K_WEIGHTS[i] || 0;
-      if (r < acc) return topK[i]!.q;
-    }
-    return topK[0]!.q;
+    return weightedPick(scored, rand);
   }
 
   // 后期(count ≥ MIN_QUESTIONS):犀利度分层 + 追问 + 信息增益 + 追问维度澄清
@@ -482,22 +583,19 @@ export function pickNextQuestion(
     }
 
     // 综合分:gain 主项 + 犀利度加成 + 低响应追问 + 矛盾追问加成,再乘 topic/stem 惩罚
+    // P9:再乘 seeded modest 抖动(打散固有排名)+ 跨 session 软惩罚
+    const jr = jitterRng(seed, count, q.id);
+    const jitter = LATE_JITTER_LO + jr() * (LATE_JITTER_HI - LATE_JITTER_LO);
+    const sessionPenalty = recentSessionIds.has(q.id) ? SESSION_SOFT_PENALTY : 1;
     return {
       q,
-      score: (gain * (0.6 + 0.4 * sw) + gain * 0.3 * lowCoverNorm + lowCoverNorm * 5 + contraBoost) * topicPenalty * stemPenalty,
+      score: (gain * (0.6 + 0.4 * sw) + gain * 0.3 * lowCoverNorm + lowCoverNorm * 5 + contraBoost) * topicPenalty * stemPenalty * jitter * sessionPenalty,
     };
   });
   scored.sort((a, b) => b.score - a.score);
 
-  // top-5 加权抽样
-  const topK = scored.slice(0, Math.min(TOP_K, scored.length));
-  const r = rand();
-  let acc = 0;
-  for (let i = 0; i < topK.length; i++) {
-    acc += TOP_K_WEIGHTS[i] || 0;
-    if (r < acc) return topK[i]!.q;
-  }
-  return topK[0]!.q;
+  // top-K 加权抽样
+  return weightedPick(scored, rand);
 }
 
 /**
