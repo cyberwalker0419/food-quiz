@@ -5,15 +5,27 @@ import { assembleResult, type AssembledResult } from './lib/taste/result'
 import { downloadShareCard, preloadShareCardFonts } from './utils/shareImage'
 import { ResultCard } from './components/ResultCard'
 import { RandomDish } from './components/RandomDish'
-import type { QuizQuestion } from './lib/taste/types'
+import type { QuizQuestion, DietaryRestriction } from './lib/taste/types'
 import './styles/App.css'
 
-type Phase = 'intro' | 'quiz' | 'calculating' | 'result' | 'random-dish'
+type Phase = 'intro' | 'dietary' | 'quiz' | 'calculating' | 'result' | 'random-dish'
 
 interface RuntimeQuestion {
   q: QuizQuestion
   rerolled: boolean
 }
+
+const DIETARY_OPTIONS: { key: DietaryRestriction; emoji: string; label: string }[] = [
+  { key: 'halal', emoji: '☪️', label: '清真' },
+  { key: 'no-pork', emoji: '🚫', label: '不吃猪肉' },
+  { key: 'no-beef', emoji: '🚫', label: '不吃牛肉' },
+  { key: 'no-lamb', emoji: '🚫', label: '不吃羊肉' },
+  { key: 'no-chicken', emoji: '🚫', label: '不吃禽肉' },
+  { key: 'no-seafood', emoji: '🚫', label: '不吃鱼鲜' },
+  { key: 'no-egg', emoji: '🚫', label: '不吃蛋' },
+  { key: 'no-offal', emoji: '🚫', label: '不吃内脏' },
+  { key: 'vegetarian', emoji: '🥬', label: '素食' },
+]
 
 function App() {
   const [phase, setPhase] = useState<Phase>('intro')
@@ -26,13 +38,16 @@ function App() {
   const [showConfetti, setShowConfetti] = useState(false)
   const [seed, setSeed] = useState<number>(() => Math.floor(Math.random() * 1000000))
   const [copyToast, setCopyToast] = useState(false)
+  const [dietary, setDietary] = useState<DietaryRestriction[]>([])
+  const [noRestriction, setNoRestriction] = useState(false)
 
   // P7.2 顶层预加载分享卡字体,确保 result 阶段字体已就绪
   useEffect(() => {
     preloadShareCardFonts()
   }, [])
 
-  const startQuiz = useCallback(() => {
+  const startQuiz = useCallback((diet: DietaryRestriction[]) => {
+    setDietary(diet)
     const newSeed = Math.floor(Math.random() * 1000000)
     setSeed(newSeed)
     setPhase('quiz')
@@ -86,14 +101,14 @@ function App() {
       setPhase('calculating')
       setTimeout(() => {
         // 每次进入 result 都用独立 seed,让推荐菜锚点随机化(同画像每次推不同)
-        const assembled = assembleResult(newState.profile, { seed: Math.floor(Math.random() * 1_000_000) })
+        const assembled = assembleResult(newState.profile, { seed: Math.floor(Math.random() * 1_000_000), dietary })
         setResult(assembled)
         setShowConfetti(true)
         setPhase('result')
         setIsTransitioning(false)
       }, 1500)
     }, 400)
-  }, [isTransitioning, currentQuestion, state, askedQuestions, seed])
+  }, [isTransitioning, currentQuestion, state, askedQuestions, seed, dietary])
 
   const goToPreviousQuestion = useCallback(() => {
     if (isTransitioning) return
@@ -182,7 +197,7 @@ function App() {
               <span>一键生成分享卡</span>
             </div>
           </div>
-          <button className="start-btn" onClick={startQuiz}>
+          <button className="start-btn" onClick={() => setPhase('dietary')}>
             <span>开始勘察</span>
             <span className="btn-arrow">→</span>
           </button>
@@ -190,6 +205,58 @@ function App() {
             吃什么啊？
           </button>
           <p className="intro-note">题目随你的选择动态变化 · 一题接一题，越答越懂你</p>
+        </div>
+      </div>
+    )
+  }
+
+  // ============ DIETARY SCREEN ============
+  if (phase === 'dietary') {
+    const toggleDietary = (key: DietaryRestriction) => {
+      setDietary((prev) => (prev.includes(key) ? prev.filter((k) => k !== key) : [...prev, key]))
+      setNoRestriction(false)
+    }
+    const canStart = dietary.length > 0 || noRestriction
+    return (
+      <div className="app dietary-screen">
+        <div className="dietary-content">
+          <div className="dietary-emoji">🍽️</div>
+          <h2 className="dietary-title">先说说你的忌口</h2>
+          <p className="dietary-subtitle">选了之后，推荐菜会自动避开（可多选）</p>
+          <div className="dietary-chips">
+            {DIETARY_OPTIONS.map((opt) => (
+              <button
+                key={opt.key}
+                type="button"
+                className={`dietary-chip ${dietary.includes(opt.key) ? 'selected' : ''}`}
+                onClick={() => toggleDietary(opt.key)}
+              >
+                <span className="chip-emoji">{opt.emoji}</span>
+                <span className="chip-label">{opt.label}</span>
+              </button>
+            ))}
+          </div>
+          <button
+            type="button"
+            className={`dietary-none ${noRestriction ? 'selected' : ''}`}
+            onClick={() => { setNoRestriction(true); setDietary([]) }}
+          >
+            😋 无忌口，都能吃
+          </button>
+          <div className="dietary-actions">
+            <button type="button" className="action-btn secondary" onClick={() => setPhase('intro')}>
+              ← 返回
+            </button>
+            <button
+              type="button"
+              className="start-btn"
+              disabled={!canStart}
+              onClick={() => startQuiz(noRestriction ? [] : dietary)}
+            >
+              <span>开始答题</span>
+              <span className="btn-arrow">→</span>
+            </button>
+          </div>
         </div>
       </div>
     )

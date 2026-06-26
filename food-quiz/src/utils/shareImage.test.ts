@@ -22,6 +22,11 @@ function makeResult(): AssembledResult {
       { name: '麻婆豆腐', cuisine: '川菜', region: '四川', vector: { sour: 0, sweet: 0, bitter: 0, spicy: 0, salty: 0, rich: 0, crunchy: 0, tender: 0 } },
       { name: '小笼包', cuisine: '江浙菜', region: '上海', vector: { sour: 0, sweet: 0, bitter: 0, spicy: 0, salty: 0, rich: 0, crunchy: 0, tender: 0 } },
       { name: '北京烤鸭', cuisine: '京菜', region: '北京', vector: { sour: 0, sweet: 0, bitter: 0, spicy: 0, salty: 0, rich: 0, crunchy: 0, tender: 0 } },
+      { name: '兰州牛肉面', cuisine: '西北菜', region: '兰州', vector: { sour: 0, sweet: 0, bitter: 0, spicy: 0, salty: 0, rich: 0, crunchy: 0, tender: 0 } },
+    ],
+    topCuisines: [
+      { cuisine: '川菜', score: 0.9, percent: 90, dishCount: 3 },
+      { cuisine: '京菜', score: 0.7, percent: 70, dishCount: 2 },
     ],
     synergy: null, allround: null,
     vector: { sour: 0, sweet: 0, bitter: 0, spicy: 0, salty: 0, rich: 0, crunchy: 0, tender: 0 },
@@ -198,18 +203,30 @@ describe('P8.3 分享图文案补全', () => {
     }
   });
 
-  it('drawShareCard 推荐菜 3 道(菜名 + 菜系,去 emoji)', () => {
+  it('drawShareCard 推荐菜 4 道(菜名 + 菜系,去 emoji)', () => {
     drawShareCard(canvas as unknown as HTMLCanvasElement, makeData());
     const texts = ctx.fillText.mock.calls.map((c: any[]) => c[0]);
     // 菜名(墨)单独绘制
     expect(texts).toContain('麻婆豆腐');
     expect(texts).toContain('小笼包');
     expect(texts).toContain('北京烤鸭');
+    expect(texts).toContain('兰州牛肉面');
     // 菜系(朱砂)紧跟菜名,形如 " · 川菜"
     expect(texts).toContain(' · 川菜');
     expect(texts).toContain(' · 江浙菜');
     expect(texts).toContain(' · 京菜');
+    expect(texts).toContain(' · 西北菜');
     expect(texts).toContain('为你推荐');
+  });
+
+  it('drawShareCard 适合菜系区画 top3 菜系 + 百分比', () => {
+    drawShareCard(canvas as unknown as HTMLCanvasElement, makeData());
+    const texts = ctx.fillText.mock.calls.map((c: any[]) => c[0]);
+    expect(texts).toContain('适合菜系');
+    expect(texts).toContain('川菜');
+    expect(texts).toContain(' 90%');
+    expect(texts).toContain('京菜');
+    expect(texts).toContain(' 70%');
   });
 
   it('drawShareCard 特征分支 section 标题为"味觉特征",mainCopy 取自 profileCopy', () => {

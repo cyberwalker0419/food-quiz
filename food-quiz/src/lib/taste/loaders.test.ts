@@ -59,10 +59,10 @@ describe('loadAvoid', () => {
 });
 
 describe('loadDishes', () => {
-  it('返回 dishes.json 全库（196 道）', () => {
+  it('返回 dishes.json 全库（245 道）', () => {
     const r = loadDishes();
     expect(r).not.toBeNull();
-    expect(r?.length).toBe(196);
+    expect(r?.length).toBe(245);
     expect(r?.[0]?.name).toBeTruthy();
     expect(r?.[0]?.vector).toBeTruthy();
   });

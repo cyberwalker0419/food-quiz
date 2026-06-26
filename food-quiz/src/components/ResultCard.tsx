@@ -98,7 +98,23 @@ export function ResultCard({ result, questionCount, onRestart, onCopy, onDownloa
           </details>
         </section>
 
-        {/* 3. 推荐菜(可折叠) */}
+        {/* 3. 推荐菜系(新增) */}
+        {result.topCuisines && result.topCuisines.length > 0 && (
+          <section className="profile-section cuisines-section">
+            <h2 className="section-title">适合菜系</h2>
+            <div className="cuisines-grid">
+              {result.topCuisines.slice(0, 4).map((c, i) => (
+                <div key={c.cuisine} className={`cuisine-card cuisine-rank-${i + 1}`}>
+                  <span className="cuisine-pct">{c.percent}%</span>
+                  <span className="cuisine-name">{c.cuisine}</span>
+                  <span className="cuisine-count">{c.dishCount}道</span>
+                </div>
+              ))}
+            </div>
+          </section>
+        )}
+
+        {/* 4. 推荐菜(可折叠) */}
         {result.topDishes.length > 0 && (
           <section className="profile-section dishes-section">
             <button
@@ -122,7 +138,7 @@ export function ResultCard({ result, questionCount, onRestart, onCopy, onDownloa
           </section>
         )}
 
-        {/* 4. 操作按钮 */}
+        {/* 5. 操作按钮 */}
         <div className="result-actions">
           <button className="action-btn primary" onClick={onRestart}>
             <span>🔄</span> 重新测试

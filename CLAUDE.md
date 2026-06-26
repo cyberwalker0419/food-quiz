@@ -85,3 +85,21 @@ intervals 文案编号对应 8 位字母串（`000.json` … `255.json`）→ pr
 - 中文交流。
 - 破坏性 / 外向动作（删文件、强推、改公共数据结构、改 8 维体系）前先确认。
 - 深度参考：`README.md`（部署 / 性能基线 / 阈值表 / 渲染顺序）、`docs/superpowers/plans/`（各阶段工作日志）。
+
+## mmx 工具（仅作 Claude Code 内置搜索/图像理解的替代）
+
+mmx 是 MiniMax 官方 CLI（`npm i -g mmx-cli`），注册于 `~/.mmx/config.json`，region = `cn`。
+在 Claude Code 中**不是 MCP** —— 需通过 Bash 调 `mmx <resource> <command>`。**配额独立计费**（mmx TokenPlan，与 Claude Code 配额池不同）。
+
+**用途范围（明确边界）**：
+
+| 用途 | 命令 | 替代的内置工具 |
+|:--|:--|:--|
+| 网页搜索（菜品事实核查、清真/素食属性、少数民族饮食禁忌等） | `mmx search query "..."` | `WebSearch` / `WebFetch` |
+| 图像理解（截图分析、UI 校对、Canvas 渲染抽查） | `mmx vision describe <img>` | 内置 vision |
+
+**不用于**：`text` / `image` / `video` / `music` / `speech` / `file`（避免吃 Claude Code 配额以外的 token）。
+**优先级**：能走 Claude Code 内置 `Read` 就走内置；只有内置不可用（WebSearch 400/429、WebFetch 域名被拦截）才退回 mmx。
+
+**节流**：批量核查用 `--output json` 一次拿多条；不要对每道菜单独调一次。
+**失败处理**：`mmx search` 失败 → 退回基于已有知识的判断 + 在 commit message / plan 里标注"未联网核实"。

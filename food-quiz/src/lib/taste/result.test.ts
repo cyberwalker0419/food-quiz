@@ -245,3 +245,37 @@ describe('assembleResult — 5 等级 grade 字段(视觉层)', () => {
     expect(spicyIv.tierLabel).toBe('重辣');
   });
 });
+
+describe('assembleResult — 菜系百分比(top3 均值)', () => {
+  it('topCuisines 含 percent 字段且为合理整数', () => {
+    const r = assembleResult({ ...ZERO_VECTOR, spicy: 90, salty: 80, rich: 70 });
+    expect(r.topCuisines.length).toBeGreaterThan(0);
+    for (const c of r.topCuisines) {
+      expect(Number.isInteger(c.percent), `${c.cuisine} percent 非整数`).toBe(true);
+      expect(c.percent).toBeGreaterThan(0);
+      expect(c.percent).toBeLessThanOrEqual(100);
+      expect(c.dishCount).toBeGreaterThan(0);
+    }
+  });
+
+  it('菜系按 score 降序(top1 匹配度最高)', () => {
+    const r = assembleResult({ ...ZERO_VECTOR, spicy: 90, salty: 80, rich: 70 });
+    for (let i = 1; i < r.topCuisines.length; i++) {
+      expect(r.topCuisines[i - 1]!.score).toBeGreaterThanOrEqual(r.topCuisines[i]!.score);
+    }
+  });
+
+  it('percent = Math.round(score * 100)', () => {
+    const r = assembleResult({ ...ZERO_VECTOR, spicy: 95 });
+    for (const c of r.topCuisines) {
+      expect(c.percent).toBe(Math.round(c.score * 100));
+    }
+  });
+
+  it('top3 均值语义: 大菜系不被冷门菜拉低(百分比较旧均值更乐观)', () => {
+    // 重口画像: 川菜应有较高百分比(top3 强匹配),而非被全库均值稀释
+    const r = assembleResult({ ...ZERO_VECTOR, spicy: 90, salty: 80, rich: 70 });
+    const top = r.topCuisines[0]!;
+    expect(top.percent).toBeGreaterThanOrEqual(40);
+  });
+});

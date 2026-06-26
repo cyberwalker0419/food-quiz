@@ -1,5 +1,4 @@
 import type { QuizQuestion, QuizOption, WeightVector } from './types';
-import { ZERO_VECTOR } from './types';
 import { questionBank } from '../../content/questions/questions.loader';
 
 export type AnswerRecord = {
@@ -23,7 +22,8 @@ export function initialState(): QuizState {
   return {
     askedIds: [],
     answers: [],
-    profile: { ...ZERO_VECTOR },
+    // 苦味初始-15：让苦味接受度低的人更容易区分
+    profile: { sour: 0, sweet: 0, bitter: -15, spicy: 0, salty: 0, rich: 0, crunchy: 0, tender: 0 },
     currentIndex: 0,
   };
 }

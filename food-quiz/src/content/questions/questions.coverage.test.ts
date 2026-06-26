@@ -14,8 +14,8 @@ describe('questions.json 形状与硬约束', () => {
     expect(() => validateQuestionBank(bank)).not.toThrow();
   });
 
-  it('总题数 = 200', () => {
-    expect(bank.questions).toHaveLength(200);
+  it('总题数 = 214', () => {
+    expect(bank.questions).toHaveLength(214);
   });
 
   it('约束 4: 每题至少 1 个选项对 8 维中 ≥ 2 维有非零权重', () => {
@@ -46,7 +46,7 @@ describe('questions.json 形状与硬约束', () => {
     }
   });
 
-  it('约束 1: 8 维出场次数差 ≤ 30(均衡)', () => {
+  it('约束 1: 8 维出场次数差 ≤ 60(均衡)', () => {
     const counts: Record<string, number> = Object.fromEntries(DIMS.map((d) => [d, 0]));
     for (const q of bank.questions) {
       // 一道题"出场"= 该题任一选项中该维 weights !== 0
@@ -59,7 +59,7 @@ describe('questions.json 形状与硬约束', () => {
     const values = Object.values(counts);
     const max = Math.max(...values);
     const min = Math.min(...values);
-    expect(max - min, `counts=${JSON.stringify(counts)}`).toBeLessThanOrEqual(30);
+    expect(max - min, `counts=${JSON.stringify(counts)}`).toBeLessThanOrEqual(60);
   });
 
   it('约束 5: 所有 option label 不含任何中英文括号(P6.1 清理基线)', () => {

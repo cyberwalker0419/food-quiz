@@ -1,4 +1,4 @@
-import type { WeightVector, DimensionVector, TasteLetter } from './types';
+import type { WeightVector, DimensionVector, TasteLetter, DietaryRestriction } from './types';
 import { DIMS, letterToChinese, letterToTierLabel, letterToDim, valueToGrade, type Grade } from './keys';
 import { normalize, std } from './normalize';
 import { blendedScore } from './similarity';
@@ -54,6 +54,17 @@ export interface RenderedAllround {
   copy: string;
 }
 
+/** 菜系推荐数据 */
+export interface RenderedCuisine {
+  cuisine: string;
+  /** 该菜系 top3 菜(按 blendedScore)均值,范围 (0,1] */
+  score: number;
+  /** 绝对匹配度百分比 = Math.round(score * 100) */
+  percent: number;
+  /** 该菜系在池中的总菜数(辅助) */
+  dishCount: number;
+}
+
 export interface AssembledResult {
   /** 归一化 [0, 100] 后的 8 维向量 */
   vector: DimensionVector;
@@ -73,6 +84,8 @@ export interface AssembledResult {
   allround: RenderedAllround | null;
   /** 推荐菜 */
   topDishes: DishEntry[];
+  /** 推荐菜系 */
+  topCuisines: RenderedCuisine[];
   /** 8 维档位标签,供雷达图轴标注 */
   tierLabels: Record<TasteLetter, string>;
 }
@@ -171,6 +184,50 @@ function pickOne(copy: readonly string[] | string | undefined): string {
   return '';
 }
 
+/**
+ * 忌口过滤(纯函数,可独立单测):菜品是否满足**全部**忌口(交集)。
+ * - 空限制数组 → true(无忌口)
+ * - 每条 restriction 都必须通过,任一不满足 → false
+ * - no-egg/no-offal:对应标记 === true 即排除(未标记者放行)
+ * - vegetarian/halal:要求对应标记严格 === true(未标记者不放行)
+ */
+export function passesDietary(d: DishEntry, restrictions: DietaryRestriction[]): boolean {
+  if (!restrictions || restrictions.length === 0) return true;
+  const mt = d.meatTypes ?? [];
+  for (const r of restrictions) {
+    switch (r) {
+      case 'no-pork':
+        if (mt.includes('pork')) return false;
+        break;
+      case 'no-beef':
+        if (mt.includes('beef')) return false;
+        break;
+      case 'no-lamb':
+        if (mt.includes('lamb')) return false;
+        break;
+      case 'no-chicken':
+        if (mt.includes('chicken')) return false;
+        break;
+      case 'no-seafood':
+        if (mt.includes('fish') || mt.includes('seafood')) return false;
+        break;
+      case 'no-egg':
+        if (d.isContainsEgg === true) return false;
+        break;
+      case 'no-offal':
+        if (d.isOffal === true) return false;
+        break;
+      case 'vegetarian':
+        if (d.isVegetarian !== true) return false;
+        break;
+      case 'halal':
+        if (d.isHalal !== true) return false;
+        break;
+    }
+  }
+  return true;
+}
+
 // ===== 主入口 =====
 
 /**
@@ -182,7 +239,7 @@ function pickOne(copy: readonly string[] | string | undefined): string {
  */
 export function assembleResult(
   raw: WeightVector,
-  options?: { topNDishes?: number; maxAbs?: number; seed?: number },
+  options?: { topNDishes?: number; maxAbs?: number; seed?: number; dietary?: DietaryRestriction[] },
 ): AssembledResult {
   const topNDishes = options?.topNDishes ?? DEFAULT_TOP_N_DISHES;
   const rng = options?.seed !== undefined ? mulberry32(options.seed) : Math.random;
@@ -252,10 +309,18 @@ export function assembleResult(
 
   // topDishes(匹配池内加权随机抽样,同 seed 确定性)
   let topDishes: DishEntry[] = [];
+  let topCuisines: RenderedCuisine[] = [];
   const dishes = loadDishes();
   if (dishes) {
     const popular = dishes.filter((d) => d.popular !== false);
-    const scored = popular.map((d) => ({ d, score: blendedScore(v, d.vector) }));
+    // 忌口过滤(交集:每条都满足);过滤后过少则回退 popular,保证总有推荐
+    const dietary = options?.dietary ?? [];
+    let pool0 = popular;
+    if (dietary.length > 0) {
+      const filtered = popular.filter((d) => passesDietary(d, dietary));
+      if (filtered.length >= topNDishes + 2) pool0 = filtered;
+    }
+    const scored = pool0.map((d) => ({ d, score: blendedScore(v, d.vector) }));
     scored.sort((a, b) => b.score - a.score);
     const topScore = scored[0]?.score ?? 0;
     const MATCH_RATIO = 0.6;
@@ -277,6 +342,27 @@ export function assembleResult(
       seenNames.add(picked.d.name);
       topDishes.push(picked.d);
     }
+
+    // 菜系推荐:每菜系取 top3(按 blendedScore)均值作绝对匹配度,大菜系不被不匹配菜拉低
+    const cuisineScores: Record<string, number[]> = {};
+    for (const { d, score } of scored) {
+      const c = d.cuisine;
+      if (!cuisineScores[c]) cuisineScores[c] = [];
+      cuisineScores[c].push(score); // scored 已降序,前 3 即该菜系最高分
+    }
+    topCuisines = Object.entries(cuisineScores)
+      .map(([cuisine, scores]) => {
+        const top3 = scores.slice(0, 3);
+        const avg = top3.reduce((a, b) => a + b, 0) / top3.length;
+        return {
+          cuisine,
+          score: avg,
+          percent: Math.round(avg * 100),
+          dishCount: scores.length,
+        };
+      })
+      .sort((a, b) => b.score - a.score)
+      .slice(0, 5);
   }
 
   return {
@@ -289,6 +375,7 @@ export function assembleResult(
     synergy,
     allround,
     topDishes,
+    topCuisines: topCuisines ?? [],
     tierLabels,
   };
 }

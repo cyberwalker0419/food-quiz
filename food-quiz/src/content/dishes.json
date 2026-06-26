@@ -13,7 +13,8 @@
       "crunchy": 10,
       "tender": 70
     },
-    "popular": true
+    "popular": true,
+    "isVegetarian": true
   },
   {
     "name": "水煮鱼",
@@ -29,7 +30,10 @@
       "crunchy": 5,
       "tender": 80
     },
-    "popular": true
+    "popular": true,
+    "meatTypes": [
+      "fish"
+    ]
   },
   {
     "name": "火锅",
@@ -45,7 +49,11 @@
       "crunchy": 30,
       "tender": 50
     },
-    "popular": true
+    "popular": true,
+    "meatTypes": [
+      "beef"
+    ],
+    "isOffal": true
   },
   {
     "name": "宫保鸡丁",
@@ -61,7 +69,10 @@
       "crunchy": 40,
       "tender": 60
     },
-    "popular": true
+    "popular": true,
+    "meatTypes": [
+      "chicken"
+    ]
   },
   {
     "name": "夫妻肺片",
@@ -77,7 +88,11 @@
       "crunchy": 20,
       "tender": 55
     },
-    "popular": true
+    "popular": true,
+    "meatTypes": [
+      "beef"
+    ],
+    "isOffal": true
   },
   {
     "name": "回锅肉",
@@ -93,7 +108,10 @@
       "crunchy": 15,
       "tender": 50
     },
-    "popular": true
+    "popular": true,
+    "meatTypes": [
+      "pork"
+    ]
   },
   {
     "name": "担担面",
@@ -109,7 +127,10 @@
       "crunchy": 10,
       "tender": 40
     },
-    "popular": true
+    "popular": true,
+    "meatTypes": [
+      "pork"
+    ]
   },
   {
     "name": "钵钵鸡",
@@ -125,7 +146,10 @@
       "crunchy": 30,
       "tender": 50
     },
-    "popular": true
+    "popular": true,
+    "meatTypes": [
+      "chicken"
+    ]
   },
   {
     "name": "白切鸡",
@@ -141,7 +165,10 @@
       "crunchy": 15,
       "tender": 90
     },
-    "popular": true
+    "popular": true,
+    "meatTypes": [
+      "chicken"
+    ]
   },
   {
     "name": "虾饺",
@@ -157,7 +184,10 @@
       "crunchy": 10,
       "tender": 90
     },
-    "popular": true
+    "popular": true,
+    "meatTypes": [
+      "seafood"
+    ]
   },
   {
     "name": "烧腊",
@@ -173,7 +203,11 @@
       "crunchy": 40,
       "tender": 50
     },
-    "popular": true
+    "popular": true,
+    "meatTypes": [
+      "pork",
+      "chicken"
+    ]
   },
   {
     "name": "叉烧",
@@ -189,7 +223,10 @@
       "crunchy": 20,
       "tender": 55
     },
-    "popular": true
+    "popular": true,
+    "meatTypes": [
+      "pork"
+    ]
   },
   {
     "name": "煲仔饭",
@@ -205,7 +242,10 @@
       "crunchy": 40,
       "tender": 45
     },
-    "popular": true
+    "popular": true,
+    "meatTypes": [
+      "pork"
+    ]
   },
   {
     "name": "肠粉",
@@ -221,7 +261,12 @@
       "crunchy": 5,
       "tender": 85
     },
-    "popular": true
+    "popular": true,
+    "meatTypes": [
+      "pork",
+      "beef",
+      "seafood"
+    ]
   },
   {
     "name": "蒸凤爪",
@@ -237,7 +282,10 @@
       "crunchy": 10,
       "tender": 75
     },
-    "popular": true
+    "popular": true,
+    "meatTypes": [
+      "chicken"
+    ]
   },
   {
     "name": "糖醋鲤鱼",
@@ -253,7 +301,10 @@
       "crunchy": 45,
       "tender": 40
     },
-    "popular": false
+    "popular": false,
+    "meatTypes": [
+      "fish"
+    ]
   },
   {
     "name": "九转大肠",
@@ -269,7 +320,11 @@
       "crunchy": 20,
       "tender": 40
     },
-    "popular": false
+    "popular": false,
+    "meatTypes": [
+      "pork"
+    ],
+    "isOffal": true
   },
   {
     "name": "葱烧海参",
@@ -285,7 +340,10 @@
       "crunchy": 5,
       "tender": 70
     },
-    "popular": true
+    "popular": true,
+    "meatTypes": [
+      "seafood"
+    ]
   },
   {
     "name": "锅包肉",
@@ -301,7 +359,10 @@
       "crunchy": 55,
       "tender": 40
     },
-    "popular": true
+    "popular": true,
+    "meatTypes": [
+      "pork"
+    ]
   },
   {
     "name": "德州扒鸡",
@@ -317,7 +378,10 @@
       "crunchy": 10,
       "tender": 80
     },
-    "popular": false
+    "popular": false,
+    "meatTypes": [
+      "chicken"
+    ]
   },
   {
     "name": "剁椒鱼头",
@@ -333,7 +397,10 @@
       "crunchy": 5,
       "tender": 70
     },
-    "popular": true
+    "popular": true,
+    "meatTypes": [
+      "fish"
+    ]
   },
   {
     "name": "辣椒炒肉",
@@ -349,7 +416,10 @@
       "crunchy": 25,
       "tender": 45
     },
-    "popular": true
+    "popular": true,
+    "meatTypes": [
+      "pork"
+    ]
   },
   {
     "name": "臭豆腐",
@@ -365,7 +435,8 @@
       "crunchy": 35,
       "tender": 60
     },
-    "popular": true
+    "popular": true,
+    "isVegetarian": true
   },
   {
     "name": "毛氏红烧肉",
@@ -381,7 +452,10 @@
       "crunchy": 5,
       "tender": 80
     },
-    "popular": true
+    "popular": true,
+    "meatTypes": [
+      "pork"
+    ]
   },
   {
     "name": "湘西腊肉",
@@ -397,7 +471,10 @@
       "crunchy": 15,
       "tender": 40
     },
-    "popular": true
+    "popular": true,
+    "meatTypes": [
+      "pork"
+    ]
   },
   {
     "name": "松鼠桂鱼",
@@ -413,7 +490,10 @@
       "crunchy": 40,
       "tender": 35
     },
-    "popular": false
+    "popular": false,
+    "meatTypes": [
+      "fish"
+    ]
   },
   {
     "name": "狮子头",
@@ -429,7 +509,10 @@
       "crunchy": 5,
       "tender": 80
     },
-    "popular": true
+    "popular": true,
+    "meatTypes": [
+      "pork"
+    ]
   },
   {
     "name": "盐水鸭",
@@ -445,7 +528,10 @@
       "crunchy": 10,
       "tender": 65
     },
-    "popular": true
+    "popular": true,
+    "meatTypes": [
+      "chicken"
+    ]
   },
   {
     "name": "蟹黄汤包",
@@ -461,7 +547,11 @@
       "crunchy": 5,
       "tender": 85
     },
-    "popular": false
+    "popular": false,
+    "meatTypes": [
+      "pork",
+      "seafood"
+    ]
   },
   {
     "name": "文思豆腐",
@@ -477,7 +567,8 @@
       "crunchy": 5,
       "tender": 95
     },
-    "popular": false
+    "popular": false,
+    "isVegetarian": true
   },
   {
     "name": "西湖醋鱼",
@@ -493,7 +584,10 @@
       "crunchy": 5,
       "tender": 65
     },
-    "popular": true
+    "popular": true,
+    "meatTypes": [
+      "fish"
+    ]
   },
   {
     "name": "东坡肉",
@@ -509,7 +603,10 @@
       "crunchy": 5,
       "tender": 85
     },
-    "popular": true
+    "popular": true,
+    "meatTypes": [
+      "pork"
+    ]
   },
   {
     "name": "龙井虾仁",
@@ -525,7 +622,10 @@
       "crunchy": 20,
       "tender": 80
     },
-    "popular": false
+    "popular": false,
+    "meatTypes": [
+      "seafood"
+    ]
   },
   {
     "name": "叫花鸡",
@@ -541,7 +641,10 @@
       "crunchy": 15,
       "tender": 75
     },
-    "popular": true
+    "popular": true,
+    "meatTypes": [
+      "chicken"
+    ]
   },
   {
     "name": "佛跳墙",
@@ -557,7 +660,13 @@
       "crunchy": 15,
       "tender": 70
     },
-    "popular": true
+    "popular": true,
+    "meatTypes": [
+      "pork",
+      "chicken",
+      "seafood"
+    ],
+    "isContainsEgg": true
   },
   {
     "name": "荔枝肉",
@@ -573,7 +682,10 @@
       "crunchy": 25,
       "tender": 55
     },
-    "popular": false
+    "popular": false,
+    "meatTypes": [
+      "pork"
+    ]
   },
   {
     "name": "沙茶面",
@@ -589,7 +701,11 @@
       "crunchy": 15,
       "tender": 40
     },
-    "popular": false
+    "popular": false,
+    "meatTypes": [
+      "seafood",
+      "pork"
+    ]
   },
   {
     "name": "海蛎煎",
@@ -605,7 +721,11 @@
       "crunchy": 35,
       "tender": 50
     },
-    "popular": false
+    "popular": false,
+    "meatTypes": [
+      "seafood"
+    ],
+    "isContainsEgg": true
   },
   {
     "name": "臭鳜鱼",
@@ -621,7 +741,10 @@
       "crunchy": 10,
       "tender": 60
     },
-    "popular": true
+    "popular": true,
+    "meatTypes": [
+      "fish"
+    ]
   },
   {
     "name": "毛豆腐",
@@ -637,7 +760,8 @@
       "crunchy": 20,
       "tender": 70
     },
-    "popular": false
+    "popular": false,
+    "isVegetarian": true
   },
   {
     "name": "一品锅",
@@ -653,7 +777,12 @@
       "crunchy": 20,
       "tender": 55
     },
-    "popular": false
+    "popular": false,
+    "meatTypes": [
+      "pork",
+      "chicken"
+    ],
+    "isContainsEgg": true
   },
   {
     "name": "火腿炖甲鱼",
@@ -669,7 +798,11 @@
       "crunchy": 5,
       "tender": 70
     },
-    "popular": false
+    "popular": false,
+    "meatTypes": [
+      "pork",
+      "seafood"
+    ]
   },
   {
     "name": "北京烤鸭",
@@ -685,7 +818,10 @@
       "crunchy": 60,
       "tender": 65
     },
-    "popular": true
+    "popular": true,
+    "meatTypes": [
+      "chicken"
+    ]
   },
   {
     "name": "涮羊肉",
@@ -701,7 +837,11 @@
       "crunchy": 10,
       "tender": 80
     },
-    "popular": true
+    "popular": true,
+    "isHalal": true,
+    "meatTypes": [
+      "lamb"
+    ]
   },
   {
     "name": "炸酱面",
@@ -717,7 +857,10 @@
       "crunchy": 15,
       "tender": 35
     },
-    "popular": true
+    "popular": true,
+    "meatTypes": [
+      "pork"
+    ]
   },
   {
     "name": "卤煮火烧",
@@ -733,7 +876,11 @@
       "crunchy": 20,
       "tender": 40
     },
-    "popular": false
+    "popular": false,
+    "meatTypes": [
+      "pork"
+    ],
+    "isOffal": true
   },
   {
     "name": "红烧肉",
@@ -749,7 +896,10 @@
       "crunchy": 5,
       "tender": 75
     },
-    "popular": true
+    "popular": true,
+    "meatTypes": [
+      "pork"
+    ]
   },
   {
     "name": "小笼包",
@@ -765,7 +915,10 @@
       "crunchy": 5,
       "tender": 80
     },
-    "popular": true
+    "popular": true,
+    "meatTypes": [
+      "pork"
+    ]
   },
   {
     "name": "生煎",
@@ -781,7 +934,10 @@
       "crunchy": 50,
       "tender": 50
     },
-    "popular": true
+    "popular": true,
+    "meatTypes": [
+      "pork"
+    ]
   },
   {
     "name": "酸辣粉",
@@ -797,7 +953,10 @@
       "crunchy": 5,
       "tender": 35
     },
-    "popular": true
+    "popular": true,
+    "meatTypes": [
+      "pork"
+    ]
   },
   {
     "name": "辣子鸡",
@@ -813,7 +972,10 @@
       "crunchy": 35,
       "tender": 40
     },
-    "popular": true
+    "popular": true,
+    "meatTypes": [
+      "chicken"
+    ]
   },
   {
     "name": "重庆小面",
@@ -829,7 +991,10 @@
       "crunchy": 10,
       "tender": 30
     },
-    "popular": true
+    "popular": true,
+    "meatTypes": [
+      "pork"
+    ]
   },
   {
     "name": "肉夹馍",
@@ -845,7 +1010,10 @@
       "crunchy": 35,
       "tender": 50
     },
-    "popular": true
+    "popular": true,
+    "meatTypes": [
+      "pork"
+    ]
   },
   {
     "name": "凉皮",
@@ -861,7 +1029,8 @@
       "crunchy": 15,
       "tender": 40
     },
-    "popular": true
+    "popular": true,
+    "isVegetarian": true
   },
   {
     "name": "羊肉泡馍",
@@ -877,23 +1046,11 @@
       "crunchy": 30,
       "tender": 35
     },
-    "popular": true
-  },
-  {
-    "name": "锅包肉",
-    "cuisine": "东北菜",
-    "region": "辽宁",
-    "vector": {
-      "sour": 15,
-      "sweet": 25,
-      "bitter": 0,
-      "spicy": 0,
-      "salty": 30,
-      "rich": 45,
-      "crunchy": 55,
-      "tender": 40
-    },
-    "popular": true
+    "popular": true,
+    "isHalal": true,
+    "meatTypes": [
+      "lamb"
+    ]
   },
   {
     "name": "地三鲜",
@@ -909,7 +1066,8 @@
       "crunchy": 30,
       "tender": 50
     },
-    "popular": true
+    "popular": true,
+    "isVegetarian": true
   },
   {
     "name": "酸菜白肉",
@@ -925,7 +1083,10 @@
       "crunchy": 10,
       "tender": 55
     },
-    "popular": true
+    "popular": true,
+    "meatTypes": [
+      "pork"
+    ]
   },
   {
     "name": "杀猪菜",
@@ -941,7 +1102,11 @@
       "crunchy": 15,
       "tender": 45
     },
-    "popular": true
+    "popular": true,
+    "meatTypes": [
+      "pork"
+    ],
+    "isOffal": true
   },
   {
     "name": "热干面",
@@ -957,7 +1122,8 @@
       "crunchy": 5,
       "tender": 30
     },
-    "popular": true
+    "popular": true,
+    "isVegetarian": true
   },
   {
     "name": "武昌鱼",
@@ -973,7 +1139,10 @@
       "crunchy": 5,
       "tender": 70
     },
-    "popular": true
+    "popular": true,
+    "meatTypes": [
+      "fish"
+    ]
   },
   {
     "name": "大盘鸡",
@@ -989,7 +1158,11 @@
       "crunchy": 20,
       "tender": 50
     },
-    "popular": true
+    "popular": true,
+    "isHalal": true,
+    "meatTypes": [
+      "chicken"
+    ]
   },
   {
     "name": "手抓饭",
@@ -1005,7 +1178,11 @@
       "crunchy": 20,
       "tender": 40
     },
-    "popular": true
+    "popular": true,
+    "isHalal": true,
+    "meatTypes": [
+      "lamb"
+    ]
   },
   {
     "name": "烤羊肉串",
@@ -1021,7 +1198,11 @@
       "crunchy": 30,
       "tender": 45
     },
-    "popular": true
+    "popular": true,
+    "isHalal": true,
+    "meatTypes": [
+      "lamb"
+    ]
   },
   {
     "name": "过桥米线",
@@ -1037,7 +1218,13 @@
       "crunchy": 15,
       "tender": 40
     },
-    "popular": true
+    "popular": true,
+    "meatTypes": [
+      "pork",
+      "chicken",
+      "fish"
+    ],
+    "isContainsEgg": true
   },
   {
     "name": "汽锅鸡",
@@ -1053,7 +1240,10 @@
       "crunchy": 5,
       "tender": 85
     },
-    "popular": true
+    "popular": true,
+    "meatTypes": [
+      "chicken"
+    ]
   },
   {
     "name": "酸汤鱼",
@@ -1069,7 +1259,10 @@
       "crunchy": 5,
       "tender": 60
     },
-    "popular": true
+    "popular": true,
+    "meatTypes": [
+      "fish"
+    ]
   },
   {
     "name": "折耳根炒肉",
@@ -1085,7 +1278,10 @@
       "crunchy": 20,
       "tender": 45
     },
-    "popular": false
+    "popular": false,
+    "meatTypes": [
+      "pork"
+    ]
   },
   {
     "name": "文昌鸡",
@@ -1101,7 +1297,10 @@
       "crunchy": 5,
       "tender": 85
     },
-    "popular": true
+    "popular": true,
+    "meatTypes": [
+      "chicken"
+    ]
   },
   {
     "name": "椰子鸡",
@@ -1117,7 +1316,10 @@
       "crunchy": 5,
       "tender": 80
     },
-    "popular": true
+    "popular": true,
+    "meatTypes": [
+      "chicken"
+    ]
   },
   {
     "name": "螺蛳粉",
@@ -1133,7 +1335,11 @@
       "crunchy": 15,
       "tender": 30
     },
-    "popular": true
+    "popular": true,
+    "meatTypes": [
+      "pork",
+      "seafood"
+    ]
   },
   {
     "name": "桂林米粉",
@@ -1149,7 +1355,11 @@
       "crunchy": 5,
       "tender": 35
     },
-    "popular": true
+    "popular": true,
+    "meatTypes": [
+      "pork",
+      "beef"
+    ]
   },
   {
     "name": "手把肉",
@@ -1165,7 +1375,10 @@
       "crunchy": 5,
       "tender": 70
     },
-    "popular": true
+    "popular": true,
+    "meatTypes": [
+      "lamb"
+    ]
   },
   {
     "name": "烤全羊",
@@ -1181,7 +1394,10 @@
       "crunchy": 30,
       "tender": 55
     },
-    "popular": true
+    "popular": true,
+    "meatTypes": [
+      "lamb"
+    ]
   },
   {
     "name": "卤肉饭",
@@ -1197,7 +1413,10 @@
       "crunchy": 5,
       "tender": 65
     },
-    "popular": true
+    "popular": true,
+    "meatTypes": [
+      "pork"
+    ]
   },
   {
     "name": "盐酥鸡",
@@ -1213,7 +1432,10 @@
       "crunchy": 50,
       "tender": 45
     },
-    "popular": true
+    "popular": true,
+    "meatTypes": [
+      "chicken"
+    ]
   },
   {
     "name": "狗不理包子",
@@ -1229,7 +1451,10 @@
       "crunchy": 5,
       "tender": 70
     },
-    "popular": true
+    "popular": true,
+    "meatTypes": [
+      "pork"
+    ]
   },
   {
     "name": "三杯鸡",
@@ -1245,7 +1470,10 @@
       "crunchy": 10,
       "tender": 60
     },
-    "popular": true
+    "popular": true,
+    "meatTypes": [
+      "chicken"
+    ]
   },
   {
     "name": "烩面",
@@ -1261,7 +1489,10 @@
       "crunchy": 10,
       "tender": 40
     },
-    "popular": true
+    "popular": true,
+    "meatTypes": [
+      "lamb"
+    ]
   },
   {
     "name": "酥油茶",
@@ -1277,7 +1508,9 @@
       "crunchy": 5,
       "tender": 20
     },
-    "popular": false
+    "popular": false,
+    "isHalal": true,
+    "isVegetarian": true
   },
   {
     "name": "糌粑",
@@ -1293,7 +1526,9 @@
       "crunchy": 15,
       "tender": 25
     },
-    "popular": false
+    "popular": false,
+    "isHalal": true,
+    "isVegetarian": true
   },
   {
     "name": "手抓羊肉",
@@ -1309,7 +1544,11 @@
       "crunchy": 5,
       "tender": 70
     },
-    "popular": true
+    "popular": true,
+    "isHalal": true,
+    "meatTypes": [
+      "lamb"
+    ]
   },
   {
     "name": "孔雀宴",
@@ -1325,7 +1564,12 @@
       "crunchy": 30,
       "tender": 50
     },
-    "popular": false
+    "popular": false,
+    "meatTypes": [
+      "chicken",
+      "fish",
+      "pork"
+    ]
   },
   {
     "name": "舂鸡脚",
@@ -1341,7 +1585,10 @@
       "crunchy": 25,
       "tender": 60
     },
-    "popular": false
+    "popular": false,
+    "meatTypes": [
+      "chicken"
+    ]
   },
   {
     "name": "馕",
@@ -1357,7 +1604,8 @@
       "crunchy": 50,
       "tender": 20
     },
-    "popular": true
+    "popular": true,
+    "isVegetarian": true
   },
   {
     "name": "熘肉段",
@@ -1373,7 +1621,10 @@
       "crunchy": 85,
       "tender": 55
     },
-    "popular": false
+    "popular": false,
+    "meatTypes": [
+      "pork"
+    ]
   },
   {
     "name": "糖醋里脊",
@@ -1389,7 +1640,10 @@
       "crunchy": 80,
       "tender": 50
     },
-    "popular": true
+    "popular": true,
+    "meatTypes": [
+      "pork"
+    ]
   },
   {
     "name": "酱骨架",
@@ -1405,7 +1659,10 @@
       "crunchy": 10,
       "tender": 55
     },
-    "popular": false
+    "popular": false,
+    "meatTypes": [
+      "pork"
+    ]
   },
   {
     "name": "脆皮大虾",
@@ -1421,7 +1678,10 @@
       "crunchy": 90,
       "tender": 65
     },
-    "popular": false
+    "popular": false,
+    "meatTypes": [
+      "seafood"
+    ]
   },
   {
     "name": "红烧偏口",
@@ -1437,7 +1697,10 @@
       "crunchy": 5,
       "tender": 75
     },
-    "popular": false
+    "popular": false,
+    "meatTypes": [
+      "fish"
+    ]
   },
   {
     "name": "东北乱炖",
@@ -1453,7 +1716,10 @@
       "crunchy": 10,
       "tender": 65
     },
-    "popular": false
+    "popular": false,
+    "meatTypes": [
+      "pork"
+    ]
   },
   {
     "name": "酱大骨",
@@ -1469,7 +1735,10 @@
       "crunchy": 5,
       "tender": 60
     },
-    "popular": false
+    "popular": false,
+    "meatTypes": [
+      "pork"
+    ]
   },
   {
     "name": "铁锅炖鱼",
@@ -1485,7 +1754,10 @@
       "crunchy": 5,
       "tender": 70
     },
-    "popular": true
+    "popular": true,
+    "meatTypes": [
+      "fish"
+    ]
   },
   {
     "name": "渍菜粉",
@@ -1501,7 +1773,10 @@
       "crunchy": 15,
       "tender": 60
     },
-    "popular": false
+    "popular": false,
+    "meatTypes": [
+      "pork"
+    ]
   },
   {
     "name": "笨鸡炖粉",
@@ -1517,7 +1792,10 @@
       "crunchy": 5,
       "tender": 70
     },
-    "popular": false
+    "popular": false,
+    "meatTypes": [
+      "chicken"
+    ]
   },
   {
     "name": "熏肉大饼",
@@ -1533,7 +1811,10 @@
       "crunchy": 60,
       "tender": 40
     },
-    "popular": false
+    "popular": false,
+    "meatTypes": [
+      "pork"
+    ]
   },
   {
     "name": "酸菜炖排骨",
@@ -1549,7 +1830,10 @@
       "crunchy": 5,
       "tender": 70
     },
-    "popular": true
+    "popular": true,
+    "meatTypes": [
+      "pork"
+    ]
   },
   {
     "name": "铁锅炖大鹅",
@@ -1565,7 +1849,10 @@
       "crunchy": 5,
       "tender": 75
     },
-    "popular": false
+    "popular": false,
+    "meatTypes": [
+      "chicken"
+    ]
   },
   {
     "name": "白肉血肠",
@@ -1581,7 +1868,11 @@
       "crunchy": 20,
       "tender": 75
     },
-    "popular": false
+    "popular": false,
+    "meatTypes": [
+      "pork"
+    ],
+    "isOffal": true
   },
   {
     "name": "雪衣豆沙",
@@ -1597,23 +1888,26 @@
       "crunchy": 75,
       "tender": 65
     },
-    "popular": true
+    "popular": true,
+    "isVegetarian": true,
+    "isContainsEgg": true
   },
   {
     "name": "嘎巴菜",
     "cuisine": "津菜",
     "region": "天津",
     "vector": {
-      "sour": 10,
-      "sweet": 10,
+      "sour": 12,
+      "sweet": 8,
       "bitter": 0,
-      "spicy": 10,
-      "salty": 65,
-      "rich": 55,
-      "crunchy": 75,
-      "tender": 50
+      "spicy": 12,
+      "salty": 72,
+      "rich": 62,
+      "crunchy": 28,
+      "tender": 70
     },
-    "popular": false
+    "popular": false,
+    "isVegetarian": true
   },
   {
     "name": "崩豆张",
@@ -1629,7 +1923,8 @@
       "crunchy": 95,
       "tender": 5
     },
-    "popular": false
+    "popular": false,
+    "isVegetarian": true
   },
   {
     "name": "十八街麻花",
@@ -1645,7 +1940,8 @@
       "crunchy": 85,
       "tender": 15
     },
-    "popular": false
+    "popular": false,
+    "isVegetarian": true
   },
   {
     "name": "煎饼果子",
@@ -1661,7 +1957,9 @@
       "crunchy": 90,
       "tender": 30
     },
-    "popular": true
+    "popular": true,
+    "isVegetarian": true,
+    "isContainsEgg": true
   },
   {
     "name": "老豆腐",
@@ -1677,7 +1975,8 @@
       "crunchy": 5,
       "tender": 75
     },
-    "popular": false
+    "popular": false,
+    "isVegetarian": true
   },
   {
     "name": "辣椒饼",
@@ -1693,7 +1992,8 @@
       "crunchy": 60,
       "tender": 30
     },
-    "popular": false
+    "popular": false,
+    "isVegetarian": true
   },
   {
     "name": "瓦罐汤",
@@ -1709,7 +2009,10 @@
       "crunchy": 0,
       "tender": 70
     },
-    "popular": true
+    "popular": true,
+    "meatTypes": [
+      "pork"
+    ]
   },
   {
     "name": "米粉蒸肉",
@@ -1725,7 +2028,10 @@
       "crunchy": 5,
       "tender": 60
     },
-    "popular": false
+    "popular": false,
+    "meatTypes": [
+      "pork"
+    ]
   },
   {
     "name": "藜蒿炒腊肉",
@@ -1741,7 +2047,10 @@
       "crunchy": 30,
       "tender": 50
     },
-    "popular": false
+    "popular": false,
+    "meatTypes": [
+      "pork"
+    ]
   },
   {
     "name": "客家酿豆腐",
@@ -1757,7 +2066,11 @@
       "crunchy": 5,
       "tender": 75
     },
-    "popular": false
+    "popular": false,
+    "meatTypes": [
+      "pork",
+      "fish"
+    ]
   },
   {
     "name": "灌汤包",
@@ -1773,7 +2086,10 @@
       "crunchy": 10,
       "tender": 70
     },
-    "popular": true
+    "popular": true,
+    "meatTypes": [
+      "pork"
+    ]
   },
   {
     "name": "道口烧鸡",
@@ -1789,7 +2105,10 @@
       "crunchy": 15,
       "tender": 65
     },
-    "popular": true
+    "popular": true,
+    "meatTypes": [
+      "chicken"
+    ]
   },
   {
     "name": "焖面",
@@ -1805,7 +2124,10 @@
       "crunchy": 10,
       "tender": 60
     },
-    "popular": true
+    "popular": true,
+    "meatTypes": [
+      "pork"
+    ]
   },
   {
     "name": "胡辣汤",
@@ -1821,7 +2143,11 @@
       "crunchy": 5,
       "tender": 50
     },
-    "popular": true
+    "popular": true,
+    "meatTypes": [
+      "beef",
+      "lamb"
+    ]
   },
   {
     "name": "洛阳浆面条",
@@ -1837,7 +2163,8 @@
       "crunchy": 0,
       "tender": 60
     },
-    "popular": false
+    "popular": false,
+    "isVegetarian": true
   },
   {
     "name": "羊杂碎",
@@ -1853,7 +2180,12 @@
       "crunchy": 10,
       "tender": 60
     },
-    "popular": false
+    "popular": false,
+    "isHalal": true,
+    "meatTypes": [
+      "lamb"
+    ],
+    "isOffal": true
   },
   {
     "name": "羊肉臊子面",
@@ -1869,7 +2201,11 @@
       "crunchy": 10,
       "tender": 55
     },
-    "popular": false
+    "popular": false,
+    "isHalal": true,
+    "meatTypes": [
+      "lamb"
+    ]
   },
   {
     "name": "回族馄饨",
@@ -1885,7 +2221,11 @@
       "crunchy": 5,
       "tender": 75
     },
-    "popular": false
+    "popular": false,
+    "isHalal": true,
+    "meatTypes": [
+      "beef"
+    ]
   },
   {
     "name": "粉汤",
@@ -1901,7 +2241,11 @@
       "crunchy": 5,
       "tender": 65
     },
-    "popular": false
+    "popular": false,
+    "isHalal": true,
+    "meatTypes": [
+      "beef"
+    ]
   },
   {
     "name": "烩小吃",
@@ -1917,7 +2261,12 @@
       "crunchy": 20,
       "tender": 60
     },
-    "popular": false
+    "popular": false,
+    "isHalal": true,
+    "meatTypes": [
+      "lamb"
+    ],
+    "isContainsEgg": true
   },
   {
     "name": "干炸黄花鱼",
@@ -1933,7 +2282,10 @@
       "crunchy": 90,
       "tender": 55
     },
-    "popular": false
+    "popular": false,
+    "meatTypes": [
+      "fish"
+    ]
   },
   {
     "name": "得莫利炖鱼",
@@ -1949,7 +2301,10 @@
       "crunchy": 5,
       "tender": 70
     },
-    "popular": false
+    "popular": false,
+    "meatTypes": [
+      "fish"
+    ]
   },
   {
     "name": "汆白肉",
@@ -1965,7 +2320,10 @@
       "crunchy": 5,
       "tender": 75
     },
-    "popular": true
+    "popular": true,
+    "meatTypes": [
+      "pork"
+    ]
   },
   {
     "name": "粘豆包",
@@ -1981,7 +2339,8 @@
       "crunchy": 10,
       "tender": 65
     },
-    "popular": false
+    "popular": false,
+    "isVegetarian": true
   },
   {
     "name": "武汉鸭脖",
@@ -1997,7 +2356,10 @@
       "crunchy": 65,
       "tender": 40
     },
-    "popular": true
+    "popular": true,
+    "meatTypes": [
+      "chicken"
+    ]
   },
   {
     "name": "潜江油焖大虾",
@@ -2013,7 +2375,10 @@
       "crunchy": 10,
       "tender": 70
     },
-    "popular": true
+    "popular": true,
+    "meatTypes": [
+      "seafood"
+    ]
   },
   {
     "name": "豆皮",
@@ -2029,7 +2394,12 @@
       "crunchy": 80,
       "tender": 40
     },
-    "popular": true
+    "popular": true,
+    "meatTypes": [
+      "pork",
+      "seafood"
+    ],
+    "isContainsEgg": true
   },
   {
     "name": "排骨藕汤",
@@ -2045,7 +2415,10 @@
       "crunchy": 0,
       "tender": 70
     },
-    "popular": true
+    "popular": true,
+    "meatTypes": [
+      "pork"
+    ]
   },
   {
     "name": "大理砂锅鱼",
@@ -2061,7 +2434,10 @@
       "crunchy": 5,
       "tender": 75
     },
-    "popular": false
+    "popular": false,
+    "meatTypes": [
+      "fish"
+    ]
   },
   {
     "name": "宣威火腿炒饭",
@@ -2077,7 +2453,10 @@
       "crunchy": 25,
       "tender": 50
     },
-    "popular": false
+    "popular": false,
+    "meatTypes": [
+      "pork"
+    ]
   },
   {
     "name": "云南火腿月饼",
@@ -2093,7 +2472,10 @@
       "crunchy": 40,
       "tender": 35
     },
-    "popular": false
+    "popular": false,
+    "meatTypes": [
+      "pork"
+    ]
   },
   {
     "name": "傣味烤鱼",
@@ -2109,7 +2491,10 @@
       "crunchy": 15,
       "tender": 70
     },
-    "popular": false
+    "popular": false,
+    "meatTypes": [
+      "fish"
+    ]
   },
   {
     "name": "酸汤面",
@@ -2125,7 +2510,10 @@
       "crunchy": 5,
       "tender": 55
     },
-    "popular": false
+    "popular": false,
+    "meatTypes": [
+      "pork"
+    ]
   },
   {
     "name": "丝娃娃",
@@ -2141,7 +2529,8 @@
       "crunchy": 45,
       "tender": 55
     },
-    "popular": false
+    "popular": false,
+    "isVegetarian": true
   },
   {
     "name": "豆米火锅",
@@ -2157,7 +2546,10 @@
       "crunchy": 10,
       "tender": 60
     },
-    "popular": false
+    "popular": false,
+    "meatTypes": [
+      "pork"
+    ]
   },
   {
     "name": "和乐蟹",
@@ -2173,7 +2565,10 @@
       "crunchy": 10,
       "tender": 80
     },
-    "popular": false
+    "popular": false,
+    "meatTypes": [
+      "seafood"
+    ]
   },
   {
     "name": "东山羊",
@@ -2189,7 +2584,10 @@
       "crunchy": 5,
       "tender": 75
     },
-    "popular": false
+    "popular": false,
+    "meatTypes": [
+      "lamb"
+    ]
   },
   {
     "name": "椰蓉粽",
@@ -2205,7 +2603,8 @@
       "crunchy": 20,
       "tender": 50
     },
-    "popular": false
+    "popular": false,
+    "isVegetarian": true
   },
   {
     "name": "清补凉",
@@ -2221,7 +2620,9 @@
       "crunchy": 30,
       "tender": 55
     },
-    "popular": true
+    "popular": true,
+    "isVegetarian": true,
+    "isContainsEgg": true
   },
   {
     "name": "荔浦芋扣肉",
@@ -2237,7 +2638,10 @@
       "crunchy": 5,
       "tender": 55
     },
-    "popular": true
+    "popular": true,
+    "meatTypes": [
+      "pork"
+    ]
   },
   {
     "name": "壮家竹筒饭",
@@ -2253,7 +2657,10 @@
       "crunchy": 30,
       "tender": 60
     },
-    "popular": false
+    "popular": false,
+    "meatTypes": [
+      "pork"
+    ]
   },
   {
     "name": "南宁老友粉",
@@ -2269,7 +2676,10 @@
       "crunchy": 10,
       "tender": 55
     },
-    "popular": false
+    "popular": false,
+    "meatTypes": [
+      "pork"
+    ]
   },
   {
     "name": "蒙古奶茶",
@@ -2285,7 +2695,9 @@
       "crunchy": 0,
       "tender": 45
     },
-    "popular": false
+    "popular": false,
+    "isHalal": true,
+    "isVegetarian": true
   },
   {
     "name": "蒙古包子",
@@ -2301,7 +2713,10 @@
       "crunchy": 10,
       "tender": 70
     },
-    "popular": false
+    "popular": false,
+    "meatTypes": [
+      "lamb"
+    ]
   },
   {
     "name": "沙葱拌羊肉",
@@ -2317,7 +2732,10 @@
       "crunchy": 35,
       "tender": 70
     },
-    "popular": false
+    "popular": false,
+    "meatTypes": [
+      "lamb"
+    ]
   },
   {
     "name": "大肠蚵仔面线",
@@ -2333,7 +2751,12 @@
       "crunchy": 5,
       "tender": 65
     },
-    "popular": false
+    "popular": false,
+    "meatTypes": [
+      "pork",
+      "seafood"
+    ],
+    "isOffal": true
   },
   {
     "name": "虱目鱼粥",
@@ -2349,7 +2772,10 @@
       "crunchy": 5,
       "tender": 75
     },
-    "popular": false
+    "popular": false,
+    "meatTypes": [
+      "fish"
+    ]
   },
   {
     "name": "剉冰",
@@ -2365,7 +2791,8 @@
       "crunchy": 85,
       "tender": 15
     },
-    "popular": true
+    "popular": true,
+    "isVegetarian": true
   },
   {
     "name": "珍珠奶茶",
@@ -2381,7 +2808,8 @@
       "crunchy": 75,
       "tender": 35
     },
-    "popular": true
+    "popular": true,
+    "isVegetarian": true
   },
   {
     "name": "酥油人参果",
@@ -2397,7 +2825,9 @@
       "crunchy": 5,
       "tender": 60
     },
-    "popular": false
+    "popular": false,
+    "isHalal": true,
+    "isVegetarian": true
   },
   {
     "name": "青稞面片",
@@ -2413,7 +2843,11 @@
       "crunchy": 10,
       "tender": 60
     },
-    "popular": false
+    "popular": false,
+    "isHalal": true,
+    "meatTypes": [
+      "beef"
+    ]
   },
   {
     "name": "藏族血肠",
@@ -2429,7 +2863,12 @@
       "crunchy": 25,
       "tender": 65
     },
-    "popular": false
+    "popular": false,
+    "meatTypes": [
+      "beef",
+      "lamb"
+    ],
+    "isOffal": true
   },
   {
     "name": "酥油茶饼",
@@ -2445,7 +2884,9 @@
       "crunchy": 15,
       "tender": 50
     },
-    "popular": false
+    "popular": false,
+    "isHalal": true,
+    "isVegetarian": true
   },
   {
     "name": "包烧肉",
@@ -2461,7 +2902,11 @@
       "crunchy": 25,
       "tender": 60
     },
-    "popular": false
+    "popular": false,
+    "meatTypes": [
+      "pork",
+      "beef"
+    ]
   },
   {
     "name": "竹筒饭",
@@ -2477,7 +2922,10 @@
       "crunchy": 20,
       "tender": 60
     },
-    "popular": false
+    "popular": false,
+    "meatTypes": [
+      "pork"
+    ]
   },
   {
     "name": "酸笋煮牛肉",
@@ -2493,7 +2941,10 @@
       "crunchy": 5,
       "tender": 70
     },
-    "popular": false
+    "popular": false,
+    "meatTypes": [
+      "beef"
+    ]
   },
   {
     "name": "香茅草烤鱼",
@@ -2509,7 +2960,10 @@
       "crunchy": 20,
       "tender": 70
     },
-    "popular": false
+    "popular": false,
+    "meatTypes": [
+      "fish"
+    ]
   },
   {
     "name": "万州烤鱼",
@@ -2525,7 +2979,10 @@
       "crunchy": 20,
       "tender": 60
     },
-    "popular": true
+    "popular": true,
+    "meatTypes": [
+      "fish"
+    ]
   },
   {
     "name": "歌乐山辣子鸡",
@@ -2541,7 +2998,10 @@
       "crunchy": 75,
       "tender": 40
     },
-    "popular": false
+    "popular": false,
+    "meatTypes": [
+      "chicken"
+    ]
   },
   {
     "name": "泡椒牛蛙",
@@ -2557,7 +3017,10 @@
       "crunchy": 10,
       "tender": 70
     },
-    "popular": false
+    "popular": false,
+    "meatTypes": [
+      "seafood"
+    ]
   },
   {
     "name": "biangbiang面",
@@ -2573,7 +3036,8 @@
       "crunchy": 50,
       "tender": 55
     },
-    "popular": true
+    "popular": true,
+    "isVegetarian": true
   },
   {
     "name": "葫芦鸡",
@@ -2589,7 +3053,10 @@
       "crunchy": 65,
       "tender": 65
     },
-    "popular": false
+    "popular": false,
+    "meatTypes": [
+      "chicken"
+    ]
   },
   {
     "name": "臊子面",
@@ -2605,7 +3072,10 @@
       "crunchy": 10,
       "tender": 60
     },
-    "popular": true
+    "popular": true,
+    "meatTypes": [
+      "pork"
+    ]
   },
   {
     "name": "腌笃鲜",
@@ -2621,7 +3091,10 @@
       "crunchy": 5,
       "tender": 70
     },
-    "popular": false
+    "popular": false,
+    "meatTypes": [
+      "pork"
+    ]
   },
   {
     "name": "油爆虾",
@@ -2637,7 +3110,10 @@
       "crunchy": 80,
       "tender": 55
     },
-    "popular": true
+    "popular": true,
+    "meatTypes": [
+      "seafood"
+    ]
   },
   {
     "name": "草头圈子",
@@ -2653,7 +3129,11 @@
       "crunchy": 5,
       "tender": 60
     },
-    "popular": false
+    "popular": false,
+    "meatTypes": [
+      "pork"
+    ],
+    "isOffal": true
   },
   {
     "name": "油爆海螺",
@@ -2669,7 +3149,10 @@
       "crunchy": 75,
       "tender": 70
     },
-    "popular": false
+    "popular": false,
+    "meatTypes": [
+      "seafood"
+    ]
   },
   {
     "name": "鲅鱼水饺",
@@ -2685,7 +3168,10 @@
       "crunchy": 10,
       "tender": 75
     },
-    "popular": false
+    "popular": false,
+    "meatTypes": [
+      "fish"
+    ]
   },
   {
     "name": "糖醋排骨",
@@ -2701,7 +3187,10 @@
       "crunchy": 40,
       "tender": 55
     },
-    "popular": true
+    "popular": true,
+    "meatTypes": [
+      "pork"
+    ]
   },
   {
     "name": "西湖莼菜汤",
@@ -2717,7 +3206,8 @@
       "crunchy": 0,
       "tender": 75
     },
-    "popular": false
+    "popular": false,
+    "isVegetarian": true
   },
   {
     "name": "南普陀素面",
@@ -2733,7 +3223,8 @@
       "crunchy": 5,
       "tender": 65
     },
-    "popular": false
+    "popular": false,
+    "isVegetarian": true
   },
   {
     "name": "福州鱼丸",
@@ -2749,7 +3240,10 @@
       "crunchy": 5,
       "tender": 80
     },
-    "popular": true
+    "popular": true,
+    "meatTypes": [
+      "fish"
+    ]
   },
   {
     "name": "黄山炖鸽",
@@ -2765,7 +3259,10 @@
       "crunchy": 5,
       "tender": 75
     },
-    "popular": false
+    "popular": false,
+    "meatTypes": [
+      "chicken"
+    ]
   },
   {
     "name": "徽州包袱饺子",
@@ -2781,7 +3278,10 @@
       "crunchy": 10,
       "tender": 70
     },
-    "popular": false
+    "popular": false,
+    "meatTypes": [
+      "pork"
+    ]
   },
   {
     "name": "豆汁焦圈",
@@ -2797,7 +3297,8 @@
       "crunchy": 85,
       "tender": 20
     },
-    "popular": false
+    "popular": false,
+    "isVegetarian": true
   },
   {
     "name": "冰糖葫芦",
@@ -2813,7 +3314,8 @@
       "crunchy": 90,
       "tender": 30
     },
-    "popular": true
+    "popular": true,
+    "isVegetarian": true
   },
   {
     "name": "拌面",
@@ -2829,7 +3331,8 @@
       "crunchy": 20,
       "tender": 55
     },
-    "popular": true
+    "popular": true,
+    "isVegetarian": true
   },
   {
     "name": "椒麻鸡",
@@ -2845,7 +3348,10 @@
       "crunchy": 50,
       "tender": 60
     },
-    "popular": true
+    "popular": true,
+    "meatTypes": [
+      "chicken"
+    ]
   },
   {
     "name": "干煸四季豆",
@@ -2861,7 +3367,8 @@
       "crunchy": 55,
       "tender": 50
     },
-    "popular": true
+    "popular": true,
+    "isVegetarian": true
   },
   {
     "name": "蛋挞",
@@ -2877,7 +3384,9 @@
       "crunchy": 65,
       "tender": 50
     },
-    "popular": true
+    "popular": true,
+    "isVegetarian": true,
+    "isContainsEgg": true
   },
   {
     "name": "驴肉火烧",
@@ -2909,7 +3418,10 @@
       "crunchy": 10,
       "tender": 70
     },
-    "popular": false
+    "popular": false,
+    "meatTypes": [
+      "fish"
+    ]
   },
   {
     "name": "沧州羊汤",
@@ -2925,7 +3437,10 @@
       "crunchy": 5,
       "tender": 60
     },
-    "popular": false
+    "popular": false,
+    "meatTypes": [
+      "lamb"
+    ]
   },
   {
     "name": "承德烤全羊",
@@ -2941,7 +3456,10 @@
       "crunchy": 25,
       "tender": 65
     },
-    "popular": false
+    "popular": false,
+    "meatTypes": [
+      "lamb"
+    ]
   },
   {
     "name": "刀削面",
@@ -2957,7 +3475,10 @@
       "crunchy": 40,
       "tender": 55
     },
-    "popular": true
+    "popular": true,
+    "meatTypes": [
+      "pork"
+    ]
   },
   {
     "name": "过油肉",
@@ -2973,7 +3494,10 @@
       "crunchy": 55,
       "tender": 65
     },
-    "popular": true
+    "popular": true,
+    "meatTypes": [
+      "pork"
+    ]
   },
   {
     "name": "平遥牛肉",
@@ -2989,7 +3513,10 @@
       "crunchy": 10,
       "tender": 70
     },
-    "popular": true
+    "popular": true,
+    "meatTypes": [
+      "beef"
+    ]
   },
   {
     "name": "莜面栲栳栳",
@@ -3005,7 +3532,10 @@
       "crunchy": 45,
       "tender": 60
     },
-    "popular": false
+    "popular": false,
+    "meatTypes": [
+      "lamb"
+    ]
   },
   {
     "name": "兰州牛肉面",
@@ -3021,7 +3551,11 @@
       "crunchy": 15,
       "tender": 60
     },
-    "popular": true
+    "popular": true,
+    "isHalal": true,
+    "meatTypes": [
+      "beef"
+    ]
   },
   {
     "name": "酿皮",
@@ -3037,7 +3571,8 @@
       "crunchy": 50,
       "tender": 60
     },
-    "popular": true
+    "popular": true,
+    "isVegetarian": true
   },
   {
     "name": "灰豆子",
@@ -3053,7 +3588,8 @@
       "crunchy": 5,
       "tender": 55
     },
-    "popular": false
+    "popular": false,
+    "isVegetarian": true
   },
   {
     "name": "小炒黄牛肉",
@@ -3069,7 +3605,10 @@
       "crunchy": 15,
       "tender": 75
     },
-    "popular": true
+    "popular": true,
+    "meatTypes": [
+      "beef"
+    ]
   },
   {
     "name": "大煮干丝",
@@ -3085,7 +3624,13 @@
       "crunchy": 5,
       "tender": 80
     },
-    "popular": false
+    "popular": false,
+    "meatTypes": [
+      "pork",
+      "chicken",
+      "seafood"
+    ],
+    "isContainsEgg": true
   },
   {
     "name": "桂林田螺",
@@ -3101,7 +3646,10 @@
       "crunchy": 35,
       "tender": 60
     },
-    "popular": false
+    "popular": false,
+    "meatTypes": [
+      "seafood"
+    ]
   },
   {
     "name": "糟辣脆皮鱼",
@@ -3117,7 +3665,10 @@
       "crunchy": 75,
       "tender": 55
     },
-    "popular": false
+    "popular": false,
+    "meatTypes": [
+      "fish"
+    ]
   },
   {
     "name": "风干牛肉",
@@ -3133,6 +3684,890 @@
       "crunchy": 50,
       "tender": 70
     },
+    "popular": true,
+    "meatTypes": [
+      "beef"
+    ]
+  },
+  {
+    "name": "老醋花生",
+    "cuisine": "冀菜",
+    "region": "河北",
+    "isVegetarian": true,
+    "vector": {
+      "sour": 25,
+      "sweet": 5,
+      "bitter": 0,
+      "spicy": 5,
+      "salty": 55,
+      "rich": 35,
+      "crunchy": 85,
+      "tender": 15
+    },
     "popular": true
+  },
+  {
+    "name": "凉拌木耳",
+    "cuisine": "东北菜",
+    "region": "黑龙江",
+    "isVegetarian": true,
+    "vector": {
+      "sour": 20,
+      "sweet": 5,
+      "bitter": 0,
+      "spicy": 15,
+      "salty": 40,
+      "rich": 15,
+      "crunchy": 60,
+      "tender": 40
+    },
+    "popular": true
+  },
+  {
+    "name": "拍黄瓜",
+    "cuisine": "东北菜",
+    "region": "吉林",
+    "isVegetarian": true,
+    "vector": {
+      "sour": 30,
+      "sweet": 5,
+      "bitter": 0,
+      "spicy": 20,
+      "salty": 40,
+      "rich": 10,
+      "crunchy": 70,
+      "tender": 35
+    },
+    "popular": true
+  },
+  {
+    "name": "东北大拉皮",
+    "cuisine": "东北菜",
+    "region": "辽宁",
+    "isVegetarian": true,
+    "vector": {
+      "sour": 15,
+      "sweet": 10,
+      "bitter": 0,
+      "spicy": 10,
+      "salty": 45,
+      "rich": 25,
+      "crunchy": 55,
+      "tender": 50
+    },
+    "popular": true
+  },
+  {
+    "name": "素馅饺子",
+    "cuisine": "东北菜",
+    "region": "黑龙江",
+    "isVegetarian": true,
+    "vector": {
+      "sour": 5,
+      "sweet": 10,
+      "bitter": 0,
+      "spicy": 0,
+      "salty": 50,
+      "rich": 45,
+      "crunchy": 5,
+      "tender": 70
+    },
+    "popular": true
+  },
+  {
+    "name": "京酱肉丝（素）",
+    "cuisine": "京菜",
+    "region": "北京",
+    "isVegetarian": true,
+    "vector": {
+      "sour": 5,
+      "sweet": 15,
+      "bitter": 0,
+      "spicy": 5,
+      "salty": 55,
+      "rich": 45,
+      "crunchy": 20,
+      "tender": 60
+    },
+    "popular": true
+  },
+  {
+    "name": "炸酱面（素）",
+    "cuisine": "京菜",
+    "region": "北京",
+    "isVegetarian": true,
+    "vector": {
+      "sour": 5,
+      "sweet": 10,
+      "bitter": 0,
+      "spicy": 5,
+      "salty": 60,
+      "rich": 40,
+      "crunchy": 10,
+      "tender": 40
+    },
+    "popular": true
+  },
+  {
+    "name": "素包子",
+    "cuisine": "京菜",
+    "region": "北京",
+    "isVegetarian": true,
+    "vector": {
+      "sour": 5,
+      "sweet": 10,
+      "bitter": 0,
+      "spicy": 5,
+      "salty": 50,
+      "rich": 40,
+      "crunchy": 5,
+      "tender": 65
+    },
+    "popular": true
+  },
+  {
+    "name": "西北凉面",
+    "cuisine": "西北菜",
+    "region": "甘肃",
+    "isVegetarian": true,
+    "vector": {
+      "sour": 15,
+      "sweet": 10,
+      "bitter": 0,
+      "spicy": 20,
+      "salty": 50,
+      "rich": 30,
+      "crunchy": 10,
+      "tender": 55
+    },
+    "popular": true
+  },
+  {
+    "name": "素杂粮饭",
+    "cuisine": "西北菜",
+    "region": "陕西",
+    "isVegetarian": true,
+    "vector": {
+      "sour": 5,
+      "sweet": 5,
+      "bitter": 0,
+      "spicy": 0,
+      "salty": 20,
+      "rich": 25,
+      "crunchy": 5,
+      "tender": 70
+    },
+    "popular": true
+  },
+  {
+    "name": "菜蛋夹馍",
+    "cuisine": "陕菜",
+    "region": "陕西",
+    "isVegetarian": true,
+    "vector": {
+      "sour": 10,
+      "sweet": 15,
+      "bitter": 0,
+      "spicy": 10,
+      "salty": 45,
+      "rich": 40,
+      "crunchy": 30,
+      "tender": 45
+    },
+    "popular": true,
+    "isContainsEgg": true
+  },
+  {
+    "name": "晋南凉粉",
+    "cuisine": "晋菜",
+    "region": "山西",
+    "isVegetarian": true,
+    "vector": {
+      "sour": 20,
+      "sweet": 10,
+      "bitter": 0,
+      "spicy": 15,
+      "salty": 40,
+      "rich": 20,
+      "crunchy": 50,
+      "tender": 35
+    },
+    "popular": true
+  },
+  {
+    "name": "素打卤面",
+    "cuisine": "晋菜",
+    "region": "山西",
+    "isVegetarian": true,
+    "vector": {
+      "sour": 5,
+      "sweet": 10,
+      "bitter": 0,
+      "spicy": 5,
+      "salty": 55,
+      "rich": 40,
+      "crunchy": 5,
+      "tender": 50
+    },
+    "popular": true
+  },
+  {
+    "name": "煎饼（素）",
+    "cuisine": "鲁菜",
+    "region": "山东",
+    "isVegetarian": true,
+    "vector": {
+      "sour": 5,
+      "sweet": 10,
+      "bitter": 0,
+      "spicy": 0,
+      "salty": 40,
+      "rich": 35,
+      "crunchy": 70,
+      "tender": 25
+    },
+    "popular": true
+  },
+  {
+    "name": "大葱蘸酱",
+    "cuisine": "鲁菜",
+    "region": "山东",
+    "isVegetarian": true,
+    "vector": {
+      "sour": 10,
+      "sweet": 5,
+      "bitter": 0,
+      "spicy": 0,
+      "salty": 35,
+      "rich": 20,
+      "crunchy": 75,
+      "tender": 30
+    },
+    "popular": true
+  },
+  {
+    "name": "素烩面",
+    "cuisine": "豫菜",
+    "region": "河南",
+    "isVegetarian": true,
+    "vector": {
+      "sour": 10,
+      "sweet": 10,
+      "bitter": 0,
+      "spicy": 5,
+      "salty": 50,
+      "rich": 40,
+      "crunchy": 5,
+      "tender": 55
+    },
+    "popular": true
+  },
+  {
+    "name": "蒸菜",
+    "cuisine": "豫菜",
+    "region": "河南",
+    "isVegetarian": true,
+    "vector": {
+      "sour": 5,
+      "sweet": 5,
+      "bitter": 0,
+      "spicy": 0,
+      "salty": 40,
+      "rich": 25,
+      "crunchy": 5,
+      "tender": 70
+    },
+    "popular": true
+  },
+  {
+    "name": "蒙古沙葱",
+    "cuisine": "蒙餐",
+    "region": "内蒙古",
+    "isVegetarian": true,
+    "vector": {
+      "sour": 15,
+      "sweet": 5,
+      "bitter": 0,
+      "spicy": 10,
+      "salty": 40,
+      "rich": 20,
+      "crunchy": 45,
+      "tender": 40
+    },
+    "popular": true
+  },
+  {
+    "name": "蒙古奶酪",
+    "cuisine": "蒙餐",
+    "region": "内蒙古",
+    "isVegetarian": true,
+    "vector": {
+      "sour": 20,
+      "sweet": 25,
+      "bitter": 0,
+      "spicy": 0,
+      "salty": 15,
+      "rich": 35,
+      "crunchy": 5,
+      "tender": 30
+    },
+    "popular": true
+  },
+  {
+    "name": "蒙古酸奶",
+    "cuisine": "蒙餐",
+    "region": "内蒙古",
+    "isVegetarian": true,
+    "vector": {
+      "sour": 40,
+      "sweet": 20,
+      "bitter": 0,
+      "spicy": 0,
+      "salty": 10,
+      "rich": 20,
+      "crunchy": 0,
+      "tender": 40
+    },
+    "popular": true
+  },
+  {
+    "name": "藏式素面",
+    "cuisine": "藏餐",
+    "region": "西藏",
+    "isVegetarian": true,
+    "vector": {
+      "sour": 10,
+      "sweet": 5,
+      "bitter": 5,
+      "spicy": 5,
+      "salty": 50,
+      "rich": 40,
+      "crunchy": 5,
+      "tender": 55
+    },
+    "popular": true
+  },
+  {
+    "name": "青稞粥",
+    "cuisine": "藏餐",
+    "region": "西藏",
+    "isVegetarian": true,
+    "vector": {
+      "sour": 5,
+      "sweet": 10,
+      "bitter": 0,
+      "spicy": 0,
+      "salty": 20,
+      "rich": 35,
+      "crunchy": 0,
+      "tender": 65
+    },
+    "popular": true
+  },
+  {
+    "name": "素包子",
+    "cuisine": "津菜",
+    "region": "天津",
+    "isVegetarian": true,
+    "vector": {
+      "sour": 5,
+      "sweet": 10,
+      "bitter": 0,
+      "spicy": 5,
+      "salty": 50,
+      "rich": 40,
+      "crunchy": 5,
+      "tender": 65
+    },
+    "popular": true
+  },
+  {
+    "name": "清真凉皮",
+    "cuisine": "清真菜",
+    "region": "宁夏",
+    "isVegetarian": true,
+    "isHalal": true,
+    "vector": {
+      "sour": 20,
+      "sweet": 10,
+      "bitter": 0,
+      "spicy": 20,
+      "salty": 45,
+      "rich": 25,
+      "crunchy": 20,
+      "tender": 45
+    },
+    "popular": true
+  },
+  {
+    "name": "回族素面",
+    "cuisine": "清真菜",
+    "region": "宁夏",
+    "isVegetarian": true,
+    "isHalal": true,
+    "vector": {
+      "sour": 10,
+      "sweet": 10,
+      "bitter": 0,
+      "spicy": 10,
+      "salty": 50,
+      "rich": 35,
+      "crunchy": 5,
+      "tender": 55
+    },
+    "popular": true
+  },
+  {
+    "name": "宁夏手抓饭",
+    "cuisine": "清真菜",
+    "region": "宁夏",
+    "isHalal": true,
+    "meatTypes": [
+      "lamb"
+    ],
+    "vector": {
+      "sour": 0,
+      "sweet": 15,
+      "bitter": 0,
+      "spicy": 10,
+      "salty": 45,
+      "rich": 55,
+      "crunchy": 15,
+      "tender": 45
+    },
+    "popular": true
+  },
+  {
+    "name": "回族烩菜",
+    "cuisine": "清真菜",
+    "region": "宁夏",
+    "isHalal": true,
+    "vector": {
+      "sour": 10,
+      "sweet": 15,
+      "bitter": 0,
+      "spicy": 15,
+      "salty": 55,
+      "rich": 50,
+      "crunchy": 10,
+      "tender": 60
+    },
+    "popular": true,
+    "meatTypes": [
+      "beef",
+      "lamb"
+    ]
+  },
+  {
+    "name": "素月饼",
+    "cuisine": "粤菜",
+    "region": "广东",
+    "isVegetarian": true,
+    "vector": {
+      "sour": 5,
+      "sweet": 40,
+      "bitter": 0,
+      "spicy": 0,
+      "salty": 25,
+      "rich": 40,
+      "crunchy": 30,
+      "tender": 40
+    },
+    "popular": true
+  },
+  {
+    "name": "素叉烧包",
+    "cuisine": "粤菜",
+    "region": "广东",
+    "isVegetarian": true,
+    "vector": {
+      "sour": 5,
+      "sweet": 30,
+      "bitter": 0,
+      "spicy": 0,
+      "salty": 35,
+      "rich": 45,
+      "crunchy": 5,
+      "tender": 60
+    },
+    "popular": true
+  },
+  {
+    "name": "烤面筋",
+    "cuisine": "西北菜",
+    "region": "陕西",
+    "vector": {
+      "sour": 5,
+      "sweet": 10,
+      "bitter": 6,
+      "spicy": 60,
+      "salty": 55,
+      "rich": 45,
+      "crunchy": 50,
+      "tender": 30
+    },
+    "popular": true,
+    "isVegetarian": true
+  },
+  {
+    "name": "花生",
+    "cuisine": "鲁菜",
+    "region": "山东",
+    "isVegetarian": true,
+    "vector": {
+      "sour": 5,
+      "sweet": 5,
+      "bitter": 6,
+      "spicy": 4,
+      "salty": 50,
+      "rich": 45,
+      "crunchy": 72,
+      "tender": 0
+    },
+    "popular": true
+  },
+  {
+    "name": "薯片",
+    "cuisine": "零食",
+    "region": "全国",
+    "isVegetarian": true,
+    "vector": {
+      "sour": 5,
+      "sweet": 5,
+      "bitter": 6,
+      "spicy": 10,
+      "salty": 60,
+      "rich": 40,
+      "crunchy": 92,
+      "tender": 0
+    },
+    "popular": true
+  },
+  {
+    "name": "豆腐脑",
+    "cuisine": "鲁菜",
+    "region": "山东",
+    "isVegetarian": true,
+    "vector": {
+      "sour": 5,
+      "sweet": 5,
+      "bitter": 6,
+      "spicy": 5,
+      "salty": 45,
+      "rich": 40,
+      "crunchy": 0,
+      "tender": 85
+    },
+    "popular": true
+  },
+  {
+    "name": "酸辣土豆丝",
+    "cuisine": "川菜",
+    "region": "四川",
+    "isVegetarian": true,
+    "vector": {
+      "sour": 40,
+      "sweet": 0,
+      "bitter": 6,
+      "spicy": 55,
+      "salty": 45,
+      "rich": 30,
+      "crunchy": 65,
+      "tender": 20
+    },
+    "popular": true
+  },
+  {
+    "name": "清蒸鱼",
+    "cuisine": "粤菜",
+    "region": "广东",
+    "vector": {
+      "sour": 5,
+      "sweet": 5,
+      "bitter": 0,
+      "spicy": 0,
+      "salty": 35,
+      "rich": 50,
+      "crunchy": 0,
+      "tender": 80
+    },
+    "popular": true,
+    "meatTypes": [
+      "fish"
+    ]
+  },
+  {
+    "name": "酸辣汤",
+    "cuisine": "川菜",
+    "region": "四川",
+    "isVegetarian": true,
+    "vector": {
+      "sour": 50,
+      "sweet": 5,
+      "bitter": 6,
+      "spicy": 55,
+      "salty": 55,
+      "rich": 55,
+      "crunchy": 10,
+      "tender": 45
+    },
+    "popular": true
+  },
+  {
+    "name": "提拉米苏",
+    "cuisine": "西餐",
+    "region": "意大利",
+    "isVegetarian": true,
+    "vector": {
+      "sour": 5,
+      "sweet": 55,
+      "bitter": 15,
+      "spicy": 0,
+      "salty": 5,
+      "rich": 60,
+      "crunchy": 15,
+      "tender": 70
+    },
+    "popular": true,
+    "isContainsEgg": true
+  },
+  {
+    "name": "双皮奶",
+    "cuisine": "粤菜",
+    "region": "广东",
+    "isVegetarian": true,
+    "vector": {
+      "sour": 10,
+      "sweet": 55,
+      "bitter": 0,
+      "spicy": 0,
+      "salty": 10,
+      "rich": 55,
+      "crunchy": 0,
+      "tender": 85
+    },
+    "popular": true,
+    "isContainsEgg": true
+  },
+  {
+    "name": "冰淇淋",
+    "cuisine": "西餐",
+    "region": "欧洲",
+    "isVegetarian": true,
+    "vector": {
+      "sour": 5,
+      "sweet": 80,
+      "bitter": 0,
+      "spicy": 0,
+      "salty": 5,
+      "rich": 45,
+      "crunchy": 10,
+      "tender": 80
+    },
+    "popular": true
+  },
+  {
+    "name": "毛肚",
+    "cuisine": "川菜",
+    "region": "四川",
+    "vector": {
+      "sour": 5,
+      "sweet": 0,
+      "bitter": 0,
+      "spicy": 0,
+      "salty": 35,
+      "rich": 35,
+      "crunchy": 60,
+      "tender": 55
+    },
+    "popular": true,
+    "meatTypes": [
+      "beef"
+    ],
+    "isOffal": true
+  },
+  {
+    "name": "肥牛",
+    "cuisine": "京菜",
+    "region": "北京",
+    "vector": {
+      "sour": 5,
+      "sweet": 5,
+      "bitter": 6,
+      "spicy": 5,
+      "salty": 45,
+      "rich": 60,
+      "crunchy": 0,
+      "tender": 70
+    },
+    "popular": true,
+    "meatTypes": [
+      "beef"
+    ]
+  },
+  {
+    "name": "红烧排骨",
+    "cuisine": "沪菜",
+    "region": "上海",
+    "vector": {
+      "sour": 5,
+      "sweet": 30,
+      "bitter": 6,
+      "spicy": 4,
+      "salty": 55,
+      "rich": 75,
+      "crunchy": 15,
+      "tender": 75
+    },
+    "popular": true,
+    "meatTypes": [
+      "pork"
+    ]
+  },
+  {
+    "name": "凉拌黄瓜",
+    "cuisine": "东北菜",
+    "region": "东北",
+    "isVegetarian": true,
+    "vector": {
+      "sour": 35,
+      "sweet": 5,
+      "bitter": 6,
+      "spicy": 20,
+      "salty": 40,
+      "rich": 15,
+      "crunchy": 70,
+      "tender": 40
+    },
+    "popular": true
+  },
+  {
+    "name": "番茄炒蛋",
+    "cuisine": "家常菜",
+    "region": "全国",
+    "isVegetarian": true,
+    "vector": {
+      "sour": 30,
+      "sweet": 35,
+      "bitter": 6,
+      "spicy": 4,
+      "salty": 40,
+      "rich": 45,
+      "crunchy": 0,
+      "tender": 75
+    },
+    "popular": true,
+    "isContainsEgg": true
+  },
+  {
+    "name": "可乐鸡翅",
+    "cuisine": "家常菜",
+    "region": "全国",
+    "vector": {
+      "sour": 5,
+      "sweet": 60,
+      "bitter": 6,
+      "spicy": 4,
+      "salty": 50,
+      "rich": 55,
+      "crunchy": 15,
+      "tender": 80
+    },
+    "popular": true,
+    "meatTypes": [
+      "chicken"
+    ]
+  },
+  {
+    "name": "麻辣烫",
+    "cuisine": "川菜",
+    "region": "四川",
+    "vector": {
+      "sour": 10,
+      "sweet": 5,
+      "bitter": 6,
+      "spicy": 75,
+      "salty": 60,
+      "rich": 70,
+      "crunchy": 20,
+      "tender": 45
+    },
+    "popular": true,
+    "meatTypes": [
+      "pork",
+      "beef"
+    ]
+  },
+  {
+    "name": "麻辣烤鱼",
+    "cuisine": "川菜",
+    "region": "重庆",
+    "vector": {
+      "sour": 5,
+      "sweet": 5,
+      "bitter": 6,
+      "spicy": 80,
+      "salty": 60,
+      "rich": 65,
+      "crunchy": 30,
+      "tender": 70
+    },
+    "popular": true,
+    "meatTypes": [
+      "fish"
+    ]
+  },
+  {
+    "name": "麻花",
+    "cuisine": "津菜",
+    "region": "天津",
+    "isVegetarian": true,
+    "vector": {
+      "sour": 5,
+      "sweet": 40,
+      "bitter": 0,
+      "spicy": 0,
+      "salty": 30,
+      "rich": 45,
+      "crunchy": 82,
+      "tender": 15
+    },
+    "popular": true
+  },
+  {
+    "name": "煎饺",
+    "cuisine": "北方菜",
+    "region": "北方",
+    "isVegetarian": true,
+    "vector": {
+      "sour": 5,
+      "sweet": 5,
+      "bitter": 6,
+      "spicy": 5,
+      "salty": 50,
+      "rich": 50,
+      "crunchy": 60,
+      "tender": 50
+    },
+    "popular": true
+  },
+  {
+    "name": "蒜蓉小龙虾",
+    "cuisine": "鄂菜",
+    "region": "湖北",
+    "vector": {
+      "sour": 5,
+      "sweet": 5,
+      "bitter": 0,
+      "spicy": 85,
+      "salty": 60,
+      "rich": 55,
+      "crunchy": 15,
+      "tender": 60
+    },
+    "popular": true,
+    "meatTypes": [
+      "seafood"
+    ]
   }
 ]

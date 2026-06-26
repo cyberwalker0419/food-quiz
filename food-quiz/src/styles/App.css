@@ -203,6 +203,8 @@ body::before {
 }
 .start-btn:hover { background: var(--cinnabar); transform: translateY(-1px); }
 .start-btn:active { transform: translateY(0); }
+.start-btn:disabled { opacity: 0.4; cursor: not-allowed; transform: none; background: var(--ink-2); }
+.start-btn:disabled:hover { background: var(--ink-2); transform: none; }
 .btn-arrow { font-size: 18px; letter-spacing: 0; }
 
 .random-entry-btn {
@@ -433,7 +435,136 @@ body::before {
 .avoid-copy  { font-size: 14px; color: var(--ink-2); line-height: 1.8; margin: 0; }
 */
 
-.dishes-section { padding-top: 30px; }
+/* 菜系推荐 */
+.cuisines-section { padding-top: 24px; }
+.cuisines-grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  justify-content: center;
+}
+.cuisine-card {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  padding: 16px 20px;
+  background: var(--paper-2);
+  border: 1px solid var(--line);
+  min-width: 100px;
+}
+.cuisine-rank-1 { border-color: var(--cinnabar); background: var(--paper-2); }
+.cuisine-rank-1 .cuisine-name,
+.cuisine-rank-1 .cuisine-pct { color: var(--cinnabar); font-weight: 700; }
+.cuisine-rank-2 .cuisine-name { color: var(--ink); }
+.cuisine-pct {
+  font-family: var(--serif);
+  font-size: 22px;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  color: var(--ink);
+  line-height: 1;
+}
+.cuisine-name {
+  font-family: var(--serif);
+  font-size: 15px;
+  font-weight: 600;
+  letter-spacing: 0.1em;
+  color: var(--ink-2);
+}
+.cuisine-count { font-size: 11px; color: var(--ink-3); letter-spacing: 0.15em; }
+
+/* ===== DIETARY SCREEN（忌口探测）===== */
+.dietary-screen {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 100vh;
+  padding: 32px 24px;
+}
+.dietary-content {
+  max-width: 420px;
+  width: 100%;
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 16px;
+}
+.dietary-emoji { font-size: 48px; }
+.dietary-title {
+  font-family: var(--serif);
+  font-size: 26px;
+  font-weight: 700;
+  color: var(--ink);
+  letter-spacing: 0.12em;
+}
+.dietary-subtitle {
+  font-size: 13px;
+  color: var(--ink-3);
+  letter-spacing: 0.08em;
+  margin-top: -6px;
+}
+.dietary-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  justify-content: center;
+  margin-top: 4px;
+}
+.dietary-chip {
+  appearance: none;
+  cursor: pointer;
+  font-family: var(--serif);
+  font-size: 14px;
+  font-weight: 500;
+  letter-spacing: 0.1em;
+  padding: 10px 18px;
+  color: var(--ink-2);
+  background: var(--paper-2);
+  border: 1px solid var(--line);
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  transition: border-color 0.2s, color 0.2s, background 0.2s;
+}
+.dietary-chip .chip-emoji { font-size: 16px; }
+.dietary-chip:hover { border-color: var(--cinnabar); color: var(--ink); }
+.dietary-chip.selected {
+  border-color: var(--cinnabar);
+  color: var(--cinnabar);
+  background: rgba(158, 43, 37, 0.06);
+  font-weight: 700;
+}
+.dietary-none {
+  appearance: none;
+  cursor: pointer;
+  font-family: var(--serif);
+  font-size: 14px;
+  font-weight: 500;
+  letter-spacing: 0.1em;
+  padding: 10px 22px;
+  color: var(--ink-2);
+  background: transparent;
+  border: 1px dashed var(--line);
+  margin-top: 2px;
+  transition: border-color 0.2s, color 0.2s;
+}
+.dietary-none:hover { border-color: var(--cinnabar); color: var(--ink); }
+.dietary-none.selected {
+  border-style: solid;
+  border-color: var(--cinnabar);
+  color: var(--cinnabar);
+  font-weight: 700;
+}
+.dietary-actions {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  margin-top: 12px;
+}
+
+.dishes-section { padding-top: 24px; }
 .dishes-toggle {
   appearance: none;
   cursor: pointer;

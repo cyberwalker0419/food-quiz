@@ -139,7 +139,7 @@ function drawDimensionList(
   w: number,
   fontFamily: string,
 ): void {
-  const rowH = 18
+  const rowH = 16
   const colChineseX = x // 中文列起点
   const colTierX = x + 50 // tierLabel 列起点
   const colGradeX = x + 250 // grade 徽章列起点
@@ -177,7 +177,7 @@ function drawDimensionList(
   }
 }
 
-/** 推荐菜 3 道:菜名(墨)·菜系(朱砂)左对齐,地区(墨灰)右对齐;菜名截断 8 字。 */
+/** 推荐菜 4 道:菜名(墨)·菜系(朱砂)左对齐,地区(墨灰)右对齐;菜名截断 8 字。 */
 function drawTopDishes(
   ctx: CanvasRenderingContext2D,
   dishes: readonly DishEntry[],
@@ -186,7 +186,7 @@ function drawTopDishes(
   w: number,
   fontFamily: string,
 ): void {
-  const items = dishes.slice(0, 3)
+  const items = dishes.slice(0, 4)
   const rowH = 18
   for (let i = 0; i < items.length; i++) {
     const d = items[i]!
@@ -209,6 +209,57 @@ function drawTopDishes(
       ctx.fillStyle = INK_3
       ctx.font = `400 11px ${fontFamily}`
       ctx.fillText(d.region, x + w, ly)
+    }
+  }
+}
+
+/** 适合菜系(top3 + 百分比):横排居中,菜系名(墨灰) + 百分比(朱砂),"川菜 52% · 湘菜 47%"。 */
+function drawTopCuisines(
+  ctx: CanvasRenderingContext2D,
+  cuisines: readonly { cuisine: string; percent: number }[],
+  W: number,
+  y: number,
+  fontFamily: string,
+): void {
+  const items = cuisines.slice(0, 3)
+  if (items.length === 0) return
+  ctx.textBaseline = 'middle'
+  // 先测各项宽度,算总宽居中
+  const nameFont = `500 13px ${fontFamily}`
+  const pctFont = `700 13px ${fontFamily}`
+  ctx.font = `400 12px ${fontFamily}`
+  const sep = '  ·  '
+  const sepW = ctx.measureText(sep).width
+  const itemWidth = (c: { cuisine: string; percent: number }) => {
+    ctx.font = nameFont
+    let total = ctx.measureText(c.cuisine).width
+    ctx.font = pctFont
+    total += ctx.measureText(` ${c.percent}%`).width
+    return total
+  }
+  let total = 0
+  for (let i = 0; i < items.length; i++) {
+    total += itemWidth(items[i]!)
+    if (i < items.length - 1) total += sepW
+  }
+  let cx = (W - total) / 2
+  for (let i = 0; i < items.length; i++) {
+    const c = items[i]!
+    ctx.textAlign = 'left'
+    ctx.fillStyle = INK_2
+    ctx.font = nameFont
+    ctx.fillText(c.cuisine, cx, y)
+    cx += ctx.measureText(c.cuisine).width
+    ctx.fillStyle = CINNABAR
+    ctx.font = pctFont
+    const pct = ` ${c.percent}%`
+    ctx.fillText(pct, cx, y)
+    cx += ctx.measureText(pct).width
+    if (i < items.length - 1) {
+      ctx.fillStyle = INK_3
+      ctx.font = `400 12px ${fontFamily}`
+      ctx.fillText(sep, cx, y)
+      cx += sepW
     }
   }
 }
@@ -252,72 +303,82 @@ export function drawShareCard(canvas: HTMLCanvasElement, data: ShareCardData) {
   // ── 主标签(top.tierLabel,大宋体) ──
   const top = r.allIntervals[0]
   const headerLabel = top ? top.tierLabel : '味觉独特'
+  ctx.textBaseline = 'alphabetic'
   ctx.fillStyle = INK
-  ctx.font = `700 42px ${FONT_SERIF}`
-  ctx.fillText(headerLabel, W / 2, 150)
+  ctx.font = `700 40px ${FONT_SERIF}`
+  ctx.fillText(headerLabel, W / 2, 138)
 
   // section 标题(主标签 + mainCopy 之间)
   ctx.textBaseline = 'middle'
   ctx.fillStyle = INK_3
   ctx.font = `500 12px ${FONT_SERIF}`
-  ctx.fillText(pickSectionTitle(r), W / 2, 178)
+  ctx.fillText(pickSectionTitle(r), W / 2, 165)
 
-  // mainCopy = 一段长综合评价(allround 分支用 allround.copy,否则 profileCopy);墨灰,最多 3 行
+  // mainCopy = 一段长综合评价(allround 分支用 allround.copy,否则 profileCopy);墨灰,最多 3 行(行距 15)
   const mainCopy = r.allround?.copy ?? r.profileCopy ?? ''
-  const mainCopyStartY = 198
   ctx.fillStyle = INK_2
   ctx.font = `400 12px ${FONT_SERIF}`
   const descLines = wrapText(ctx, mainCopy, W - 96)
   descLines.slice(0, 3).forEach((line, i) => {
-    ctx.fillText(line, W / 2, mainCopyStartY + i * 16)
+    ctx.fillText(line, W / 2, 186 + i * 15)
   })
 
-  // ── 八维雷达图(中心 y=400) ──
-  const radarSize = 280
-  const radarY = 400
+  // ── 八维雷达图(size 240,中心 y=355) ──
+  const radarSize = 240
+  const radarY = 355
   ctx.save()
   ctx.translate((W - radarSize) / 2, radarY - radarSize / 2)
   drawRadarChart(ctx, r.allIntervals, radarSize, { fontFamily: FONT_SERIF, padding: radarSize * 0.20 })
   ctx.restore()
 
-  // ── 八维档位明细 ──
-  drawDivider(ctx, W, 548)
+  // ── 八维档位明细(rowH 16) ──
+  drawDivider(ctx, W, 496)
   ctx.textAlign = 'center'
   ctx.textBaseline = 'alphabetic'
   ctx.fillStyle = INK_3
   ctx.font = `500 13px ${FONT_SERIF}`
-  ctx.fillText('八维档位', W / 2, 566)
-  drawDimensionList(ctx, r.allIntervals, 40, 584, W - 80, FONT_SERIF)
+  ctx.fillText('八维档位', W / 2, 514)
+  drawDimensionList(ctx, r.allIntervals, 40, 532, W - 80, FONT_SERIF)
 
-  // ── 推荐菜 ──
+  // ── 适合菜系(top3 + 百分比,横排居中) ──
+  if (r.topCuisines && r.topCuisines.length > 0) {
+    ctx.textAlign = 'center'
+    ctx.textBaseline = 'alphabetic'
+    ctx.fillStyle = INK_3
+    ctx.font = `500 13px ${FONT_SERIF}`
+    ctx.fillText('适合菜系', W / 2, 678)
+    drawTopCuisines(ctx, r.topCuisines, W, 700, FONT_SERIF)
+  }
+
+  // ── 推荐菜(4 道) ──
   if (r.topDishes.length > 0) {
     ctx.textAlign = 'center'
     ctx.textBaseline = 'alphabetic'
     ctx.fillStyle = INK_3
     ctx.font = `500 13px ${FONT_SERIF}`
-    ctx.fillText('为你推荐', W / 2, 852)
-    drawTopDishes(ctx, r.topDishes, 40, 872, W - 80, FONT_SERIF)
+    ctx.fillText('为你推荐', W / 2, 738)
+    drawTopDishes(ctx, r.topDishes, 40, 758, W - 80, FONT_SERIF)
   }
 
   // ── footer(双线 + 毛笔标语) ──
-  drawDivider(ctx, W, H - 110)
+  drawDivider(ctx, W, 826)
   ctx.strokeStyle = LINE
   ctx.lineWidth = 1
   ctx.beginPath()
-  ctx.moveTo(40, H - 104.5)
-  ctx.lineTo(W - 40, H - 104.5)
+  ctx.moveTo(40, 831.5)
+  ctx.lineTo(W - 40, 831.5)
   ctx.stroke()
   ctx.textAlign = 'center'
   ctx.textBaseline = 'alphabetic'
   ctx.fillStyle = INK_3
   ctx.font = `400 11px ${FONT_SERIF}`
-  ctx.fillText(`基于 ${data.questionCount} 道 · 八维味觉分析`, W / 2, H - 78)
+  ctx.fillText(`基于 ${data.questionCount} 道 · 八维味觉分析`, W / 2, 850)
   ctx.fillStyle = CINNABAR
   ctx.font = `400 17px ${FONT_BRUSH}`
-  ctx.fillText('测 测 你 的 味 觉 灵 魂', W / 2, H - 50)
+  ctx.fillText('测 测 你 的 味 觉 灵 魂', W / 2, 878)
   ctx.fillStyle = INK_3
   ctx.font = `400 10px ${FONT_SERIF}`
-  ctx.fillText('扫码或搜索「味觉灵魂」参与测试', W / 2, H - 28)
+  ctx.fillText('扫码或搜索「味觉灵魂」参与测试', W / 2, 900)
 }
 
 /** P6.4 渲染为 JPEG 并触发下载(尺寸 540×960,jpeg 0.85)。 */

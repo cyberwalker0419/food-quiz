@@ -76,3 +76,26 @@ export type Sharpness = 'sharp' | 'smooth';
 export function sharpnessOf(q: QuizQuestion): Sharpness {
   return q.options.length === 2 ? 'sharp' : 'smooth';
 }
+
+/**
+ * 饮食忌口(测试前独立步骤探测,影响菜品推荐过滤)。
+ * - no-pork:    不吃猪肉
+ * - no-beef:    不吃牛肉
+ * - no-lamb:    不吃羊肉
+ * - no-chicken: 不吃禽肉(鸡/鸭/鹅)
+ * - no-seafood: 不吃鱼鲜(鱼/虾蟹等水产)
+ * - no-egg:     不吃蛋(禽蛋/蛋清/蛋黄)
+ * - no-offal:   不吃内脏(肝/肠/肺/胃/肫/血等)
+ * - vegetarian: 素食(仅推 isVegetarian 菜)
+ * - halal:      清真(仅推 isHalal 菜)
+ */
+export type DietaryRestriction =
+  | 'no-pork'
+  | 'no-beef'
+  | 'no-lamb'
+  | 'no-chicken'
+  | 'no-seafood'
+  | 'no-egg'
+  | 'no-offal'
+  | 'vegetarian'
+  | 'halal';

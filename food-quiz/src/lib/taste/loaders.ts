@@ -55,6 +55,16 @@ export interface DishEntry {
   vector: DimensionVector;
   /** 是否日常/知名菜（true=推荐/题库/随机菜可用；false=冷门地方菜，仅入库） */
   popular?: boolean;
+  /** 是否素菜（无任何肉类成分） */
+  isVegetarian?: boolean;
+  /** 是否清真（覆盖回族/维吾尔族等忌口） */
+  isHalal?: boolean;
+  /** 是否含禽蛋（鸡蛋/鸭蛋/鸽蛋/鹌鹑蛋/蛋清等，用于 no-egg 忌口过滤） */
+  isContainsEgg?: boolean;
+  /** 是否含动物内脏/血制品（肝/肠/肺/胃/肫/血等，用于 no-offal 忌口过滤） */
+  isOffal?: boolean;
+  /** 含有的肉类类型（用于忌口过滤） */
+  meatTypes?: ('pork' | 'beef' | 'lamb' | 'chicken' | 'fish' | 'seafood')[];
 }
 
 // ===== 工具 =====
