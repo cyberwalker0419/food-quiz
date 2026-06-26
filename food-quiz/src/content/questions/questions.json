@@ -2829,16 +2829,16 @@
         },
         {
           "id": "q63-b",
-          "label": "蒸蛋羹",
+          "label": "蛋花汤",
           "weights": {
-            "sour": 5,
+            "sour": 0,
             "sweet": 5,
-            "bitter": 6,
-            "spicy": 4,
-            "salty": 40,
+            "bitter": 0,
+            "spicy": 0,
+            "salty": 45,
             "rich": 45,
             "crunchy": 0,
-            "tender": 90
+            "tender": 85
           }
         },
         {
@@ -3725,16 +3725,16 @@
         },
         {
           "id": "q77-d",
-          "label": "海鲜粥",
+          "label": "皮蛋瘦肉粥",
           "weights": {
-            "sour": 5,
+            "sour": 0,
             "sweet": 5,
-            "bitter": 6,
-            "spicy": 4,
-            "salty": 40,
-            "rich": 45,
+            "bitter": 0,
+            "spicy": 0,
+            "salty": 45,
+            "rich": 40,
             "crunchy": 0,
-            "tender": 80
+            "tender": 82
           }
         }
       ]
@@ -4393,15 +4393,15 @@
         },
         {
           "id": "q88-c",
-          "label": "卤味",
+          "label": "卤蛋",
           "weights": {
-            "sour": 5,
-            "sweet": 10,
-            "bitter": 6,
-            "spicy": 25,
-            "salty": 70,
-            "rich": 60,
-            "crunchy": 15,
+            "sour": 0,
+            "sweet": 5,
+            "bitter": 0,
+            "spicy": 0,
+            "salty": 68,
+            "rich": 55,
+            "crunchy": 0,
             "tender": 55
           }
         },
@@ -4565,15 +4565,15 @@
         },
         {
           "id": "q91-b",
-          "label": "沙琪玛",
+          "label": "蛋卷",
           "weights": {
-            "sour": 3,
-            "sweet": 65,
+            "sour": 5,
+            "sweet": 60,
             "bitter": 0,
             "spicy": 0,
-            "salty": 5,
-            "rich": 60,
-            "crunchy": 30,
+            "salty": 20,
+            "rich": 55,
+            "crunchy": 55,
             "tender": 45
           }
         },
@@ -4951,16 +4951,16 @@
         },
         {
           "id": "q97-c",
-          "label": "锅巴",
+          "label": "爆米花",
           "weights": {
-            "sour": 5,
-            "sweet": 5,
-            "bitter": 6,
-            "spicy": 5,
-            "salty": 50,
+            "sour": 0,
+            "sweet": 40,
+            "bitter": 0,
+            "spicy": 0,
+            "salty": 40,
             "rich": 40,
-            "crunchy": 88,
-            "tender": 0
+            "crunchy": 80,
+            "tender": 30
           }
         },
         {
@@ -5357,16 +5357,16 @@
       "options": [
         {
           "id": "q104-a",
-          "label": "纯黑咖啡",
+          "label": "浓茶",
           "weights": {
             "sour": 5,
             "sweet": 0,
-            "bitter": 90,
+            "bitter": 70,
             "spicy": 0,
-            "salty": 0,
-            "rich": 0,
+            "salty": 5,
+            "rich": 15,
             "crunchy": 0,
-            "tender": 0
+            "tender": 30
           }
         },
         {
@@ -5831,16 +5831,16 @@
       "options": [
         {
           "id": "q127-a",
-          "label": "麻辣小龙虾",
+          "label": "麻辣牛蛙",
           "weights": {
             "sour": 5,
-            "sweet": 0,
-            "bitter": 6,
-            "spicy": 88,
-            "salty": 60,
-            "rich": 70,
+            "sweet": 5,
+            "bitter": 0,
+            "spicy": 80,
+            "salty": 50,
+            "rich": 68,
             "crunchy": 20,
-            "tender": 35
+            "tender": 55
           }
         },
         {
@@ -5873,13 +5873,13 @@
         },
         {
           "id": "q127-d",
-          "label": "烤串",
+          "label": "烤肠",
           "weights": {
-            "sour": 5,
-            "sweet": 0,
-            "bitter": 6,
-            "spicy": 30,
-            "salty": 60,
+            "sour": 0,
+            "sweet": 5,
+            "bitter": 0,
+            "spicy": 5,
+            "salty": 62,
             "rich": 55,
             "crunchy": 25,
             "tender": 50
@@ -7931,16 +7931,16 @@
         },
         {
           "id": "q202-b",
-          "label": "拿铁",
+          "label": "卡布奇诺",
           "weights": {
             "sour": 5,
-            "sweet": 20,
-            "bitter": 10,
+            "sweet": 40,
+            "bitter": 25,
             "spicy": 0,
-            "salty": 5,
-            "rich": 35,
+            "salty": 15,
+            "rich": 50,
             "crunchy": 0,
-            "tender": 35
+            "tender": 55
           }
         }
       ]
@@ -8271,16 +8271,16 @@
         },
         {
           "id": "q212-b",
-          "label": "话梅",
+          "label": "山楂片",
           "weights": {
-            "sour": 60,
-            "sweet": 25,
-            "bitter": 5,
+            "sour": 50,
+            "sweet": 40,
+            "bitter": 0,
             "spicy": 0,
-            "salty": 35,
-            "rich": 10,
-            "crunchy": 5,
-            "tender": 15
+            "salty": 15,
+            "rich": 20,
+            "crunchy": 10,
+            "tender": 30
           }
         }
       ]
