@@ -1,9 +1,9 @@
-// 8 维味觉维度（中文：酸甜苦辣咸浓脆嫩）
-// 字段名一律英文驼峰;顺序与 keys.ts 的 DIMS 严格一致: S T K L I X C N
+// 8 维味觉维度（中文：酸甜热辣咸浓脆嫩）
+// 字段名一律英文驼峰;顺序与 keys.ts 的 DIMS 严格一致: S T H L I X C N
 export type TasteDimension =
   | 'sour'
   | 'sweet'
-  | 'bitter'
+  | 'temperature'
   | 'spicy'
   | 'salty'
   | 'rich'
@@ -17,7 +17,7 @@ export type DimensionVector = Record<TasteDimension, number>;
 export type WeightVector = Record<TasteDimension, number>;
 
 /** 单字母大写集合(从 keys.ts 复用,避免循环 import) */
-export type TasteLetter = 'S' | 'T' | 'K' | 'L' | 'I' | 'X' | 'C' | 'N';
+export type TasteLetter = 'S' | 'T' | 'H' | 'L' | 'I' | 'X' | 'C' | 'N';
 
 /** 单个选项 */
 export interface QuizOption {
@@ -57,7 +57,7 @@ export interface QuestionBank {
 export const ZERO_VECTOR: WeightVector = Object.freeze({
   sour: 0,
   sweet: 0,
-  bitter: 0,
+  temperature: 0,
   spicy: 0,
   salty: 0,
   rich: 0,

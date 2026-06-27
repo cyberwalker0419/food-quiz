@@ -1,11 +1,11 @@
 import type { QuestionBank, QuizQuestion, WeightVector, TasteDimension } from '../../lib/taste/types';
 
 const DIMS: readonly TasteDimension[] = [
-  'sour', 'sweet', 'bitter', 'spicy',
+  'sour', 'sweet', 'temperature', 'spicy',
   'salty', 'rich', 'crunchy', 'tender',
 ] as const;
 
-const LETTERS = new Set(['S', 'T', 'K', 'L', 'I', 'X', 'C', 'N']);
+const LETTERS = new Set(['S', 'T', 'H', 'L', 'I', 'X', 'C', 'N']);
 
 /** 校验一个题库是否符合形状约束,失败抛 Error */
 export function validateQuestionBank(bank: unknown): asserts bank is QuestionBank {

@@ -7,7 +7,7 @@ import bankJson from './questions.json';
 
 const bank = bankJson as QuestionBank;
 
-const DIMS: TasteDimension[] = ['sour', 'sweet', 'bitter', 'spicy', 'salty', 'rich', 'crunchy', 'tender'];
+const DIMS: TasteDimension[] = ['sour', 'sweet', 'temperature', 'spicy', 'salty', 'rich', 'crunchy', 'tender'];
 
 describe('questions.json 形状与硬约束', () => {
   it('validateQuestionBank 通过', () => {

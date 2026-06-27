@@ -4,20 +4,20 @@
  * 8 维单字母常量(顺序固定,不可重排)
  * - S = 酸 sour
  * - T = 甜 sweet
- * - K = 苦 bitter
+ * - H = 热 temperature(上桌冷热)
  * - L = 辣 spicy
  * - I = 咸 salty   (第 2 字母,因「浓」占 X 让位)
  * - X = 浓 rich
  * - C = 脆 crunchy
  * - N = 嫩 tender
  */
-export const DIMS = ['S', 'T', 'K', 'L', 'I', 'X', 'C', 'N'] as const satisfies readonly TasteLetter[];
+export const DIMS = ['S', 'T', 'H', 'L', 'I', 'X', 'C', 'N'] as const satisfies readonly TasteLetter[];
 
 /** 8 维顺序的英文字段名,与 DIMS 一一对应 */
 export const DIM_FIELDS = [
   'sour',
   'sweet',
-  'bitter',
+  'temperature',
   'spicy',
   'salty',
   'rich',
@@ -26,7 +26,7 @@ export const DIM_FIELDS = [
 ] as const satisfies readonly TasteDimension[];
 
 /** 8 维顺序的中文名,与 DIMS 一一对应;第 6 位为「浓」 */
-export const DIM_CHINESE = ['酸', '甜', '苦', '辣', '咸', '浓', '脆', '嫩'] as const;
+export const DIM_CHINESE = ['酸', '甜', '热', '辣', '咸', '浓', '脆', '嫩'] as const;
 
 /** 单字母 → 英文驼峰字段名 */
 export function letterToDim(letter: TasteLetter): TasteDimension {
@@ -51,8 +51,8 @@ export function dimToLetter(dim: TasteDimension): TasteLetter {
 
 /**
  * 8 字符索引串 → 3 位十进制序号
- * 大写→1,小写→0,S T K L I X C N 顺序对应 bit7..bit0
- * 例:"StKliXcN" → S(1) t(0) K(1) l(0) i(0) X(1) c(0) N(1) → 0b10100101 = 165
+ * 大写→1,小写→0,S T H L I X C N 顺序对应 bit7..bit0
+ * 例:"StHliXcN" → S(1) t(0) H(1) l(0) i(0) X(1) c(0) N(1) → 0b10100101 = 165
  */
 export function keyToIndex(key: string): number {
   if (key.length !== 8) throw new Error(`key length must be 8, got ${key.length}: ${key}`);
@@ -88,14 +88,22 @@ export function isHigh(letter: string): boolean {
  * 两档中文渲染标签(原三档中的极档已合并入高档,文案不再区分)。
  * - 除「浓」维外:低档 = 低<中文名>,高档 = 重<中文名>
  * - 「浓」维(letter = X):低档 = 清淡,高档 = 浓
- * - score 阈值: ≤ 60 低档, > 60 高档
+ * - 「热」维(letter = H):三档平分单字 — 凉(<33) / 温(33≤x<66) / 烫(≥66)
+ * - score 阈值(非 H/X 维): ≤ 60 低档, > 60 高档
  *
  * 注:本函数与 valueToGrade 互不替换,前者驱动文案选择,
  * 后者仅用于雷达 / bar / 徽章颜色(五等级 A/B/C/D/E)。
+ * 温度维三档切点(33/66)与底层 interval 选文件统一 60 阈值(bit5)不同,
+ * "温"档横跨 60 切点属正常(显示层与选文件层解耦)。
  */
 export function letterToTierLabel(letter: TasteLetter, score: number): string {
   if (!Number.isFinite(score)) {
     throw new Error(`score must be a finite number, got ${score}`);
+  }
+  if (letter === 'H') {
+    if (score >= 66) return '烫';
+    if (score >= 33) return '温';
+    return '凉';
   }
   const isX = letter === 'X';
   if (score > 60) {

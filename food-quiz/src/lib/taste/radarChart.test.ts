@@ -33,17 +33,24 @@ function createMockCtx(): any {
 
 /** 构造 8 维测试数据,values 按 DIMS 顺序,letter 自动分配。 */
 function makeIntervals(values: number[]): RenderedInterval[] {
-  return DIMS.map((letter, i) => ({
-    letter,
-    index: i,
-    key: letter.toLowerCase(),
-    label: `label-${letter}`,
-    copy: `copy-${letter}`,
-    value: values[i] ?? 50,
-    tierLabel: `${letter}-tier`,
-    grade: gradeOf(values[i] ?? 50),
-    isHigh: (values[i] ?? 50) > 60,
-  }));
+  return DIMS.map((letter, i) => {
+    const v = values[i] ?? 50;
+    // 温度维(H)轴名用真实档位单字(凉/温/烫),其余维用占位 tierLabel(测试只校验温度维之外的轴名走 DIM_CHINESE)
+    const tierLabel = letter === 'H'
+      ? (v >= 66 ? '烫' : v >= 33 ? '温' : '凉')
+      : `${letter}-tier`;
+    return {
+      letter,
+      index: i,
+      key: letter.toLowerCase(),
+      label: `label-${letter}`,
+      copy: `copy-${letter}`,
+      value: v,
+      tierLabel,
+      grade: gradeOf(v),
+      isHigh: v > 60,
+    };
+  });
 }
 
 function gradeOf(v: number): Grade {
@@ -60,8 +67,8 @@ describe('drawRadarChart', () => {
     const intervals = makeIntervals([0, 0, 0, 0, 0, 0, 0, 0]);
     drawRadarChart(ctx, intervals, 320);
     const fillTextCalls = ctx.fillText.mock.calls.map((c: any[]) => c[0]);
-    // 找 8 个中文字
-    const chineseLabels = fillTextCalls.filter((s: string) => /[酸甜苦辣咸浓脆嫩]/.test(s));
+    // 找 8 个轴名(7 个固定中文 + 1 个温度档位单字 凉/温/烫)
+    const chineseLabels = fillTextCalls.filter((s: string) => /[酸甜热辣咸浓脆嫩凉温烫]/.test(s));
     expect(chineseLabels.length).toBeGreaterThanOrEqual(8);
   });
 
@@ -110,14 +117,13 @@ describe('drawRadarChart', () => {
     expect(ctx.font).toContain('Noto Sans SC');
   });
 
-  it('轴标签调用 fillText,内容与 DIM_CHINESE 一致', () => {
+  it('轴标签调用 fillText,非温度维内容与 DIM_CHINESE 一致,温度维画档位单字', () => {
     const ctx = createMockCtx();
     const intervals = makeIntervals([50, 50, 50, 50, 50, 50, 50, 50]);
     drawRadarChart(ctx, intervals, 320);
     const fillTextCalls = ctx.fillText.mock.calls.map((c: any[]) => c[0]);
-    // 取最后 8 个 fillText(轴标签是循环里调,后面是环刻度 20/40/60/80/100)
-    // 简化:确认每个中文字都被 fill
-    const chinese = ['酸', '甜', '苦', '辣', '咸', '浓', '脆', '嫩'];
+    // 7 个非温度维固定中文 + 温度维 value=50 → '温'
+    const chinese = ['酸', '甜', '辣', '咸', '浓', '脆', '嫩', '温'];
     for (const c of chinese) {
       expect(fillTextCalls).toContain(c);
     }
@@ -147,7 +153,7 @@ describe('P7.4 雷达图 ABCDE 字母层 + 底色', () => {
     const intervals = makeIntervals([50, 50, 50, 50, 50, 50, 50, 50]);
     drawRadarChart(ctx, intervals, 320);
     const fillTextCalls = ctx.fillText.mock.calls.map((c: any[]) => c[0]);
-    const chinese = ['酸', '甜', '苦', '辣', '咸', '浓', '脆', '嫩'];
+    const chinese = ['酸', '甜', '辣', '咸', '浓', '脆', '嫩', '温'];
     for (const c of chinese) expect(fillTextCalls).toContain(c);
     // grade 字母:全部值=50 → grade='C',所以 8 个 'C' 都被 fill(纯文本,无颜色徽章)
     const gradeCCount = fillTextCalls.filter((s: string) => s === 'C').length;

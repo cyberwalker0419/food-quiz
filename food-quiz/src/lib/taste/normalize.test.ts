@@ -4,19 +4,19 @@ import { ZERO_VECTOR } from './types';
 import type { DimensionVector } from './types';
 
 const full: DimensionVector = {
-  sour: 100, sweet: 100, bitter: 100, spicy: 100,
+  sour: 100, sweet: 100, temperature: 100, spicy: 100,
   salty: 100, rich: 100, crunchy: 100, tender: 100,
 };
 
 const zeros: DimensionVector = {
-  sour: 0, sweet: 0, bitter: 0, spicy: 0,
+  sour: 0, sweet: 0, temperature: 0, spicy: 0,
   salty: 0, rich: 0, crunchy: 0, tender: 0,
 };
 
 describe('normalize', () => {
   it('全 0 → 全 50', () => {
     expect(normalize(ZERO_VECTOR)).toEqual({
-      sour: 50, sweet: 50, bitter: 50, spicy: 50,
+      sour: 50, sweet: 50, temperature: 50, spicy: 50,
       salty: 50, rich: 50, crunchy: 50, tender: 50,
     });
   });
@@ -55,7 +55,7 @@ describe('std', () => {
 
   it('一半 0 一半 100 → 50', () => {
     const v: DimensionVector = {
-      sour: 0, sweet: 0, bitter: 0, spicy: 0,
+      sour: 0, sweet: 0, temperature: 0, spicy: 0,
       salty: 100, rich: 100, crunchy: 100, tender: 100,
     };
     expect(std(v)).toBe(50);
@@ -73,8 +73,8 @@ describe('cosineSim', () => {
   });
 
   it('正交 → 0', () => {
-    const a: DimensionVector = { ...zeros, sour: 100, sweet: 100, bitter: 100, spicy: 100, salty: 0, rich: 0, crunchy: 0, tender: 0 };
-    const b: DimensionVector = { ...zeros, sour: 0, sweet: 0, bitter: 0, spicy: 0, salty: 100, rich: 100, crunchy: 100, tender: 100 };
+    const a: DimensionVector = { ...zeros, sour: 100, sweet: 100, temperature: 100, spicy: 100, salty: 0, rich: 0, crunchy: 0, tender: 0 };
+    const b: DimensionVector = { ...zeros, sour: 0, sweet: 0, temperature: 0, spicy: 0, salty: 100, rich: 100, crunchy: 100, tender: 100 };
     expect(cosineSim(a, b)).toBeCloseTo(0, 6);
   });
 });

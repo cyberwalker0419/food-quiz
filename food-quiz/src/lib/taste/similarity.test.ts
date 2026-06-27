@@ -3,12 +3,12 @@ import { cosineSim, euclideanDist, blendedScore } from './similarity';
 import type { DimensionVector } from './types';
 
 const full: DimensionVector = {
-  sour: 100, sweet: 100, bitter: 100, spicy: 100,
+  sour: 100, sweet: 100, temperature: 100, spicy: 100,
   salty: 100, rich: 100, crunchy: 100, tender: 100,
 };
 
 const zeros: DimensionVector = {
-  sour: 0, sweet: 0, bitter: 0, spicy: 0,
+  sour: 0, sweet: 0, temperature: 0, spicy: 0,
   salty: 0, rich: 0, crunchy: 0, tender: 0,
 };
 
@@ -23,8 +23,8 @@ describe('cosineSim', () => {
   });
 
   it('正交 → 0', () => {
-    const a: DimensionVector = { ...zeros, sour: 100, sweet: 100, bitter: 100, spicy: 100, salty: 0, rich: 0, crunchy: 0, tender: 0 };
-    const b: DimensionVector = { ...zeros, sour: 0, sweet: 0, bitter: 0, spicy: 0, salty: 100, rich: 100, crunchy: 100, tender: 100 };
+    const a: DimensionVector = { ...zeros, sour: 100, sweet: 100, temperature: 100, spicy: 100, salty: 0, rich: 0, crunchy: 0, tender: 0 };
+    const b: DimensionVector = { ...zeros, sour: 0, sweet: 0, temperature: 0, spicy: 0, salty: 100, rich: 100, crunchy: 100, tender: 100 };
     expect(cosineSim(a, b)).toBeCloseTo(0, 6);
   });
 });
@@ -50,8 +50,8 @@ describe('blendedScore', () => {
   });
 
   it('完全正交 → cos=0,dist=√8·100≈282.8', () => {
-    const a: DimensionVector = { ...zeros, sour: 100, sweet: 100, bitter: 100, spicy: 100, salty: 0, rich: 0, crunchy: 0, tender: 0 };
-    const b: DimensionVector = { ...zeros, sour: 0, sweet: 0, bitter: 0, spicy: 0, salty: 100, rich: 100, crunchy: 100, tender: 100 };
+    const a: DimensionVector = { ...zeros, sour: 100, sweet: 100, temperature: 100, spicy: 100, salty: 0, rich: 0, crunchy: 0, tender: 0 };
+    const b: DimensionVector = { ...zeros, sour: 0, sweet: 0, temperature: 0, spicy: 0, salty: 100, rich: 100, crunchy: 100, tender: 100 };
     // cos=0(无公共非零维),dist=√8·100
     expect(blendedScore(a, b)).toBeCloseTo(0.5 * 0 + 0.5 * (1 / (1 + Math.sqrt(8) * 100)), 4);
   });

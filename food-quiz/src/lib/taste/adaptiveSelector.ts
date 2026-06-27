@@ -3,7 +3,7 @@ import { ZERO_VECTOR, sharpnessOf } from './types';
 import { questionBank } from '../../content/questions/questions.loader';
 
 const DIMS: readonly TasteDimension[] = [
-  'sour', 'sweet', 'bitter', 'spicy',
+  'sour', 'sweet', 'temperature', 'spicy',
   'salty', 'rich', 'crunchy', 'tender',
 ] as const;
 
@@ -36,7 +36,7 @@ export const WEAK_W = 5;
 export const CLARIFIED_ABS = 140;
 /** 追问机制 C(覆盖度追问):某维累计 |weight| 总和 < 此值视为欠探索。 */
 export const COVERAGE_FLOOR = 180;
-/** 追问机制 C:题库中某维平均 |weight|/题 < 此值时,跳过该维(题库本身无法充分探索,如苦维)。 */
+/** 追问机制 C:题库中某维平均 |weight|/题 < 此值时,跳过该维(题库本身无法充分探索,如温度维)。 */
 export const BANK_MIN_DENSITY = 25;
 /** 低响应维度窗口:基于最近 N 题的 profile 增量。 */
 const LOW_RESPONSE_WINDOW = 5;
@@ -49,7 +49,7 @@ export const STEM_DEDUP_LATE_THRESHOLD = 20;
 
 /**
  * 题库各维平均信号密度(模块级缓存,避免 detectPursueDims 重复计算)。
- * 用于机制 C:密度 < BANK_MIN_DENSITY 的维度(如苦维 ≈ 14.4)被跳过,避免永久追问。
+ * 用于机制 C:密度 < BANK_MIN_DENSITY 的维度(如温度维)被跳过,避免永久追问。
  */
 const BANK_DENSITY: Record<TasteDimension, number> = (() => {
   const out = {} as Record<TasteDimension, number>;
@@ -269,7 +269,7 @@ function maxOptionWeight(q: QuizQuestion, d: TasteDimension): number {
  * 机制 B(同维强弱波动):用户在某维既给过强信号(|w|≥STRONG_W),又在能强表态的题上
  *   选了弱选项(|w|≤WEAK_W,且题里其他选项 ≥STRONG_W) → 该维判为自相矛盾。
  * 机制 C(覆盖度不足):某维累计信号总量 < COVERAGE_FLOOR → 该维视为欠探索。
- *   题库密度 < BANK_MIN_DENSITY 的维度(如苦维)被自动跳过。
+ *   题库密度 < BANK_MIN_DENSITY 的维度(如温度维)被自动跳过。
  *
  * 收敛保证:profile 推到 |值| ≥ CLARIFIED_ABS 或累计信号 ≥ COVERAGE_FLOOR 后
  * 该维脱离追问集合,不会卡满 45。
@@ -325,7 +325,7 @@ export function detectPursueDims(
   // 机制 C: 覆盖度不足 — 某维累计信号总量低于 COVERAGE_FLOOR
   for (const d of DIMS) {
     if (Math.abs(profile[d] || 0) >= CLARIFIED_ABS) continue; // 已澄清
-    if (BANK_DENSITY[d] < BANK_MIN_DENSITY) continue;         // 题库无法充分探索(如苦维)
+    if (BANK_DENSITY[d] < BANK_MIN_DENSITY) continue;         // 题库无法充分探索(如温度维)
     let userTotal = 0;
     for (const a of answered) {
       userTotal += Math.abs(a.w[d] || 0);

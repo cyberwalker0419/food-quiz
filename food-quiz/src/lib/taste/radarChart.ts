@@ -109,10 +109,11 @@ export function drawRadarChart(
     ctx.fillStyle = INK_3;
     ctx.font = `600 ${gradeFontSize}px ${fontFamily}`;
     ctx.fillText(grade, lx, ly - labelFontSize * 0.55);
-    // 下行:中文(墨,主字)
+    // 下行:中文(墨,主字);温度维(H)动态显示用户档位单字(凉/温/烫),其余维固定中文
     ctx.fillStyle = INK;
     ctx.font = `500 ${labelFontSize}px ${fontFamily}`;
-    ctx.fillText(DIM_CHINESE[i]!, lx, ly + gradeFontSize * 0.45);
+    const label = DIMS[i] === 'H' ? (axisIv?.tierLabel ?? '温') : DIM_CHINESE[i]!;
+    ctx.fillText(label, lx, ly + gradeFontSize * 0.45);
   }
 
   // 4. 数据多边形
