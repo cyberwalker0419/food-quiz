@@ -1,0 +1,597 @@
+# food-quiz 味觉算法白皮书
+
+> **范围**：`food-quiz/src/lib/taste/` 全部算法层的形式化描述、数值对比与演进历史。
+> **状态**：选题多样性（问题一）已闭环；推荐区分度（问题二）已修复；gDPP 经实证否决。
+> **日期**：2026-06-13 ~ 2026-06-27（56 commits）。本文档随 `b6b16fb` 之后的 P11 改动重建（旧 `algorithm.md` 于 `6d3f80c` 精简时移除）。
+
+---
+
+## 摘要
+
+food-quiz 是一个**零网络**的「中国味觉性格测试」：被试先选忌口，再作答 25–45 道自适应题目，每题选项携带 8 维味觉权重，累加成味觉画像向量，归一化后渲染为雷达图 + 长评价 + 跨菜系推荐菜 + 国风分享卡。全部数据编译期内联（Vite glob），无 fetch / 无 API / 无后端。
+
+算法层（`lib/taste/`，第 1 层，纯函数 + 100% 单测）由 9 个模块组成，分四条主线：
+
+1. **向量体系**（keys/types）：8 维单字母空间 `S T K L I X C N`，256 组合索引。
+2. **变换与度量**（normalize/similarity）：归一化、标准差、余弦/去中心化余弦/欧氏/混合相似度。
+3. **自适应选题**（adaptiveSelector/state）：CAT 变体，信息增益 + 多层去重 + MMR + 追问 + 跨 session 衰减。
+4. **结果组装**（result/loaders/radarChart）：归一化→档位→联动/全能文案→推荐菜 MMR→菜系百分比→Canvas 雷达图。
+
+本文档形式化每条主线，给出关键标定的**实测数值**，并以 commit 粒度记录演进。
+
+---
+
+## 1. 系统总览
+
+### 1.1 四阶段状态机（[App.tsx](food-quiz/src/App.tsx)）
+
+```
+intro → dietary → quiz → calculating → result
+                    ↑                     ↓
+                    └── 上一题（可回退）───┘
+```
+
+- **intro**：开始。
+- **dietary**：9 种忌口探测（影响推荐菜过滤）。
+- **quiz**：自适应选题循环。每答一题 `applyAnswer` 更新 profile，调 `pickNextQuestion` 出下一题，`shouldStop` 判定是否进 calculating。
+- **calculating → result**：`assembleResult` 归一化 + 组装渲染结构，画雷达图 / 推荐菜 / 分享卡。
+
+### 1.2 三层架构（分层铁律）
+
+```
+lib/taste/    第 1 层：算法核心（纯函数，100% 单测，禁 import 第 2/3 层）
+content/      第 2 层：JSON 文案资产（5 目录 + dishes.json，互不引用）
+components/   第 3 层：React 组件 + Canvas 副作用（shareImage）
+```
+
+第 1 层只接收纯数据（如 `ReadonlyMap`），不 import `utils/`（`sessionMemory` 属第 3 层）。坏形状 JSON 被 loader 静默降级为 `null`，对应 section 不渲染——**不抛错**。
+
+### 1.3 算法模块清单
+
+| 模块 | 职责 | 核心导出 |
+|:--|:--|:--|
+| [keys.ts](food-quiz/src/lib/taste/keys.ts) | 8 维字母体系 + 256 索引 + 档位标签 | `DIMS`, `keyToIndex`, `letterToTierLabel`, `valueToGrade` |
+| [types.ts](food-quiz/src/lib/taste/types.ts) | 类型 + `ZERO_VECTOR` + 犀利度 + 忌口 | `WeightVector`, `DimensionVector`, `sharpnessOf` |
+| [normalize.ts](food-quiz/src/lib/taste/normalize.ts) | 归一化 + 标准差 | `normalize`, `std` |
+| [similarity.ts](food-quiz/src/lib/taste/similarity.ts) | 4 种相似度 | `cosineSim`, `centeredCosineSim`, `euclideanDist`, `blendedScore` |
+| [state.ts](food-quiz/src/lib/taste/state.ts) | 答题状态机 + profile 累加 | `applyAnswer`, `undoLast` |
+| [adaptiveSelector.ts](food-quiz/src/lib/taste/adaptiveSelector.ts) | 自适应选题（核心） | `pickNextQuestion`, `shouldStop`, `detectPursueDims` |
+| [result.ts](food-quiz/src/lib/taste/result.ts) | 结果组装 + 忌口过滤 | `assembleResult`, `passesDietary` |
+| [loaders.ts](food-quiz/src/lib/taste/loaders.ts) | JSON 加载 + 形状校验 | `loadInterval`, `loadDishes` 等 |
+| [radarChart.ts](food-quiz/src/lib/taste/radarChart.ts) | Canvas 雷达图绘制 | `drawRadarChart` |
+
+---
+
+## 2. 8 维味觉空间
+
+### 2.1 维度与字母体系（keys.ts）
+
+固定顺序，**不可重排**：
+
+| 字段 | sour | sweet | bitter | spicy | salty | rich | crunchy | tender |
+|:--|:--|:--|:--|:--|:--|:--|:--|:--|
+| 字母 | S | T | K | L | I | X | C | N |
+| 中文 | 酸 | 甜 | 苦 | 辣 | 咸 | 浓 | 脆 | 嫩 |
+
+- 第 5 位字段名固定 `rich`（浓），禁 `umami`/`鲜`；字母 `X` 让位给"浓"。
+- 8 字母互异 → 256 组合串唯一（§2.3）。
+
+### 2.2 类型层（types.ts）
+
+| 类型 | 含义 | 值域 |
+|:--|:--|:--|
+| `WeightVector` | 原始累加权重（profile） | 允许负值、允许超 100 |
+| `DimensionVector` | 归一化向量（雷达/匹配） | $[0,100]$ |
+| `TasteLetter` | 单字母联合类型 | `S\|T\|K\|L\|I\|X\|C\|N` |
+
+**犀利度**（派生元数据，不入 JSON）：`sharpnessOf(q)` = 2 选项 → `sharp`（权重绝对值大，精准探测/剪枝），否则 → `smooth`（建基线）。
+
+### 2.3 256 组合索引（keyToIndex）
+
+8 字符串，大写=1、小写=0，`S T K L I X C N` 对应 bit7..bit0：
+
+$$\text{idx} = \sum_{i=0}^{7} \mathbb{1}[\text{letter}_i \text{ 大写}] \cdot 2^{7-i} \in [0,255]$$
+
+例：`StKliXcN` → `10100101`₂ = 165。这 256 个索引唯一对应 `intervals/000.json ~ 255.json` 的整体组合画像文案。
+
+### 2.4 档位标签（两套并行）
+
+| 函数 | 用途 | 规则 |
+|:--|:--|:--|
+| `letterToTierLabel` | **文案触发**（驱动 interval/synergy 选择） | score>60 → `重X`（浓维→`浓`）；else → `低X`（浓维→`清淡`） |
+| `valueToGrade` | **视觉层**（雷达/bar/徽章颜色） | A≥80, B≥60, C≥40, D≥20, E<20（每档 20 分） |
+
+两套独立，互不替换。旧"极档 ⚡"已于 2026-06 并入高档，文案不再区分。
+
+---
+
+## 3. 向量变换与度量
+
+### 3.1 归一化 normalize（[normalize.ts:16](food-quiz/src/lib/taste/normalize.ts:16)）
+
+$$v[d] = \mathrm{clamp}\!\left(50 + \frac{50 \cdot raw[d]}{m},\ 0,\ 100\right),\quad m=\max(1,\ \max_d|raw[d]|)$$
+
+- $raw = +m \to 100$，$raw = -m \to 0$，$raw = 0 \to 50$（中点）。
+- 按最大绝对维等比缩放，**保留正负形状**（profile 的正负 → 归一化后围绕 50）。
+
+### 3.2 标准差 std（[normalize.ts:29](food-quiz/src/lib/taste/normalize.ts:29)）
+
+总体标准差（除以 $N=8$）。$std < 15$ 触发**全能文案**分支（§6.4）——8 维都很接近 50（中庸型）。
+
+### 3.3 相似度 similarity（[similarity.ts](food-quiz/src/lib/taste/similarity.ts)）
+
+| 函数 | 公式 | 用途 |
+|:--|:--|:--|
+| `cosineSim` | $\frac{a\cdot b}{\|a\|\|b\|}$（标准） | 画像评估/选题 closestTo（保留，不改） |
+| `centeredCosineSim` | 减 8 维均值后余弦，$[-1,1]$ | **问题二**：推荐/dedup/penalty |
+| `euclideanDist` | $\sqrt{\sum(a-b)^2}$ | blendedScore 距离项 |
+| `blendedScore` | $0.5\cdot\frac{\mathrm{cen}+1}{2} + 0.5\cdot\frac{1}{1+\mathrm{dist}}$ | 推荐菜/菜系匹配 |
+
+### 3.4 全正压缩与去中心化（问题二根因）
+
+`topicVector`（题主题向量）= options 权重绝对值均值，8 维**恒非负**。任意两题都落在全正象限，标准余弦虚高：
+
+| 度量 | 题库采样均值（400 对） | 含义 |
+|:--|:--:|:--|
+| `cosineSim`（标准） | **0.801** | 虚高：任意两题"都挺像" |
+| `centeredCosineSim`（去中心） | **0.498** | 真实：恢复形状区分力 |
+
+去中心化先减均值，向量围绕 0 有正有负，余弦才反映"形状差异"。常数向量 → 0。**这是推荐区分度与选题去冗余的共同根因**，P10/P11 统一用 `centeredCosineSim` 修复（`blendedScore` 的 cos 项也改用它并映射 $[0,1]$）。
+
+---
+
+## 4. 答题状态机（state.ts）
+
+### 4.1 profile 累加（[state.ts:66](food-quiz/src/lib/taste/state.ts:66)）
+
+每答一题，所选 option 的 8 维权重累加进 profile：
+
+$$profile[d] \mathrel{+}= opt.weights[d]$$
+
+profile 是 `WeightVector`（原始，未归一化），可正可负，范围约 ±几百（25–45 题累积）。
+
+### 4.2 bitter 初始 −15（[state.ts:26](food-quiz/src/lib/taste/state.ts:26)）
+
+$$profile_0 = \{sour:0,\dots,bitter:-15,\dots,tender:0\}$$
+
+苦味起步 −15：让"苦味接受度低"的人更快被区分（苦维题库密度本身偏低，需补偿）。
+
+### 4.3 可逆性
+
+`applyAnswer` / `undoLast` / `replaceAnswer` 全部基于"加减权重"，profile 永远是**当前已答选项的净累加**。支持"回退到某题改答"（后续答案丢弃，profile 同步回滚）。
+
+### 4.4 profile 的下游消费
+
+| 消费者 | 判据 | 代码 |
+|:--|:--|:--|
+| 信息增益选题 | $gain=\sum\|profile[d]\|\cdot|w|$ | adaptiveSelector.ts:558 |
+| 剪枝（极度排斥） | $profile[d]\le -30$ | adaptiveSelector.ts:184 |
+| 追问收敛 | $\|profile[d]\|\ge 140$ | adaptiveSelector.ts:411 |
+| 覆盖度追问 | 累计 $|weight| < 180$ | adaptiveSelector.ts:431 |
+| 最终归一化 | normalize → 雷达图 | result.ts:252 |
+
+> **profile vs topicVector**：profile 描述**人**（可正可负，累加）；topicVector 描述**题**（恒非负，绝对值均值）。全正压缩只影响后者。
+
+---
+
+## 5. 自适应选题（adaptiveSelector.ts）—— 核心
+
+### 5.1 选题管线
+
+```
+pool = 题库 − asked
+  → 剪枝（profile≤−30 的维相关题）
+  → L1 exact dedup（最近1题 cen≥0.95）
+  → L2 cover dedup（最近2-5题维度重合>3）
+  → L4 global dedup（最近10题同题≤1次，无追问时）
+  → 评分（早期: std/coverage/jitter；后期: gain/sw/lowCover/MMR/contraBoost）
+  → top-K=12 加权采样
+```
+
+每层过滤后若池空，**退回上一层池**（兜底，防死锁）。
+
+### 5.2 犀利度分层（sharpnessWeight）
+
+按答题进度匹配题的犀利度：
+
+| 阶段 | count | 目标 sharp 比例 | 实现 |
+|:--|:--:|:--:|:--|
+| early | <10 | 0.4（smooth 主导） | $1-EARLY\_SMOOTH\_RATIO=0.4$ |
+| mid | 10–24 | 0.4→0.6 线性插值 | — |
+| late | ≥25 | 0.6（sharp 主导） | $LATE\_SHARP\_RATIO=0.6$ |
+
+返回 $[0,1]$，作乘法加权：$sw\cdot 10$（早期）或 $0.6+0.4sw$（后期）。
+
+### 5.3 信息增益评分（后期）
+
+$$gain(q) = \sum_{opt}\sum_d |profile[d]|\cdot|w_{opt}[d]|$$
+
+profile 越大的维，被该题改动后信息量越大。这是 CAT 的主项——把画像不确定的维问清楚。
+
+### 5.4 多层 local 去重栈
+
+| 层 | 作用域 | 阈值 | 动作 |
+|:--|:--|:--|:--|
+| L1 exact | 最近 1 题 | cen ≥ 0.95 | **排除**（换皮） |
+| L2 cover | 最近 2–5 题 | 维度重合 > 3 | **排除** |
+| L3 MMR | 最近 5 题 | 连续 | **降权**（§5.5） |
+| L4 global | 最近 10 题 | 同题 ≥ 2 | **排除** |
+| L5 stem | 全 session | 累计 n 次 | $\times[1,0.3,0.1,0.03,0.01]$ |
+
+### 5.5 MMR 连续去冗余（P11）
+
+L3 原 P7.1 为**离散计数**（超 0.80 各 ×0.3）。两个缺陷：计数非 max（单点极相似漏判）、离散阈值突变。P11 改为标准 MMR 连续形式：
+
+$$topicPenalty = 1 - W_{mmr}\cdot\mathrm{clamp}(mmrMax,0,1)$$
+$$mmrMax = \max_{r \in last5}\mathrm{cen}(tv(q),\,tv(r))$$
+$$\text{若 } mmrMax \ge 0.80:\ topicPenalty \leftarrow \min(topicPenalty,\ FLOOR)$$
+
+$W_{mmr}=0.6$，$FLOOR=0.3$（安全网，对齐原 ×0.3 强度）。负相似截 0（形状相反=天然多样，不奖不罚）。
+
+**标定**（5 画像 × 8 seed，强制 MAX，隔离早/后期）：
+
+| 指标 | 早期（无 MMR） | 后期（有 MMR） | 变化 |
+|:--|:--:|:--:|:--:|
+| 邻对 cen 均值 | 0.522 | **0.415** | −20% |
+| 高相似（≥0.80）占比 | 29.3% | **3.5%** | −88% |
+
+后期 0.415 < 随机基线 0.498，证明主动避相似且未过压。
+
+### 5.6 追问机制（detectPursueDims，渐进式 25–45）
+
+三套机制都不依赖负权重，规避"题库各维权重几乎全正"的偏态：
+
+| 机制 | 触发 | 参数 |
+|:--|:--|:--|
+| **A 同主题不一致** | 同主题题对（sig≥0.6）共同主维上，归一化表态强度差 ≥ 0.45 | `THEME_SIM=0.6`, `INCONSISTENCY_GAP=0.45` |
+| **B 强弱波动** | 某维既给强信号（\|w\|≥18）又在能强表态的题选弱（\|w\|≤5） | `STRONG_W=18`, `WEAK_W=5` |
+| **C 覆盖度不足** | 某维累计信号 < 180（题库密度<25 的维跳过，如苦维） | `COVERAGE_FLOOR=180`, `BANK_MIN_DENSITY=25` |
+
+**收敛保证**：$|profile[d]| \ge CLARIFIED\_ABS=140$ 或累计信号 ≥ 180 后，该维脱离追问集，不会卡满 45。
+
+> 注：机制 A 的同主题判定**暂保留 `signatureSim`**（未去中心化），属追问战线，不随 P10 连带改。
+
+### 5.7 停止判定 shouldStop（25–45 渐进模型）
+
+$$count \ge 45 \to \text{停};\quad count < 25 \to \text{继续}$$
+
+$count \ge 25$ 后按残余追问维度数渐进容忍：
+
+| count | 停止条件 |
+|:--|:--|
+| 25–32 | 追问维 = 0 才停（严格） |
+| 33–36 | 追问维 ≤ 1 |
+| 37–40 | 追问维 ≤ 2 |
+| 41+ | 必停 |
+
+实测平均约 33 题（`93ae269`）。
+
+### 5.8 跨 session SH 频次衰减（P11）
+
+`sessionMemory`（localStorage，滚动窗 $MAX\_SESSIONS=3$）记录最近 3 轮 askedIds。选题时读出频次：
+
+$$sessionPenalty = SESSION\_SOFT\_PENALTY^{freq},\quad freq=\text{最近 3 轮出现次数}$$
+
+$0.7^{freq}$：1 次→0.70（沿用 P9 二元基线），2 次→0.49，3 次→0.34。P9 原为二元（出过即 ×0.7），高频垄断题未被额外压制；P11 恢复拼平数组中本就存在的频次（此前被 `new Set` 去重丢失）。
+
+**标定**（3 画像 × 5 轮，within-profile 跨轮 Jaccard）：
+
+| 模式 | Jaccard |
+|:--|:--:|
+| 无 SH | 0.087 |
+| **频次 SH（P11）** | **0.004（−95.5%）** |
+| 二元 SH（P9 baseline） | 0.053 |
+
+### 5.9 集中度控制（A1）
+
+集中度 = 单题在多 session 的最高出场率。机制：top-12 加权采样（≈ Randomesque）+ seeded 抖动 + 早期多样性项。
+
+早期评分（$count<25$，无 profile，信息增益退化为均匀覆盖）：
+
+$$score = (sw\cdot 10 + stdN\cdot W_{div} + covN\cdot W_{div}\cdot jitter + jitterBase)\cdot stemPenalty\cdot sessionPenalty$$
+
+$W_{div}=EARLY\_DIV\_WEIGHT$ 标定扫描（5 画像 × 8 seed）：
+
+| $W_{div}$ | 集中度 | 现象 |
+|:--:|:--:|:--|
+| 1.0 | 0.88 ❌ | stdN 固定主导，排名僵化 |
+| **0.5** | **0.63** ✅ | 谷底 |
+| 0.3 | 0.82 ❌ | 打散不足 |
+
+护栏断言集中度 $\le 0.7$。当前实测 ≈ 0.63（5×8 seed）；P10 度量去中心化后辅助测量降至 0.375（3×8 seed）。
+
+### 5.10 gDPP 评估（负结果）
+
+理论担忧：MMR 是 local（max-sim），长 session 可能"温水煮青蛙"（每步 max 过关但整体坍塌）。gDPP（贪心 DPP，log-det 边际增益 $\propto 1-k^\top K^{-1}k$）是 joint 度量，理论上能抓。
+
+**诊断一**（last5 窗口 mean pairwise sim）：后段 0.432 < 前段 0.569，且后段窗口 mean 0.432 ≈ 邻对 max 0.415 → **无累积坍塌**。
+
+**诊断二**（3 方案 × 4 窗口全因子，3 画像 × 3 seed）：
+
+| 方案\窗口 | 5 | 10 | 15 | 20 |
+|:--|:--:|:--:|:--:|:--:|
+| **MMR（base）** | **0.423** | 0.473 | 0.523 | 0.564 |
+| gDPP | 0.668 | 0.713 | 0.715 | 0.711 |
+| hybrid | 0.599 | 0.622 | 0.673 | 0.670 |
+
+（数值为后段邻对 cen 均值，越低越好）
+
+**三大发现（反转假设）**：
+1. **MMR 扩窗口恶化**：$5\to20$，0.423→0.564。max-sim 在大窗口均一化，失去区分力。
+2. **gDPP 全线最差**：proj energy 在去中心化量纲下数值极小，penalty≈1，实质失效。
+3. **hybrid 被拖累**：弱惩罚稀释 MMR 效果。
+
+**换度量分析**：`sig`（标准余弦）让 K 更病态（K⁻¹ 爆炸）；RBF 核能稳但要标定 σ 且脱离 `cen` 体系。**换度量救不活 gDPP**。
+
+**根因**：① CAT 主次冲突（gDPP 把多样性当主目标，与 gain 主项打架）；② 度量病态（`cen` 作 kernel 近奇异）；③ 窗口均一化。**结论：MMR·last5 最优，gDPP 不上。**
+
+---
+
+## 6. 结果组装（result.ts）
+
+### 6.1 主入口 assembleResult（[result.ts:245](food-quiz/src/lib/taste/result.ts:245)）
+
+输入 raw profile + 可选 `{seed, dietary, maxAbs, topNDishes}`，输出 `AssembledResult`（归一化向量 + 档位 + 文案 + 推荐菜/菜系）。
+
+### 6.2 256 interval index + 标题去堆砌
+
+- 每维 $v[d] > HIGH\_THRESHOLD=75$ → 高档位（bit=1）。
+- **去堆砌**（`MAX_LABEL_DIMS=2`）：高档维 > 2 时，只保留 $|v-50|$ 最大的 2 维定 interval index，避免"浓/嫩"堆砌。
+- $HIGH\_THRESHOLD$ 于 P9 从 60 收紧到 75：normalize 相对缩放会把中等维推 >60，导致多维全判高、塌缩到少数 interval（实测 32 样本仅 2 种标题、69% 同标题）；75 后分散到 7 种/最高频 38%。
+
+### 6.3 联动 synergy（Top1+Top2 > 75）
+
+最强的 2 维都 > 75 → 加载 `synergies/<ab>.json`，未命中走 `_fallback.json` 模板（替换 `{a}{b}` 为中文名）。
+
+### 6.4 全能 allround（std < 15）
+
+$std < STD\_ALLROUND=15$ → 8 维都接近 50（中庸型）→ 加载 `allround/_index.json` 随机抽一条。独立分支。
+
+### 6.5 长评价 buildProfileCopy（[result.ts:154](food-quiz/src/lib/taste/result.ts:154)）
+
+一段 ~100 字整体人格定性，由 3 句拼成：
+
+$$profileCopy = overallCopy\ +\ (synergyCopy\ \|\|\ scene句)\ +\ tail句$$
+
+scene/tail 句池按 $highCount$ 分 3 桶（清淡≤1 / 适中2-3 / 重口≥4），用不同散列独立选取避免撞句。所有素材经 humanizer-zh 润色（不走裸文案，CLAUDE.md 铁律）。
+
+### 6.6 推荐菜 MMR 加权抽样（[result.ts:341](food-quiz/src/lib/taste/result.ts:341)）
+
+1. 全菜按 `blendedScore(v, dish.vector)` 评分降序；
+2. 取 top 分 $\ge topScore \times MATCH\_RATIO(0.6)$ 作匹配池（池不足退回全量）；
+3. 池内按 $weight = score^2$ 加权随机抽 $N=5$ 道（同 seed 确定性），菜名去重。
+
+$score^2$ 权重让高分菜更易命中但不垄断。这取代了早期"纯 top-N"（相似菜扎堆）。
+
+### 6.7 菜系百分比（[result.ts:365](food-quiz/src/lib/taste/result.ts:365)）
+
+每菜系取该系 **top3 菜的 blendedScore 均值**作绝对匹配度 $\in (0,1]$，$\times 100$ 取整为百分比：
+
+$$cuisineScore = \mathrm{mean}\big(\text{top3 } blendedScore\big),\quad percent = \mathrm{round}(cuisineScore \times 100)$$
+
+**关键设计**：用 top3 均值而非全菜系均值——大菜系（川菜，菜多但不全匹配）不被不匹配菜拉低，小菜系特色菜能突围。这是问题二（去中心化）在菜系层的对应修复。
+
+### 6.8 忌口过滤 passesDietary（[result.ts:199](food-quiz/src/lib/taste/result.ts:199)）
+
+9 种忌口，**交集**判定（每条都须满足）：
+
+| 忌口 | 判据 |
+|:--|:--|
+| no-pork/beef/lamb/chicken | `meatTypes` 含对应肉 → 排除 |
+| no-seafood | 含 fish 或 seafood → 排除 |
+| no-egg/offal | 标记 === true → 排除（未标放行） |
+| vegetarian/halal | 标记 === true 才放行（**未标不放行**） |
+
+过滤后菜数 $< N+2$ 则回退到全 popular 池，保证总有推荐。
+
+---
+
+## 7. 数据加载与校验（loaders.ts）
+
+### 7.1 Vite glob eager（[loaders.ts:6](food-quiz/src/lib/taste/loaders.ts:6)）
+
+```ts
+const allJson = import.meta.glob('../../content/**/*.json', { eager: true });
+```
+
+编译期内联全部 JSON，零运行时 fetch。
+
+### 7.2 形状校验（静默降级）
+
+每个 `load*` 函数检查返回值的字段类型，**坏形状 → null**（不抛错）：
+
+```ts
+if (typeof e.copy !== 'string' || typeof e.label !== 'string' ...) return null;
+```
+
+调用端收到 null 走兜底（默认文案 / 空数组 / section 不渲染）。**这是分层铁律的容错基石**——删任一 JSON 不影响其他模块。
+
+### 7.3 兜底链
+
+| loader | 缺失/坏形状兜底 |
+|:--|:--|
+| `loadInterval` | null → "味觉画像"/"自成一格" |
+| `loadSynergy` | 具体文件 → `_fallback.json` → 硬编码 |
+| `loadAllround` | null → 不触发全能分支 |
+| `loadDishes` | null → 不渲染推荐菜 |
+
+---
+
+## 8. 雷达图绘制（radarChart.ts）
+
+### 8.1 几何
+
+- 8 轴均匀分布：$angle_i = \frac{2\pi i}{8} - \frac{\pi}{2}$（顶轴朝上）。
+- 半径 $R = \max(40,\ size/2 - padding)$，$padding=50$（防标签裁切，`d86e426`）。
+- 5 圈同心八边形网格（20/40/60/80/100）。
+- 数据多边形：朱砂半透明径向渐变填充（中心 0.08 → 边缘 0.22）+ 朱砂描边。
+
+### 8.2 国风色板（对齐 App.css :root）
+
+| 用途 | 色 |
+|:--|:--|
+| 墨（标签主字） | `#1F1A17` |
+| 墨灰（grade 字母） | `#9A8B75` |
+| 朱砂（数据） | `#9E2B25` |
+| 米纸（底色） | `#F5EFE0` |
+
+### 8.3 标注
+
+每轴双行：上行 grade 字母（墨灰小字，**纯文本无徽章**，`c4fb5a5`）、下行中文维名（墨主字）。`GRADE_COLORS` 保留供 ResultCard CSS 对齐，但雷达图本身不用颜色徽章（P8.3 统一）。
+
+---
+
+## 9. 改动历史（56 commits，2026-06-13 ~ 06-27）
+
+### 9.1 Phase 1 奠基（06-13 ~ 06-14）
+
+| commit | 内容 |
+|:--|:--|
+| `caf4a91` | 项目初始提交 |
+| `1425b65` | 三层算法参考文档 |
+| `46473ea`~`a44e7b6` | 味觉基因标签 ABCD-pq → **STKLIXCN 单字母体系**（5 个 plan commit） |
+| `e628f5b` | 加 vitest + test 脚本 |
+| `a5b2f8e` / `541ebd6` | types.ts / keys.ts |
+| `9d0f7a6` | 题库 JSON 形状校验器 |
+| `d8930c3` | 200 题题库（8 维覆盖断言） |
+| `dca9301` | **单入口自适应选题器**（20–45 题，8 维） |
+| `00e3965` | grade A/B/C/D/E 渲染管线 + 5 解耦文案模块 |
+| `bf7158b` | 280 文案 + 85 中文菜（Phase 4+5） |
+| `1a106a8` | 雷达图 / 去重追问 / sharp-smooth 分层 / jpeg 分享卡 / 去括号 |
+
+### 9.2 P7/P8 多级去重 + 国风（06-17）
+
+| commit | 内容 |
+|:--|:--|
+| `99ab6fd` | **P7/P8 多级去重引擎** + 菜扩至 196 |
+| `cd070ca` | 题库 v6（真实菜品向量） |
+| `4003c12` | 题干"啥"→"什么" + 生僻菜换亲民零食 |
+| `37d4027` | **国风 editorial 重构** + "吃什么啊"随机菜页 |
+
+### 9.3 修复期（06-18 ~ 06-20）
+
+| commit | 内容 |
+|:--|:--|
+| `c5bc5dd` | **loaders glob 路径修复**（文案/菜此前全加载为 null） |
+| `c6f57e1` | 推荐菜/题库只取日常知名菜 |
+| `39b24eb` | 修复"上一题"跳过错位 bug |
+| `d86e426` | 雷达图加画布内边距（标签不裁切） |
+| `69df620` | 删避雷指南 + 推荐菜加菜系/地区多样性 |
+| `32b928f` | **topDishes 改 MMR 多样性选菜**（解决相似菜扎堆） |
+| `c9ca57b` | **25–45 动态矛盾追问模型** |
+| `8aedcb7` / `e2d17af` | 推荐菜 seed 加权抽样 → 匹配池加权随机 |
+| `04b5780` | humanizer-zh 润色后的结果文案 |
+| `2b2d3a4` | 雷达图 grade 徽章错位 + 味觉特征 top3 重复修复 |
+
+### 9.4 性能 + 精简（06-24）
+
+| commit | 内容 |
+|:--|:--|
+| `6cb4b39` | 味觉特征重构为**一段长综合评价** + 文案 humanize |
+| `93ae269` | selector 优化至**平均 ~33 题** |
+| `c4fb5a5` | radar 标签裁切修复 + 国风重构 |
+| `6d3f80c` | **精简 CLAUDE.md/README，移除 algorithm.md/pro.md/技术栈.md** |
+
+### 9.5 忌口 + 菜系（06-26）
+
+| commit | 内容 |
+|:--|:--|
+| `1a2d633` | **忌口探测 + 菜系百分比 + 题库去重阔题 + 分享卡菜系区** |
+| `50b145f` | 库外选项频次超限清理（29 项降到 ≤2） |
+
+### 9.6 多样性闭环（06-27，本工作）
+
+| commit | 内容 |
+|:--|:--|
+| `ea65cac` | **A1 集中度护栏 + 自适应多样性 + 分层修复 + 推荐匹配去中心化**（问题二 blendedScore 改 cen） |
+| `b6b16fb` | **P10 选题去冗余度量去中心化**（先决：sig 0.801→cen 0.498，阈值重标） |
+| P11（待提交） | **MMR 连续去冗余 + SH 频次衰减**（后期高相似 29.3%→3.5%；within Jaccard 0.087→0.004） |
+
+---
+
+## 10. 参数总表
+
+### 选题（adaptiveSelector.ts）
+
+| 参数 | 值 | 标定依据 |
+|:--|:--|:--|
+| `MIN/MAX_QUESTIONS` | 25 / 45 | 产品定义 |
+| `PRUNE_THRESHOLD` | −30 | 极度排斥剪枝 |
+| `EXACT_DEDUP_THRESHOLD` | 0.95 | cen p95=0.949 |
+| `COVER_OVERLAP_THRESHOLD` | 3 | 维度重合 |
+| `TOPIC_OVERLAP_THRESHOLD` | 0.80 | cen p73≈0.815（MMR 硬线） |
+| `MMR_DIV_WEIGHT` | 0.6 | §5.5 标定 |
+| `MMR_HARD_FLOOR` | 0.3 | 对齐原离散 ×0.3 |
+| `GLOBAL_DEDUP_WINDOW` | 10 | 同题去重窗 |
+| `STEM_DEDUP_SOFT_PENALTY` | [1,.3,.1,.03,.01] | stem 频次 |
+| `STEM_DEDUP_LATE_DOUBLE_PENALTY` | 0.3 | 后期≥20 题 + stem≥2 |
+| `SESSION_SOFT_PENALTY` | 0.7 | SH 频次衰减底 |
+| `EARLY_DIV_WEIGHT` | 0.5 | 扫描谷底（§5.9） |
+| `EARLY_STD_SCALE` / `EARLY_COVERAGE_SCALE` | 35 / 300 | 归一化上限 |
+| `EARLY/LATE_SMOOTH/SHARP_RATIO` | 0.6 / 0.6 | 犀利度分层 |
+| `LOW_RESPONSE_WINDOW` | 5 | recent / MMR 窗口（§5.10 证为甜区） |
+| `THEME_SIM` | 0.6 | 追问同主题（保留 sig） |
+| `INCONSISTENCY_GAP` | 0.45 | 追问机制 A |
+| `STRONG_W` / `WEAK_W` | 18 / 5 | 追问机制 B |
+| `CLARIFIED_ABS` | 140 | 追问收敛 |
+| `COVERAGE_FLOOR` / `BANK_MIN_DENSITY` | 180 / 25 | 追问机制 C |
+| `TOP_K` | 12 | 候选池 |
+
+### 结果（result.ts）
+
+| 参数 | 值 | 含义 |
+|:--|:--|:--|
+| `HIGH_THRESHOLD` | 75 | 判高档（P9: 60→75 收紧） |
+| `MAX_LABEL_DIMS` | 2 | 标题去堆砌 |
+| `STD_ALLROUND` | 15 | 全能文案触发 |
+| `MATCH_RATIO` | 0.6 | 推荐菜匹配池下限 |
+| `DEFAULT_TOP_N_DISHES` | 5 | 推荐菜数 |
+
+### 其他
+
+| 参数 | 值 | 位置 |
+|:--|:--|:--|
+| `MAX_SESSIONS` | 3 | sessionMemory 滚动窗 |
+| profile 初始 `bitter` | −15 | state.ts |
+| 雷达 `padding` | 50 | radarChart.ts |
+
+---
+
+## 附录 A：实验方法
+
+### A.1 session 模拟范式
+
+所有标定共用一套纯函数模拟（不碰 localStorage）：
+- 固定 seed 的 Mulberry32 PRNG；
+- "贴画像选 option"：每题选与目标向量 $\cos$ 最大的选项；
+- 强制 MAX（不用 shouldStop）获取后段数据，或真实停止测业务指标。
+
+### A.2 指标定义
+
+- **集中度**：$\max_i \mathrm{count}(i)/N_{sessions}$（5×8 seed）。
+- **邻对相似**：相邻题 $tv$ 的 cen；"后期"= $count\ge25$。
+- **窗口 joint**：$w$ 题滑动窗口内 $\binom{w}{2}$ 题对 cen 均值。
+- **跨轮 Jaccard**：两轮 askedIds 的 $|A\cap B|/|A\cup B|$。
+
+### A.3 可复现性
+
+标定脚本为一次性 `_*.test.ts`（`_overlap-measure`/`_homog-diagnose`/`_threshold-calib`/`_mmr-calib`/`_sh-calib`/`_gdpp-measure`/`_window-exp`），测完即删（`ls | grep '^_'` + `git status --short` 双验证）。本文档数值来自这些脚本的 `--reporter=verbose` console 输出。
+
+---
+
+## 附录 B：决策时间线
+
+| 阶段 | 决策 | 关键数值 |
+|:--|:--|:--|
+| Phase 1 | 8 维单字母体系 + 单入口选题器 + grade 渲染 | — |
+| P7/P8 | 多级去重引擎 | — |
+| 25–45 追问 | 动态矛盾追问模型 | 平均 ~33 题 |
+| 推荐菜 | MMR 多样性选菜 + 匹配池加权抽样 | 解决相似菜扎堆 |
+| 问题二 | 推荐匹配改去中心化 cen | blendedScore cos 项 |
+| P9/A1 | 集中度护栏 + 早期多样性项 | 集中度 0.88→0.63 |
+| P10 | dedup/penalty 度量去中心化（先决） | sig 0.801→cen 0.498 |
+| P11 MMR | 单 session 离散→连续 | 后期高相似 29.3%→3.5% |
+| P11 SH | 跨 session 二元→频次衰减 | within Jaccard 0.087→0.004 |
+| gDPP | 12 配置实证否决 | 全线劣于 MMR·5 |
+| 窗口扩大 | 实证否决（负优化） | MMR $w:5\to20$ 恶化 |
+| 下一步 | 瓶颈转移至文案层 | 45% 模板化 |
