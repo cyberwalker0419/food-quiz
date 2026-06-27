@@ -8,6 +8,7 @@ import {
   topicVector,
   signatureSim,
   getSessionStemCounts,
+  mmrHardFilter,
   STEM_DEDUP_SOFT_PENALTY,
   STEM_DEDUP_LATE_DOUBLE_PENALTY,
   STEM_DEDUP_LATE_THRESHOLD,
@@ -28,7 +29,7 @@ import {
   COVERAGE_FLOOR,
   BANK_MIN_DENSITY,
 } from './adaptiveSelector';
-import type { Sharpness, WeightVector } from './types';
+import type { Sharpness, WeightVector, QuizQuestion } from './types';
 import { normalize, cosineSim } from './normalize';
 import { centeredCosineSim } from './similarity';
 import { ZERO_VECTOR } from './types';
@@ -948,6 +949,69 @@ describe('P11 MMR 连续去冗余(后期 topicPenalty 连续化)', () => {
         expect(new Set(askedIds).size).toBe(askedIds.length);
       }
     }
+  });
+});
+
+describe('§11.7 甜区落地:late MMR 硬过滤(mmrHardFilter)', () => {
+  // §11.7 Stage1/2 实证:late 分支 top-K 前置硬剔除与 recent(最近5题)任一 cen≥TOPIC_OVERLAP_THRESHOLD
+  // 的候选(与现有乘性 topicPenalty 叠加:硬过滤先剔除极相似,penalty 对剩余软惩罚)。early 分支因伤追问
+  // (见末尾用例)暂缓,仅 late 落地——late 不改 profile/pursue 状态,故不伤 pursueRate/mean(quiz-simulation 实测三数全持平)。
+  function cen(a: WeightVector, b: WeightVector): number {
+    return centeredCosineSim(a as unknown as never, b as unknown as never);
+  }
+  // 扫题库找一对 topicVector cen≥threshold 的真实题(硬过滤作用对象)
+  function findOverlapPair(threshold: number): [QuizQuestion, QuizQuestion] | null {
+    const Q = questionBank.questions;
+    for (let i = 0; i < Q.length; i++) {
+      for (let j = i + 1; j < Q.length; j++) {
+        if (cen(topicVector(Q[i]!), topicVector(Q[j]!)) >= threshold) return [Q[i]!, Q[j]!];
+      }
+    }
+    return null;
+  }
+  function findDisjoint(b: QuizQuestion, threshold: number): QuizQuestion {
+    for (const q of questionBank.questions) {
+      if (q.id !== b.id && cen(topicVector(q), topicVector(b)) < threshold) return q;
+    }
+    throw new Error('找不到与 b 不重合的题');
+  }
+
+  it('题库存在 cen≥TOPIC_OVERLAP_THRESHOLD 的真实题对(硬过滤有作用对象,非空设)', () => {
+    expect(findOverlapPair(TOPIC_OVERLAP_THRESHOLD)).not.toBeNull();
+  });
+
+  it('剔除与 recentSigs 任一 cen≥阈值的候选,保留不重合候选', () => {
+    const pair = findOverlapPair(TOPIC_OVERLAP_THRESHOLD);
+    expect(pair).not.toBeNull();
+    const [a, b] = pair!;
+    const c = findDisjoint(b, TOPIC_OVERLAP_THRESHOLD);
+    const scored = [{ q: a, score: 100 }, { q: c, score: 50 }];
+    const filtered = mmrHardFilter(scored, [topicVector(b)]);
+    expect(filtered.find((x) => x.q.id === a.id)).toBeUndefined();  // a 与 b 重合 → 剔除
+    expect(filtered.find((x) => x.q.id === c.id)).toBeDefined();    // c 不重合 → 保留
+  });
+
+  it('全被剔则退回原 scored(兜底防池空,复用 L496/501/510 dedup 范式)', () => {
+    const pair = findOverlapPair(TOPIC_OVERLAP_THRESHOLD);
+    expect(pair).not.toBeNull();
+    const [a, b] = pair!;
+    const scored = [{ q: a, score: 100 }];  // 唯一候选与 b 重合 → 全被剔
+    expect(mmrHardFilter(scored, [topicVector(b)])).toBe(scored);  // 退回原引用
+  });
+
+  it('recentSigs 空时直通(首题 / recent 未满 5)', () => {
+    const q = questionBank.questions[0]!;
+    const scored = [{ q, score: 100 }];
+    expect(mmrHardFilter(scored, [])).toBe(scored);
+  });
+
+  it('early 分支暂不挂硬过滤:§11.7 复核 quiz-simulation 实测伤追问(pursueRate 41%→28%)', () => {
+    // early 硬过滤剔除"与 recent cen≥0.80"的同维候选,误杀摇摆画像机制B 所需的同维二次探测
+    // (spicy 强题 q_a 后的 q_b 同维 → cen≥0.80 被误杀)→ pursueRate 41%→28%、mean 27.4→26.2。
+    // §11.7 Stage1"earlyCen −32% 近乎免费"在 forceMax 画像成立但未测追问代价;closestTo+追问语境
+    // 代价暴露。决策:early 暂缓、late 单独落地;early 可行阈值/条件留任务③(A 判据)实验定。
+    // 锚点:quiz-simulation 主断言 pursueRate≥40% 间接锁定 early 不能伤追问(若误启用 early 硬过滤即回归)。
+    expect(TOPIC_OVERLAP_THRESHOLD).toBe(0.80);
   });
 });
 

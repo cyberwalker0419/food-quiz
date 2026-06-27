@@ -179,6 +179,27 @@ function weightedPick(
 }
 
 /**
+ * §11.7 甜区落地:在已评分候选(top-K 前置)中硬剔除与 recent 任一题去中心化相似度
+ * ≥ TOPIC_OVERLAP_THRESHOLD 的候选。Stage 1 实证:early 评分被 sw*10 锁死,乘性 penalty
+ * 无效,唯硬过滤才降集中度(earlyCen −32% 近乎免费)。全被剔则退回未过滤 scored(兜底防池空)。
+ * early/late 共用,不碰评分公式(sw*10 分层 / late gain / 乘性 topicPenalty 均不动)。
+ */
+export function mmrHardFilter(
+  scored: { q: QuizQuestion; score: number }[],
+  recentSigs: WeightVector[],
+): { q: QuizQuestion; score: number }[] {
+  if (recentSigs.length === 0) return scored;
+  const filtered = scored.filter(({ q }) => {
+    const tv = topicVector(q);
+    for (const stv of recentSigs) {
+      if (centeredSig(tv, stv) >= TOPIC_OVERLAP_THRESHOLD) return false;
+    }
+    return true;
+  });
+  return filtered.length > 0 ? filtered : scored;
+}
+
+/**
  * 当前 profile 中被剪枝的维度集合:
  *   raw weight ≤ PRUNE_THRESHOLD(用户极度排斥)
  * 注:必须至少有 3 题答案才进入剪枝(避免前 2 题偶发拉低误判)。
@@ -551,6 +572,10 @@ export function pickNextQuestion(
         score: (sw * 10 + stdTerm + covTerm * jitter + jitterBase) * stemPenalty * sessionPenalty,
       };
     });
+    // §11.7 复核(quiz-simulation 实测):early 硬过滤剔除"与 recent cen≥0.80"的同维候选,
+    // 误杀摇摆画像机制B 所需的同维二次探测(先强后弱波动)→ pursueRate 41%→28%、mean→26.2。
+    // §11.7 Stage1"earlyCen −32% 近乎免费"在 forceMax 画像成立但未测追问代价;closestTo+追问
+    // 语境代价暴露 → early 暂缓,留 late 单独验证 + 任务③实验定 early 可行阈值/条件。
     scored.sort((a, b) => b.score - a.score);
     return weightedPick(scored, rand);
   }
@@ -619,10 +644,13 @@ export function pickNextQuestion(
       score: (gain * (0.6 + 0.4 * sw) + gain * 0.3 * lowCoverNorm + lowCoverNorm * 5 + contraBoost) * topicPenalty * stemPenalty * jitter * sessionPenalty,
     };
   });
-  scored.sort((a, b) => b.score - a.score);
+  // §11.7 甜区落地:late 加 MMR 硬过滤(Stage1 实证 early 硬过滤的副作用 lateCen +25% 需 late 压)。
+  // 与现有乘性 topicPenalty 叠加:硬过滤先剔除极相似(cen≥0.80),penalty 对剩余软惩罚,不碰评分公式。
+  const filteredLate = mmrHardFilter(scored, recent.slice(-5).map(topicVector));
+  filteredLate.sort((a, b) => b.score - a.score);
 
   // top-K 加权抽样
-  return weightedPick(scored, rand);
+  return weightedPick(filteredLate, rand);
 }
 
 /**
