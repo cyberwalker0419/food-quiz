@@ -133,3 +133,35 @@ quiz-simulation 不传 recentCounts → EMA 对主基线三数**无影响**（= 
 - **瓶颈⑥（跨 session conc）已被 SH 解**（conc 1.0→0.417，acc 不崩）——硬帽、Cluster 均无必要。
 - **第三档①（σ 重构）必要性降级**：不再为⑥（SH 已解），重定位为解 **early sw*10 锁死 / earlyCen**（single-session early 集中度，SH 不解）。任务⑨ σ 判据聚焦 early gain/earlyCen。
 - **SH 名义软实硬**（freq=1 压死热门题）：是 EMA 选题无效的根因，也是 SH 解⑥的机制。SH 强度是否需调软（让 EMA 生效 + 避免过度压制）留作独立评估，牵动 EMA/early 硬过滤可重试条件。
+
+---
+
+## SH 强度多维评估 — 临时脚本 `_sh-strength-exp.test.ts`（测完即删）
+
+补充任务③ 的 acc/conc，加选题多样性（earlyCen/lateCen）/ 题库利用率 / 跨 session 重复。
+
+> **修正任务③ 实验瑕疵**：任务③ `_hotcap-exp`「轮前读 counts」（10 session 共享）不真实——App.tsx 是每 session（startQuiz）读一次。本实验改为 session 前读（真实顺序测试），数值更准。
+
+| 指标 | baseline | SH-only | 评估 |
+|:--|:--|:--|:--|
+| conc | 1.000 | **0.275** | SH 解⑥更彻底（任务③ 轮前读 0.417 偏乐观，真实 0.275） |
+| acc | 0.9617 | 0.9617 | 完全持平，不崩 |
+| 跨 session 重复 | 4.5 | **0.1** | SH 大幅降重复（顺序压上 session 题），核心目的达成 |
+| 题库利用率 | 55/214（26%） | **164/214（77%）** | SH 让每 session 用新题，利用率翻倍 |
+| earlyCen | 0.5003 | 0.5206（+0.02） | single-session early 多样性微降 |
+| lateCen | 0.2436 | **0.3130（+29%）** | single-session late 多样性降（SH 副作用） |
+
+### 结论
+
+1. **SH 过强对跨 session 完全正面**（conc 0.275、重复 0.1、利用率 77%、acc 不崩）——「软名义实硬」恰恰实现跨 session 去重的设计目的。**SH 不需调软**（调软反损 conc/重复/利用率）。
+2. **SH 唯一副作用：single-session lateCen +29%**（SH 压 recentCounts 题 → late 可用题少 → 邻题更相似）。已由任务① late 硬过滤部分补偿（无 SH 下 lateCen 0.2643→0.2303；带 SH 下升到 0.3130，late 硬过滤的补偿效果待带 SH 重测）。
+3. **EMA 在 SH 下确认冗余**：SH 已把跨 session 重复降到 0.1，freq 衰减无空间。SH 既不调软，EMA 永远冗余。
+
+### EMA 去留建议
+
+SH 不调软 → EMA 永远冗余（选题无效，数值层正确但无落地价值）。**建议回退 EMA（c398edf）**：它增加认知负担却不产生选题效果；SH 的跨 session 去重已由"硬 SH"完整实现，无需 EMA 的"软衰减"层。若保留，须在文档标注"当前 SH 下冗余，仅 SH 调软时生效"。
+
+### 牵动可重试条件
+
+- **early 硬过滤可重试**：原条件含"SH 调软"，现 SH 不调软 → 该条件分支作废。early 重试只剩"① σ 重构（追问不再依赖同维二次探测）"或"early 加追问维保护 / 提高阈值"。
+- **任务⑨ σ 判据**：聚焦 early gain / earlyCen（SH 不解 single-session early），不依赖 SH 调软。
