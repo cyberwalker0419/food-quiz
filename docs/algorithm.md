@@ -735,6 +735,53 @@ if (typeof e.copy !== 'string' || typeof e.label !== 'string' ...) return null;
 | §5.2.2 LLM 裸扩写 | ❌ 违规 | 违反 humanizer-zh + 脚本 pipeline 铁律（CLAUDE.md） |
 | §9.2 多模态测评 | ❌ 超界 | 超出零网络纯前端味觉测试定位 |
 
+### 11.9 外部评审（范式级）：不确定性建模方向
+
+外部算法评审（2026-06-27，Adaptive Testing / Active Learning / Recommendation / Diversity / Information Theory 五视角）。评审比 §11.8 的方案高一层级——不再在现有框架内调参，而指出**框架本身的定义缺陷**。工程质量★★★★★、算法设计★★★★☆、学术创新★★★☆☆（有提升空间）。判断当前已进入第二阶段（"如何减少提问同时提升体验"），局部策略（MMR/Penalty/Threshold）收益已下降，下一阶段应转向**不确定性建模**。
+
+#### 核心诊断：gain 不是真 Active Learning（评审优先级①，且同时解瓶颈⑥）
+
+当前 `gain(q)=Σ|profile[d]|·|w[d]|`（§5.3）本质是 **Weight-based Greedy Selection**——"继续强化已有偏好"，而非"优先确认未知偏好"。
+
+**评审点出的盲区**：profile 仅维护 μ，无 σ，故无法区分：
+- Case A：辣=+100 来自 **10 道一致回答**（高置信）
+- Case B：辣=+100 来自 **1 道极端题**（低置信）
+
+二者当前完全等价，可信度却天差地别。
+
+**建议**：profile 从 `mean` 升级为 `mean + variance + sampleCount + confidence`；每题估计 **Expected Posterior Variance** 或 **Expected Entropy Reduction**，选 ΔVariance 最大而非 Gain 最大。CAT 真正进入 Active Learning 范畴。
+
+> **本项目校准——评审未点破的最大价值**：此方向**同时解瓶颈⑥**。§11.7 卡在 early `sw*10` 锁死、diversity 旋钮全无效，根因表面是犀利度主导，真正根因是 **early profile≈0 时 `Σ|profile|·|w|` 也≈0 退化均匀** → 早期无信息驱动信号 → 只能靠 `sw*10` 兜底。改用 Variance Reduction 后，early profile≈0 时**不确定性最大**，gain 不退化，diversity 项自然有发力空间。**优先级①不只是新方向，是瓶颈⑥的根因解**。
+
+#### 其余方向（评审建议 + 本项目校准）
+
+| 方向 | 评审 | 本项目校准 |
+|:--|:--|:--|
+| **Lookahead/Beam Search**（模拟未来 2-3 步） | ★★★★★ 有论文价值 | ⚠️ 是①的**下游**——"未来收益"需基于不确定性模型才定义得清；先做①，②才有意义。单独做②会沿用错误的 gain。且 214 题 × beam 成本对单次趣味测试收益未必划算，需先量化 |
+| **Thompson Sampling**（Question Reward + 在线探索） | ★★★★ 长期在线 | ⚠️ 需校准：本项目是**单次 25-45 题**趣味测试，无跨题 Reward 闭环；"在线学习"更适合多轮长期系统。单次 session 内 Thompson 信号弱，降级 |
+| **Candidate Topic Cluster**（题→Cluster→每簇保留若干→MMR） | ★★★★ 降重复感 | ✅ **独立有效，可先做**：呼应 Stage 3"conc=1 是题库结构决定"。Cluster 比 topicVector cen 稳定，且不依赖①，可立即试 |
+| **Quality-Diversity DPP**（kernel $L_{ij}=q_i q_j s_{ij}$，q=InfoGain） | ★★★ 值得实验 | ⚠️ **与 Stage 2 结论有张力**：Stage 2 证 cen 度量病态、rbf 负优化；QD-DPP 若用 cen 继承病态，用 rbf 已被证负优化。除非 Quality 项改变数值结构——不确定，需专门实验，**不能假设它绕过了我们的实证否决**，预期偏负面 |
+| **Session EMA**（`EMA←0.95·old+0.05·appear`，`×1/(1+EMA)`） | ★★★ 工程优化 | ✅ 合理：0.7^freq 滚动窗有边界效应，EMA 更平滑。ROI 中等，独立可做 |
+| MMR 参数微调 | ★ 极低 | ✅ 共识停（§11.7 已停） |
+
+#### 本项目优先级（校准后）
+
+| 序 | 方向 | 评审 | 本项目 | 理由 |
+|:--|:--|:--|:--|:--|
+| 1 | 不确定性建模（profile 加 σ，gain 改 Variance Reduction） | ★★★★★ | **★★★★★** | 评审核心，且**同时解瓶颈⑥**——优先级比评审所述更高 |
+| 2 | Candidate Topic Cluster | ★★★★ | **★★★★** | 独立于①可先做，直接降 conc |
+| 3 | Session EMA | ★★★ | **★★★** | 工程改进，顺手 |
+| 4 | Lookahead | ★★★★★ | **★★** | 是①下游，不能先于①；成本/收益需量化 |
+| 5 | QD-DPP | ★★★ | **★★** | 继承 Stage 2 否决张力，需重评，预期负面 |
+| 6 | Thompson | ★★★★ | **★** | 单次趣味测试适用性存疑 |
+
+#### 两点保留意见
+
+1. **定位克制**："学术创新有空间"准确，但本项目是趣味测试非研究系统。不确定性建模/Lookahead 方向对，但目标仍是"用更少题、更准、体验更好"，非发论文。Lookahead 的实现成本（214 题 × beam 2-3 步）对单次测试收益未必划算，需先量化再决定是否投入。
+2. **QD-DPP 诚实**：评审称"白皮书否决的是 Pure Diversity DPP"——对，但 Stage 2 连 gDPP-rbf 都否了（负优化）。QD-DPP 把 gain 放进 kernel **可能**改变数值结构，也**可能**继承 cen 病态。不能因名字多了"Quality"就假设它绕过实证否决；值得一次专门实验，但预期偏负面。
+
+> **结论**：评审核心诊断（gain 非真 Active Learning）成立，且**可能同时解 §11.7 卡住的瓶颈⑥**——这是评审最大的、连它自己都没点破的价值。下一阶段真正值得投入的是**不确定性建模**：profile 加 σ、gain 改 Expected Variance Reduction。这不是又一个局部优化，是把项目从"经验驱动"升到"概率驱动"的范式转换。Candidate Cluster 可独立先做，EMA 可顺手，Lookahead/Thompson/QD-DPP 需校准或依赖①先行。
+
 ---
 
 ## 附录 A：实验方法
