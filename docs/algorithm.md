@@ -920,7 +920,7 @@ $$\Delta\mathrm{Var}(q)=\sum_d \sigma_d^2\cdot\left(1-\frac{\sigma_d^2}{\sigma_d
 
 **决策**：第三档①**关闭**。① 对 early（SH 解⑥后唯一剩余必要性）严重负增量，对 late 无必要。§11.10.5 落地路径第三档分叉裁定为「σ 无解→① 降级，第二档收口为算法侧终点」。诚实接受 early sw*10 锁死的天花板（conc≈0.47-0.75，由 seeded jitter 决定，非采样/评分可破）。
 
-**真正解 early 锁死的方向**（非①）：early 硬过滤 + 追问维保护/提高阈值（§11.7 任务① early 可重试条件，待后续），或扩基线建立题库——而非换更强评分信号（VR/σ 强区分反而加剧锁死）。Lookahead/Thompson/QD-DPP（§11.10.4 序 9-11）均依赖①先行，随①关闭一并搁置。
+**真正解 early 锁死的方向**（非①）：扩基线建立题库（数据层，第二档任务⑦）——而非换更强评分信号（VR/σ 强区分反而加剧锁死，任务⑨①证伪），也非评分后硬过滤（任务⑨② 实证：early 硬过滤+追问维保护/提阈值对跨 session 无正收益，hard080 反使跨 session jaccard +16%/conc +20%，且跨 session 同质化已被 SH 解至 jaccard 0.050/used 100%，硬过滤无空间）。Lookahead/Thompson/QD-DPP（§11.10.4 序 9-11）均依赖①先行，随①关闭一并搁置。**early sw*10 锁死的评分/采样/过滤三条路径全部实证失败**（VR 评分层 / top-K randomesque 已饱和 / 硬过滤层），唯一剩余解是扩题库（让 early 合规基线题池变大，从源头分散）。详见 experiments.md 任务⑨②。
 
 ---
 
