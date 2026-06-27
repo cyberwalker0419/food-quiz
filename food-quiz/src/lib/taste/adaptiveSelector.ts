@@ -80,8 +80,9 @@ const TOP_K = 12;
 const TOP_K_WEIGHTS = [
   0.15, 0.13, 0.11, 0.10, 0.09, 0.08, 0.07, 0.06, 0.06, 0.05, 0.05, 0.05,
 ];
-/** 跨 session 频次衰减(轻量 SH):最近 3 轮每题出现 freq 次 → 评分 × 此值^freq(0.7^freq)。
- *  freq=1 ×0.7(沿用 P9 二元基线),freq=2 ×0.49,freq=3 ×0.34——频次越高惩罚越重,压跨 session 高频垄断题。 */
+/** 跨 session 频次衰减(轻量 SH):recentCounts 的 freq(sessionMemory EMA 加权:最近轮=1.0、
+ *  前轮=0.5、再前轮=0.25 跨轮累加)→ 评分 × 此值^freq(0.7^freq)。freq 越高惩罚越重,压跨 session
+ *  高频垄断题;EMA 让旧轮次重复惩罚轻于最近轮次(口味漂移 / 遗忘容忍)。freq 浮点仍单调降。 */
 export const SESSION_SOFT_PENALTY = 0.7;
 /** P9 多样性:早期 seeded 抖动(乘性,只作用于 std+coverage,不动 sw*10 犀利度分层)。 */
 const EARLY_JITTER_LO = 0.3;

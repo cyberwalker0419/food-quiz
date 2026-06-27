@@ -46,16 +46,26 @@ export function loadRecentAskedIds(maxSessions: number = MAX_SESSIONS): string[]
   return all.slice(Math.max(0, all.length - maxSessions)).flat();
 }
 
+/** EMA 轮次距离衰减:最近 1 轮 distance=0→weight=1.0;2 轮前→0.5;3 轮前→0.25。
+ *  比所有轮次等权计数更合理——旧轮次重复惩罚轻(口味漂移 / 遗忘容忍),最近轮次惩罚重。 */
+const EMA_DECAY = 0.5;
+
 /**
- * 读取最近 maxSessions 轮每题的出现频次(P11 轻量 SH 频次衰减用)。
- * loadRecentAskedIds 拼平后重复 id 本就多次出现——这里计数还原频次,供 pickNextQuestion
- * 做 SESSION_SOFT_PENALTY^freq 衰减:freq 越高惩罚越重,压制跨 session 高频垄断题。
- * (此前 App 用 new Set(loadRecentAskedIds()) 把频次去重了,本函数恢复它。)
+ * 读取最近 maxSessions 轮每题的 EMA 加权频次(P11 轻量 SH 频次衰减用)。
+ * 不再走 loadRecentAskedIds 的拼平等权计数(.flat 丢轮次),而是直接读 readRaw 保留轮次结构、
+ * 按距离加权:末尾=最近一轮 distance=0 weight=1.0,往前 distance 递增 weight=EMA_DECAY^distance,
+ * 同题跨轮累加。供 pickNextQuestion 做 SESSION_SOFT_PENALTY^freq(0.7^freq,freq 浮点仍单调降)。
  */
 export function loadRecentAskedCounts(maxSessions: number = MAX_SESSIONS): Map<string, number> {
+  const all = readRaw();
+  const recent = all.slice(Math.max(0, all.length - maxSessions));
   const counts = new Map<string, number>();
-  for (const id of loadRecentAskedIds(maxSessions)) {
-    counts.set(id, (counts.get(id) ?? 0) + 1);
+  for (let i = 0; i < recent.length; i++) {
+    const distance = recent.length - 1 - i;  // 末尾(最近)→distance=0
+    const weight = EMA_DECAY ** distance;
+    for (const id of recent[i]!) {
+      counts.set(id, (counts.get(id) ?? 0) + weight);
+    }
   }
   return counts;
 }
