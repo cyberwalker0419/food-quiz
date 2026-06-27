@@ -17,6 +17,8 @@ import {
   EXACT_DEDUP_THRESHOLD,
   COVER_OVERLAP_THRESHOLD,
   TOPIC_OVERLAP_THRESHOLD,
+  MMR_DIV_WEIGHT,
+  MMR_HARD_FLOOR,
   GLOBAL_DEDUP_WINDOW,
   THEME_SIM,
   INCONSISTENCY_GAP,
@@ -571,8 +573,12 @@ describe('P7.1 二级 + 三级去重常量', () => {
   it('COVER_OVERLAP_THRESHOLD = 3', () => {
     expect(COVER_OVERLAP_THRESHOLD).toBe(3);
   });
-  it('TOPIC_OVERLAP_THRESHOLD = 0.80(P10 去中心化量纲)', () => {
+  it('TOPIC_OVERLAP_THRESHOLD = 0.80(P11 MMR 极相似硬线触发点,沿用 P10 去中心化量纲)', () => {
     expect(TOPIC_OVERLAP_THRESHOLD).toBe(0.80);
+  });
+  it('MMR_DIV_WEIGHT = 0.6 / MMR_HARD_FLOOR = 0.3(P11 连续去冗余 + 极相似安全网)', () => {
+    expect(MMR_DIV_WEIGHT).toBe(0.6);
+    expect(MMR_HARD_FLOOR).toBe(0.3);
   });
   it('EXACT_DEDUP_THRESHOLD = 0.95(P10 去中心化量纲,拦 top5%)', () => {
     expect(EXACT_DEDUP_THRESHOLD).toBe(0.95);
@@ -733,30 +739,46 @@ describe('P9 跨 session 多样性(seeded 抖动 + 覆盖奖励)', () => {
     expect(used.size).toBeGreaterThanOrEqual(90);
   });
 
-  it('跨 session 软惩罚生效:把"本会被选中"的题加入 recentSessionIds,会改变选择', () => {
-    // pickNextQuestion 纯函数 → 同 seed 下"默认首选"确定。惩罚它(×0.7)应在某些 seed 改变结果。
+  it('跨 session 频次衰减生效:把"本会被选中"的题以 freq=1 加入 recentCounts,会改变选择', () => {
+    // pickNextQuestion 纯函数 → 同 seed 下"默认首选"确定。惩罚它(×0.7^1)应在某些 seed 改变结果。
     let changed = 0;
     for (let seed = 0; seed < 100; seed++) {
       const s = 5000 + seed;
       const normal = pickNextQuestion(makeState([], [], ZERO_VECTOR), s);
       if (!normal) continue;
-      const penalized = pickNextQuestion(makeState([], [], ZERO_VECTOR), s, new Set([normal.id]));
+      const penalized = pickNextQuestion(makeState([], [], ZERO_VECTOR), s, new Map([[normal.id, 1]]));
       if (penalized && penalized.id !== normal.id) changed++;
     }
     expect(changed).toBeGreaterThan(0);
   });
 
-  it('软惩罚是软的:recentSessionIds 含全部题时仍能返回有效题(不硬过滤)', () => {
-    const all = new Set(questionBank.questions.map((q) => q.id));
+  it('频次衰减是软的:recentCounts 含全部题(freq=1)时仍能返回有效题(不硬过滤)', () => {
+    const all = new Map(questionBank.questions.map((q) => [q.id, 1] as [string, number]));
     const q = pickNextQuestion(makeState([], [], ZERO_VECTOR), 42, all);
     expect(q).not.toBeNull();
     expect(q?.id).toBeTruthy();
   });
 
-  it('recentSessionIds 默认空集 → 与不传第三参行为一致', () => {
+  it('recentCounts 默认空 Map → 与不传第三参行为一致', () => {
     const a = pickNextQuestion(makeState([], [], ZERO_VECTOR), 777);
-    const b = pickNextQuestion(makeState([], [], ZERO_VECTOR), 777, new Set());
+    const b = pickNextQuestion(makeState([], [], ZERO_VECTOR), 777, new Map());
     expect(a?.id).toBe(b?.id);
+  });
+
+  it('P11 轻量 SH 频次衰减:freq 越高惩罚越重——freq=2 挤掉首选的次数 ≥ freq=1', () => {
+    // 同 seed 下,把"首选题"分别按 freq=1 / freq=2 传入;0.7^2=0.49 < 0.7^1=0.7 → freq=2 更易挤掉首选。
+    let changedByFreq1 = 0, changedByFreq2 = 0;
+    for (let seed = 0; seed < 100; seed++) {
+      const s = 6000 + seed;
+      const normal = pickNextQuestion(makeState([], [], ZERO_VECTOR), s);
+      if (!normal) continue;
+      const p1 = pickNextQuestion(makeState([], [], ZERO_VECTOR), s, new Map([[normal.id, 1]]));
+      const p2 = pickNextQuestion(makeState([], [], ZERO_VECTOR), s, new Map([[normal.id, 2]]));
+      if (p1 && p1.id !== normal.id) changedByFreq1++;
+      if (p2 && p2.id !== normal.id) changedByFreq2++;
+    }
+    expect(changedByFreq2).toBeGreaterThan(0);
+    expect(changedByFreq2).toBeGreaterThanOrEqual(changedByFreq1);
   });
 });
 
@@ -865,6 +887,67 @@ describe('P10 先决:去中心化 dedup 度量', () => {
     }
     expect(n).toBeGreaterThan(0);
     expect(cenSum / n).toBeLessThan(rawSum / n);
+  });
+});
+
+describe('P11 MMR 连续去冗余(后期 topicPenalty 连续化)', () => {
+  // penalty(mmrMax) = 1 − MMR_DIV_WEIGHT·clamp(mmrMax,0,1);mmrMax ≥ TOPIC_OVERLAP_THRESHOLD 再 floor MMR_HARD_FLOOR
+  function penalty(mmrMax: number): number {
+    const c = Math.max(0, Math.min(1, mmrMax));
+    let p = 1 - MMR_DIV_WEIGHT * c;
+    if (mmrMax >= TOPIC_OVERLAP_THRESHOLD) p = Math.min(p, MMR_HARD_FLOOR);
+    return p;
+  }
+
+  it('惩罚形状:mmrMax=0→1;0.5→0.70;负值截 0 不奖励(形状相反=天然多样)', () => {
+    expect(penalty(0)).toBe(1);
+    expect(penalty(0.5)).toBeCloseTo(0.7, 5);
+    expect(penalty(-0.5)).toBe(1);
+  });
+
+  it('极相似硬线:mmrMax ≥ 0.80 → penalty 封顶 MMR_HARD_FLOOR(0.3)', () => {
+    expect(penalty(0.8)).toBe(MMR_HARD_FLOOR);
+    expect(penalty(0.95)).toBe(MMR_HARD_FLOOR);
+  });
+
+  it('连续单调(floor 前):mmrMax 升 → penalty 严格降,消原 P7.1 离散阈值突变', () => {
+    expect(penalty(0.3)).toBeGreaterThan(penalty(0.5));
+    expect(penalty(0.5)).toBeGreaterThan(penalty(0.7));
+    // 0.79 vs 0.81:原 P7.1 离散在此突变(0.79→×1, 0.81→×0.3);MMR 连续(0.79 未 floor≈0.526,0.81 floor 0.3)
+    expect(penalty(0.79)).toBeCloseTo(1 - MMR_DIV_WEIGHT * 0.79, 5);
+    expect(penalty(0.81)).toBe(MMR_HARD_FLOOR);
+  });
+
+  it('集成:后期 MMR 不破坏选题(3 画像 × 4 seed,出题数 ∈ [MIN,MAX],全 id 唯一)', () => {
+    const targets: WeightVector[] = [
+      { sour: 90, sweet: 30, bitter: 80, spicy: 0, salty: 20, rich: 40, crunchy: 60, tender: 30 },
+      { sour: 10, sweet: 20, bitter: 10, spicy: 95, salty: 60, rich: 70, crunchy: 30, tender: 40 },
+      { sour: 20, sweet: 90, bitter: 0, spicy: 10, salty: 30, rich: 80, crunchy: 20, tender: 70 },
+    ];
+    for (const target of targets) {
+      for (let s = 0; s < 4; s++) {
+        const askedIds: string[] = [];
+        const answers: { questionId: string; weights?: WeightVector }[] = [];
+        let profile: WeightVector = { ...ZERO_VECTOR };
+        const seed = 9000 + s * 37;
+        for (let step = 0; step < MAX_QUESTIONS; step++) {
+          const q = pickNextQuestion(makeState(askedIds, answers, profile), seed + step);
+          if (!q) break;
+          let bestOpt = q.options[0]!;
+          let bestSim = -Infinity;
+          for (const o of q.options) {
+            const sim = cosineSim(o.weights, target);
+            if (sim > bestSim) { bestSim = sim; bestOpt = o; }
+          }
+          askedIds.push(q.id);
+          answers.push({ questionId: q.id });
+          for (const k of Object.keys(profile) as (keyof WeightVector)[]) profile[k] += bestOpt.weights[k] || 0;
+          if (shouldStop(makeState(askedIds, answers, profile))) break;
+        }
+        expect(askedIds.length).toBeGreaterThanOrEqual(MIN_QUESTIONS);
+        expect(new Set(askedIds).size).toBe(askedIds.length);
+      }
+    }
   });
 });
 

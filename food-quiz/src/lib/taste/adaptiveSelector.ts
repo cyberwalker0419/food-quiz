@@ -23,9 +23,17 @@ export const LATE_SHARP_RATIO = 0.6;
 export const EXACT_DEDUP_THRESHOLD = 0.95;
 /** 二级去重:与最近 2-5 题维度覆盖重合数 > 此值视为覆盖雷同,跳过。 */
 export const COVER_OVERLAP_THRESHOLD = 3;
-/** 三级去重:与最近 5 题主题向量去中心化余弦 ≥ 此值的题,评分阶段 × 0.3^n 降权。
- *  P10 先决:去中心化量纲,对齐 p73≈0.815,软降权拦 top ~27% 中高相似(比 exact 松)。 */
+/** P11 MMR 极相似硬线触发点:候选与已选(最近 5 题)最大去中心化相似度 mmrMax ≥ 此值
+ *  → 惩罚封顶 ≤ MMR_HARD_FLOOR(安全网)。P10 先决沿用去中心化量纲,对齐 p73≈0.815。
+ *  语义从 P7.1「三级去重 ×0.3^n 计数」改为「MMR 安全网 floor 触发点」(连续惩罚为主,此为兜底)。 */
 export const TOPIC_OVERLAP_THRESHOLD = 0.80;
+/** P11 MMR 连续去冗余(替换 P7.1 离散 topicPenalty):mmrMax 的乘性惩罚斜率。
+ *  penalty = 1 − MMR_DIV_WEIGHT × clamp(mmrMax,0,1);负值(形状相反=天然多样)截 0 不奖不罚。
+ *  max 替代计数(被"最相似那题"主导,精准压换皮)、连续替代阈值(消 0.80 附近突变)。
+ *  标定 0.6:mmrMax=0.5→penalty 0.70;0.8→0.52(再 floor 0.3);0.95→0.43(再 floor 0.3)。 */
+export const MMR_DIV_WEIGHT = 0.6;
+/** P11 MMR 极相似安全网:mmrMax ≥ TOPIC_OVERLAP_THRESHOLD 时惩罚封顶,对齐原 P7.1 离散 ×0.3 强度。 */
+export const MMR_HARD_FLOOR = 0.3;
 /** 四级全局去重:最近 N 题窗口内,同一题最多出现 1 次。 */
 export const GLOBAL_DEDUP_WINDOW = 10;
 /** 追问机制 A(同主题强弱不一致):两题主题向量余弦 ≥ 此值视为同主题。 */
@@ -72,7 +80,8 @@ const TOP_K = 12;
 const TOP_K_WEIGHTS = [
   0.15, 0.13, 0.11, 0.10, 0.09, 0.08, 0.07, 0.06, 0.06, 0.05, 0.05, 0.05,
 ];
-/** 跨 session 软惩罚:最近 3 轮出过的题,评分 × 此值(轻惩罚,不禁止)。 */
+/** 跨 session 频次衰减(轻量 SH):最近 3 轮每题出现 freq 次 → 评分 × 此值^freq(0.7^freq)。
+ *  freq=1 ×0.7(沿用 P9 二元基线),freq=2 ×0.49,freq=3 ×0.34——频次越高惩罚越重,压跨 session 高频垄断题。 */
 export const SESSION_SOFT_PENALTY = 0.7;
 /** P9 多样性:早期 seeded 抖动(乘性,只作用于 std+coverage,不动 sw*10 犀利度分层)。 */
 const EARLY_JITTER_LO = 0.3;
@@ -450,8 +459,9 @@ export function pickNextQuestion(
     profile: WeightVector;
   },
   seed: number,
-  /** P9 跨 session 记忆:最近几轮出过的题 id,评分阶段施轻惩罚(不禁止)。默认空集。 */
-  recentSessionIds: ReadonlySet<string> = new Set(),
+  /** P11 轻量 SH(跨 session 频次衰减):最近几轮每题出现频次 → SESSION_SOFT_PENALTY^freq 衰减。
+   *  freq 越高惩罚越重(0 次 ×1,1 次 ×0.7,2 次 ×0.49,3 次 ×0.34),压制跨 session 高频垄断题。默认空 Map。 */
+  recentCounts: ReadonlyMap<string, number> = new Map(),
 ): QuizQuestion | null {
   const count = state.askedIds.length;
 
@@ -533,8 +543,8 @@ export function pickNextQuestion(
       const stemCount = stemCounts.get(q.stem) ?? 0;
       const stemPenaltyIdx = Math.min(stemCount, STEM_DEDUP_SOFT_PENALTY.length - 1);
       const stemPenalty = STEM_DEDUP_SOFT_PENALTY[stemPenaltyIdx]!;
-      // P9 跨 session 软惩罚
-      const sessionPenalty = recentSessionIds.has(q.id) ? SESSION_SOFT_PENALTY : 1;
+      // P11 轻量 SH:跨 session 频次衰减(0.7^freq)
+      const sessionPenalty = SESSION_SOFT_PENALTY ** (recentCounts.get(q.id) ?? 0);
       return {
         q,
         // ①+②:归一化 + jitter 只碰 covTerm(stdTerm 固定不抖);sw*10 主导分层,covTerm 提供多样性打散
@@ -568,14 +578,18 @@ export function pickNextQuestion(
     }
     // 归一化:lowResDims.size = 4,典型 tv 单维 0~100 → 0~400
     const lowCoverNorm = Math.min(1, lowCover / 100);
-    // 4) 三级降权:与最近 5 题主题向量余弦 ≥ 0.7 的,每次重合 × 0.3
-    let topicPenalty = 1;
+    // 4) P11 MMR 连续去冗余(替换 P7.1 离散 topicPenalty):
+    //    max-sim 替代计数(被"最相似那题"主导,精准压换皮;原离散按超阈个数,单点极像漏判);
+    //    连续替代阈值(0.80 附近 0.79/0.81 突变消除);负值(形状相反=天然多样)截 0 不奖不罚。
     const last5 = recent.slice(-5);
+    let mmrMax = 0;
     for (const r of last5) {
-      if (centeredSig(tv, topicVector(r)) >= TOPIC_OVERLAP_THRESHOLD) {
-        topicPenalty *= 0.3;
-      }
+      const s = centeredSig(tv, topicVector(r));
+      if (s > mmrMax) mmrMax = s;
     }
+    let topicPenalty = 1 - MMR_DIV_WEIGHT * Math.max(0, Math.min(1, mmrMax));
+    // 极相似硬线(安全网):mmrMax ≥ TOPIC_OVERLAP_THRESHOLD(近换皮)→ 惩罚封顶 ≤ MMR_HARD_FLOOR
+    if (mmrMax >= TOPIC_OVERLAP_THRESHOLD) topicPenalty = Math.min(topicPenalty, MMR_HARD_FLOOR);
     // 5) P8.1:stem 全 session 软惩罚(累计出现 n 次 → 评分 × penalty[n])
     const stemCount = stemCounts.get(q.stem) ?? 0;
     const stemPenaltyIdx = Math.min(stemCount, STEM_DEDUP_SOFT_PENALTY.length - 1);
@@ -599,7 +613,7 @@ export function pickNextQuestion(
     // P9:再乘 seeded modest 抖动(打散固有排名)+ 跨 session 软惩罚
     const jr = jitterRng(seed, count, q.id);
     const jitter = LATE_JITTER_LO + jr() * (LATE_JITTER_HI - LATE_JITTER_LO);
-    const sessionPenalty = recentSessionIds.has(q.id) ? SESSION_SOFT_PENALTY : 1;
+    const sessionPenalty = SESSION_SOFT_PENALTY ** (recentCounts.get(q.id) ?? 0);
     return {
       q,
       score: (gain * (0.6 + 0.4 * sw) + gain * 0.3 * lowCoverNorm + lowCoverNorm * 5 + contraBoost) * topicPenalty * stemPenalty * jitter * sessionPenalty,

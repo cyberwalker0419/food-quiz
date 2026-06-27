@@ -47,6 +47,20 @@ export function loadRecentAskedIds(maxSessions: number = MAX_SESSIONS): string[]
 }
 
 /**
+ * 读取最近 maxSessions 轮每题的出现频次(P11 轻量 SH 频次衰减用)。
+ * loadRecentAskedIds 拼平后重复 id 本就多次出现——这里计数还原频次,供 pickNextQuestion
+ * 做 SESSION_SOFT_PENALTY^freq 衰减:freq 越高惩罚越重,压制跨 session 高频垄断题。
+ * (此前 App 用 new Set(loadRecentAskedIds()) 把频次去重了,本函数恢复它。)
+ */
+export function loadRecentAskedCounts(maxSessions: number = MAX_SESSIONS): Map<string, number> {
+  const counts = new Map<string, number>();
+  for (const id of loadRecentAskedIds(maxSessions)) {
+    counts.set(id, (counts.get(id) ?? 0) + 1);
+  }
+  return counts;
+}
+
+/**
  * 记录一轮测试的 askedIds,追加进滚动窗口(保留最近 MAX_SESSIONS 轮)。
  * 同一轮重复调用会重复追加——调用方应仅在 quiz 完成时调用一次。
  */

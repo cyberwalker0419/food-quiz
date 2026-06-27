@@ -3,7 +3,7 @@ import { initialState, applyAnswer, undoLast, type QuizState } from './lib/taste
 import { pickNextQuestion, shouldStop, MIN_QUESTIONS, MAX_QUESTIONS } from './lib/taste/adaptiveSelector'
 import { assembleResult, type AssembledResult } from './lib/taste/result'
 import { downloadShareCard, preloadShareCardFonts } from './utils/shareImage'
-import { loadRecentAskedIds, recordSession } from './utils/sessionMemory'
+import { loadRecentAskedCounts, recordSession } from './utils/sessionMemory'
 import { ResultCard } from './components/ResultCard'
 import { RandomDish } from './components/RandomDish'
 import type { QuizQuestion, DietaryRestriction } from './lib/taste/types'
@@ -41,9 +41,9 @@ function App() {
   const [copyToast, setCopyToast] = useState(false)
   const [dietary, setDietary] = useState<DietaryRestriction[]>([])
   const [noRestriction, setNoRestriction] = useState(false)
-  // P9 跨 session 记忆:本轮启动时读一次最近几轮出过的题 id,传给 pickNextQuestion 施轻惩罚。
+  // P11 跨 session 频次记忆(轻量 SH):本轮启动时读最近几轮每题出现频次,传给 pickNextQuestion 做 0.7^freq 衰减。
   // 用 ref 而非 state——它不参与渲染,且两处回调都要稳定读到同一份。
-  const recentSessionIds = useRef<Set<string>>(new Set(loadRecentAskedIds()))
+  const recentSessionCounts = useRef<Map<string, number>>(loadRecentAskedCounts())
 
   // P7.2 顶层预加载分享卡字体,确保 result 阶段字体已就绪
   useEffect(() => {
@@ -54,8 +54,8 @@ function App() {
     setDietary(diet)
     const newSeed = Math.floor(Math.random() * 1000000)
     setSeed(newSeed)
-    // P9:每轮重新读取跨 session 记忆(上一轮刚 recordSession 写入的会进来)
-    recentSessionIds.current = new Set(loadRecentAskedIds())
+    // P11:每轮重新读取跨 session 频次(上一轮刚 recordSession 写入的会进来)
+    recentSessionCounts.current = loadRecentAskedCounts()
     setPhase('quiz')
     setState(initialState())
     setCurrentQuestion(null)
@@ -72,7 +72,7 @@ function App() {
     const q = pickNextQuestion(
       { askedIds: state.askedIds, answers: state.answers, profile: state.profile },
       seed,
-      recentSessionIds.current,
+      recentSessionCounts.current,
     )
     if (q) setCurrentQuestion({ q, rerolled: false })
   }, [phase, currentQuestion, state, seed])
@@ -98,7 +98,7 @@ function App() {
         const nextQ = pickNextQuestion(
           { askedIds: newState.askedIds, answers: newState.answers, profile: newState.profile },
           seed,
-          recentSessionIds.current,
+          recentSessionCounts.current,
         )
         if (nextQ) {
           setCurrentQuestion({ q: nextQ, rerolled: true })
