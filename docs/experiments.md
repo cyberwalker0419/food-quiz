@@ -101,3 +101,35 @@ quiz-simulation 不传 recentCounts → EMA 对主基线三数**无影响**（= 
 
 ① 仍可能必要的部分：① 还针对 §11.7 Stage1 的「early sw*10 锁死」（early 评分锁死、diversity 旋钮无效、earlyCen 高）。这是 **single-session early 集中度**，非跨 session conc，SH 不解此。
 故①的必要性从「解⑥（跨 session conc）」重定位为「解 early sw*10 锁死 / earlyCen」。任务⑨（σ 可行性实验）的判据相应聚焦 early gain 是否退化、earlyCen 是否降，不再看跨 session conc。
+
+---
+
+## 任务④ Candidate Cluster 必要性诊断 — 临时脚本 `_cluster-exp.test.ts`（测完即删）
+
+轻量诊断（不改正式代码）：测现状（四级去重 + P8.1 stem 软惩罚 + late 双重惩罚）下，closestTo 40 session 内同 stem 最大出现次数。
+
+| 指标 | 值 |
+|:--|:--|
+| max stem count 分布（1/2/3/4/5+） | **40 / 0 / 0 / 0 / 0** |
+| 全局 max stem | **1** |
+| max≥3 的 session | 0/40 |
+
+**结论**：现状下 single-session 内同 stem 题最多出现 **1 次**（40/40 session 全部）。Cluster（限同 stem ≤m，m=2/3）**完全无增量**——现状 ≤1 已严于 m=2 的目标。→ **Cluster 弃**，无落地必要。
+
+与任务③ 一致：conc 类问题已被现有机制全覆盖——**跨 session conc by SH（0.417）**，**single-session stem 集中 by 四级去重 + stem 软惩罚（≤1）**。Cluster、热度硬帽均无增量空间，均不落地。
+
+---
+
+## 第一档总结
+
+| 任务 | 结论 | 落地 |
+|:--|:--|:--|
+| ① §11.7 late MMR 硬过滤 | lateCen −12.9%，三数持平；early 四重代价弃·可重试 | late 落地（860e812），early 暂缓 |
+| ② Session EMA | 加权数值正确；选题待 SH 调软（SH 过强 freq=1 压死题） | 落地（c398edf），SH 强度重评留任务③ |
+| ③ A 热度硬帽判据 | SH-only conc 0.417（−58%）解⑥；硬帽零增量 | 不落地（SH 已够） |
+| ④ Candidate Cluster | 现状 stem ≤1，Cluster 无增量 | 弃 |
+
+**重大方向调整**：
+- **瓶颈⑥（跨 session conc）已被 SH 解**（conc 1.0→0.417，acc 不崩）——硬帽、Cluster 均无必要。
+- **第三档①（σ 重构）必要性降级**：不再为⑥（SH 已解），重定位为解 **early sw*10 锁死 / earlyCen**（single-session early 集中度，SH 不解）。任务⑨ σ 判据聚焦 early gain/earlyCen。
+- **SH 名义软实硬**（freq=1 压死热门题）：是 EMA 选题无效的根因，也是 SH 解⑥的机制。SH 强度是否需调软（让 EMA 生效 + 避免过度压制）留作独立评估，牵动 EMA/early 硬过滤可重试条件。
