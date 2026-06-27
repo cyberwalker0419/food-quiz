@@ -679,6 +679,17 @@ if (typeof e.copy !== 'string' || typeof e.label !== 'string' ...) return null;
 
 > **新瓶颈⑥（待评估）**：early 犀利度分层 `sw*10` 锁死选题，使集中度冲到 1.0、diversity 量级旋钮无效。若要进一步降集中度，需把 early 的"犀利度主导"改为"犀利度+多样性联合"，或扩充基线建立题的题库多样性。这是 Stage 1 发现的派生瓶颈，ROI 待估。
 
+#### 落地复核（commit 860e812）：early 硬过滤伤追问，暂缓；late 落地
+
+§11.7 三阶段结论（early+late 都用硬过滤）在 forceMax+wobble 画像下成立，但工程化落地到 quiz-simulation（closestTo + 追问机制）时暴露盲区：
+
+- **盲区**：§11.7 指标只有 acc/conc/earlyCen/lateCen，**未测追问触发率**（pursueRate）。forceMax 画像始终选最强烈选项、无摇摆，追问机制不触发，故 early 硬过滤的追问代价不可见。
+- **early 硬过滤实测伤追问**：early 分支硬剔除"与 recent cen≥0.80"的同维候选，误杀摇摆画像机制B 所需的**同维二次探测**——摇摆画像 step%5 用 closestTo 选 spicy 强题 q_a，下次本应再选同维 q_b 形成"先强后弱"波动信号，但 q_a/q_b 同维→cen≥0.80→q_b 被 early 硬过滤误杀→spicy 维只有单次强表态、无强-弱对比→机制B 哑火。实测 pursueRate **41%→28%**、mean 27.4→26.2。
+- **结构性冲突**：同维追问题与换皮题在 topicVector cen 上无法区分（都 cen≥0.80），非调阈值能轻易调和——除非阈值高到只剔真正换皮（cen≥0.95），但那样 earlyCen 降幅有限。
+- **late 硬过滤无回归**：late 不改 profile/pursue 状态（pursue.size 由 early 积累的 profile 决定），只影响 ≥25 题后选题序列，故 quiz-simulation 三数全持平（平均 27.4 / 机制B 41% / 重复 0）。late 收益（降 lateCen）沿用 §11.7 forceMax 实证，closestTo 下未单独量化。
+
+**决策**：early 硬过滤暂缓（留任务③ A 判据实验定可行阈值/条件，或确认⑥需根因解①）；late 硬过滤落地（`mmrHardFilter` helper，与乘性 topicPenalty 叠加）。**§11.7"earlyCen −32% 近乎免费"修正为：仅在无追问机制的画像下成立；closestTo+追问语境下 early 多样性的代价是 pursueRate −13pp。**
+
 ### 11.8 外部方案评审：有效候选方向
 
 外部《自适应测评系统算法优化方案》评审（docx，2026-06-27）。方向与三阶段实验趋同，但核心公式（乘性 λ·penalty）、删 early/late 分支、α/SE 临床指标已被 §11.7 证伪或不适用，不采纳为实施依据。抽出仍有效的 5 点，按 ROI 排序纳入后续候选：
