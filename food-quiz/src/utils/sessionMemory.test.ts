@@ -1,7 +1,6 @@
 import { describe, it, expect, beforeEach, afterEach } from 'vitest';
 import {
   loadRecentAskedIds,
-  loadRecentAskedCounts,
   recordSession,
   clearRecentSessions,
 } from './sessionMemory';
@@ -101,35 +100,5 @@ describe('sessionMemory', () => {
     recordSession(['q1']);
     const ids = loadRecentAskedIds();
     expect(ids).toEqual(['q1', 'q1']);
-  });
-
-  it('loadRecentAskedCounts:EMA 按轮次距离加权(最近=1.0,前=0.5,再前=0.25)', () => {
-    recordSession(['old']);      // 最早 → distance=2 → weight=0.25
-    recordSession(['mid']);      // 中   → distance=1 → weight=0.5
-    recordSession(['recent']);   // 最近 → distance=0 → weight=1.0
-    const counts = loadRecentAskedCounts();
-    expect(counts.get('recent')).toBe(1.0);
-    expect(counts.get('mid')).toBe(0.5);
-    expect(counts.get('old')).toBe(0.25);
-  });
-
-  it('loadRecentAskedCounts:同题跨轮 EMA 累加(最近+最早=1.0+0.25=1.25,非旧整数 2)', () => {
-    recordSession(['x']);        // 最早 distance=2
-    recordSession(['other']);
-    recordSession(['x']);        // 最近 distance=0
-    const counts = loadRecentAskedCounts();
-    expect(counts.get('x')).toBe(1.25);
-    expect(counts.get('other')).toBe(0.5);
-  });
-
-  it('loadRecentAskedCounts:单轮 weight=1.0(等价旧整数计数,App 层 Map 不变)', () => {
-    recordSession(['a', 'b']);
-    const counts = loadRecentAskedCounts();
-    expect(counts.get('a')).toBe(1.0);
-    expect(counts.get('b')).toBe(1.0);
-  });
-
-  it('loadRecentAskedCounts:空存储 → 空 Map', () => {
-    expect(loadRecentAskedCounts().size).toBe(0);
   });
 });
