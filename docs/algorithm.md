@@ -619,8 +619,65 @@ if (typeof e.copy !== 'string' || typeof e.label !== 'string' ...) return null;
 | ③ 温度维不可达 | 数据制约 | ❌ 需扩题库 | 中（数据层） |
 | ④ joint 缺失 | 已接受闭环 | — | — |
 | ⑤ 文案同质化 | 数据层 | ❌ 需 humanizer | **高**（用户原声） |
+| ⑥ early 犀利度锁死 | 算法架构 | ⚠️ 待评估 | 中（降集中度需重构 early） |
 
-> **结论**：算法层唯一值得动手的是**瓶颈 ①（MMR 下沉 early）**——它是"已优化区段（后期）与主体体验区段（前期）错配"的设计缺陷，而非帕累托边界。其余要么是刻意取舍（②）、数据制约（③⑤）、已闭环（④）。
+> **结论**：算法层唯一值得动手的是**瓶颈 ①（MMR 下沉 early）**——它是"已优化区段（后期）与主体体验区段（前期）错配"的设计缺陷，而非帕累托边界。其余要么是刻意取舍（②）、数据制约（③⑤）、已闭环（④）、派生待评（⑥）。**§11.7 三阶段实验已实证**：MMR 下沉 early（硬过滤形态）早期邻对 cen −32% 且准确度近乎免费；gDPP 二次否决；集中度 conc=1 是 early 犀利度分层硬约束（瓶颈⑥）。
+
+### 11.7 三阶段甜区实验（目标函数翻转：体验为主，准确度为成本）
+
+**动机**：趣味测试的"结果"是性格标签 + 分享卡，非临床诊断，用户对 ±10% 画像偏差无感，但对"邻题雷同 / 跨次同题"直接感知且反感。故将目标函数从"准确度为主、多样性为约束"翻转为"体验为主、准确度为成本"，找甜区。
+
+**方法**：3 stage 一次性 `_stage{1,2,3}-exp.test.ts`（forceMax+wobble，5 画像 × 8 seed = 40 session/cfg，测完即删）。指标：acc=cos(normalize(profile),normalize(target))↑好、conc=单题最高出场率↓好、earlyCen/lateCen=邻对 cen↓好。
+
+#### Stage 1：MMR scope × early diversity 量级
+
+扫描 MMR scope {late(现状) / both(下沉 early)} × earlyDivScale {2,5,10}。**关键发现：early 评分被 `sw*10` 犀利度分层锁死，乘性 topicPenalty 与 diversity 量级旋钮均无效（6 格数据全同）；唯有把 MMR 做成 early 的硬过滤（top-K 内剔除与 recent cen≥0.80）才生效。**
+
+| cfg | acc | dAcc | earlyCen | dEarly | lateCen |
+|:--|:--|:--|:--|:--|:--|
+| late/scale2（≈现状） | 0.9529 | — | 0.5135 | — | 0.5213 |
+| **both/scale2（MMR 下沉 early 硬过滤）** | **0.9547** | **+0.0018** | **0.3478** | **−0.1657（−32%）** | 0.6538 |
+
+- **早期邻对 cen −32%，准确度几乎免费**（+0.0018，印证"早期 profile≈0，换多样性无成本"）。
+- **副作用：lateCen 恶化 +25%**（0.5213→0.6538）——early 硬过滤改变 askedIds 序列，late 的 MMR 反而更难压。需 late 也用硬过滤（Stage 2 已做）。
+- **scale 旋钮无效**：early diversity 不能靠加权，只能靠硬排除。
+
+#### Stage 2：gDPP 干净重评（用户点名项）
+
+在 both 配置上对比 diversity 方法 {MMR·last5 / gDPP-cen / gDPP-rbf}，penalty 同斜率 0.6 公平对比，early+late 都用硬过滤让 diversity 发力。
+
+| method | acc | earlyCen | lateCen |
+|:--|:--|:--|:--|
+| **mmr** | **0.9602** | 0.3433 | **0.3415** |
+| gdpp-cen | 0.9602 | 0.3433 | 0.3415 |
+| gdpp-rbf | 0.9564 | 0.3388 | 0.5686 |
+
+- **gDPP-cen 与 MMR 完全相同**——cen kernel 下 proj energy 极小，gain≈0，penalty≈1，等效无惩罚。**实证度量病态**（§5.10 诊断②复现）。
+- **gDPP-rbf 负优化**：lateCen +66%（0.3415→0.5686），acc 还降 0.0038。RBF kernel 把太多有用候选误剔。**换度量救不活 gDPP，反劣化**（诊断③确认）。
+- **结论：gDPP 不上，MMR 够用**。MMR·last5（硬过滤形态）early+late 双低、acc 最高，是甜区 diversity 方法。
+
+#### Stage 3：TOP_K × 权重陡峭度（集中度扫描）
+
+扫描 TOP_K {8,12,16} × shape {flat/current/steep}，基于 MMR early+late 硬过滤配置。
+
+| cfg | acc | conc | earlyCen | lateCen |
+|:--|:--|:--|:--|:--|
+| K12/current（≈现状） | 0.9602 | **1** | 0.3433 | 0.3415 |
+| K16/flat（最平） | 0.9619 | **1** | 0.3360 | **0.2903** |
+| K8/steep（最陡） | 0.9599 | **1** | 0.3989 | 0.3322 |
+
+- **conc=1 在 9 格全不变**——集中度对 TOP_K/权重陡峭度**完全无响应**。acc 波动 ±0.002（噪声级）。
+- **根因**：conc=1（某题 40/40 session 全命中）是 **early `sw*10` 犀利度分层 + 题库结构**决定的——某些题（如 q1）在几乎所有 session 前几题都被需要以建立基线。**采样权重旋钮无效**，要降集中度得动犀利度分层本身或题库。
+- lateCen 有微弱规律：更平的采样（K16/flat）让 late 段更多样（0.2903），但这是邻对 cen 微调，集中度纹丝不动。
+
+#### 三阶段综合结论
+
+1. **甜区 diversity = MMR·last5 硬过滤形态，early+late 都用**（Stage 1+2 联合）。早期邻对 cen −32%、准确度近乎免费；lateCen 经 late 硬过滤也压到 0.34。
+2. **gDPP 实证否决（第二次）**：cen 病态、rbf 负优化，换度量救不活。MMR 够用。
+3. **集中度 `conc=1` 是 early 犀利度分层 + 题库结构的硬约束**，非采样可解——比 §11.2 的 0.63 天花板更极端（forceMax 下冲到 1.0）。要降集中度需重构 early 犀利度分层（让基线建立题更多样）或扩题库，属新瓶颈⑥。
+4. **准确度代价在任何 diversity 配置下都 <0.002**（近乎免费）——目标函数翻转的可行性得到验证：体验提升的代价远低于预期。
+
+> **新瓶颈⑥（待评估）**：early 犀利度分层 `sw*10` 锁死选题，使集中度冲到 1.0、diversity 量级旋钮无效。若要进一步降集中度，需把 early 的"犀利度主导"改为"犀利度+多样性联合"，或扩充基线建立题的题库多样性。这是 Stage 1 发现的派生瓶颈，ROI 待估。
 
 ---
 
@@ -663,4 +720,5 @@ if (typeof e.copy !== 'string' || typeof e.label !== 'string' ...) return null;
 | 窗口扩大 | 实证否决（负优化） | MMR $w:5\to20$ 恶化 |
 | Phase B Step1（main 69e0c20） | 8 维体系 bitter→temperature | 苦维密度 14.4 → 温度维 24.8（仍<25 被机制C跳过） |
 | merge main 进 P10/P11 线 | 温度维命名 + MMR/SH 算法叠加 | 机制B 触发率 56%→40.6%，基线断言 0.45→0.40 |
+| 三阶段甜区实验（§11.7） | 目标函数翻转：体验为主、准确度为成本 | MMR 下沉 early 硬过滤：earlyCen −32% acc 近乎免费；gDPP 二次否决；conc=1 系 early 犀利度锁死 |
 | 下一步 | 瓶颈转移至文案层 | 45% 模板化；温度维 Step2（128 intervals H-高 + h-t/c-h 文案）待 humanizer |
