@@ -74,3 +74,30 @@ quiz-simulation 不传 recentCounts → EMA 对主基线三数**无影响**（= 
 2. **选题层面 EMA 当前无可见效果**：q59 一旦进 recentCounts（任何 freq>0），SH penalty 把它从 75% 压到 0%；old/ema 的 penalty 差异（0.7 vs 0.915，或 0.343 vs 0.536）都不足以让题复出。
 3. **根因——SH 名义"软"实"硬"**：`SESSION_SOFT_PENALTY=0.7` 下 freq=1 penalty=0.7 即把热门题压死，freq 衰减与否无关。EMA 的选题价值依赖 SH 强度：SH 调软（penalty→0.95 量级）后，freq 衰减的选题差异才会显现。
 4. **可重试 / 条件依赖**：EMA 保留（逻辑正确、无害、为 SH 调软铺垫）；**SH 强度需重评**——这是任务③（A 跨 session 热度硬帽，同为 SH 类）的输入。SH 调软后必须重测 EMA 选题效果（重跑本表，预期 ema > old）。
+
+---
+
+## 任务③ A 跨 session 热度硬帽判据实验 — 临时脚本 `_hotcap-exp.test.ts`（测完即删）
+
+模拟 6 轮 × 10 session（5 画像 × 2 seed），recentCounts 跨轮刷新（模拟 App.tsx startQuiz），对比 baseline / SH-only / SH+硬帽(N,K)。硬帽实现：recentCounts 里 freq≥K 的题 freq 设 10（趋 0 penalty，等效硬排除）。
+
+| 配置 | conc | acc | mean | dup |
+|:--|:--|:--|:--|:--|
+| baseline（无 SH） | **1.000** | 0.9617 | 26.3 | 0 |
+| SH-only | **0.417** | 0.9622 | 25.4 | 0 |
+| SH+硬帽（N=3,K=2） | 0.417 | 0.9622 | 25.4 | 0 |
+| SH+硬帽（N=5,K=2） | 0.417 | 0.9622 | 25.4 | 0 |
+
+> 注：实验因 4 模式 × 6 轮 × 10 session 计算量超 vitest 默认 5s 超时，但 console 在超时前已输出全部 4 模式完整数据，数据有效。
+
+### 结论（判据 conc≤0.7 + acc 降幅<0.005）
+
+1. **baseline 多 session conc=1.000**：某题在每个 session 都出现——这才是瓶颈⑥的真实形态（**跨 session 集中度**，非 §11.7 forceMax 的单 session 内 conc=1）。closestTo 单 session conc=0.75，但多 session 累积冲到 1.0。
+2. **SH-only conc=0.417（−58%），acc 微升（0.9622 vs 0.9617）**：SH（跨 session 频次衰减）已大幅降跨 session 集中度且不伤 acc。判据 **conc≤0.7（0.417）+ acc<0.005（微升）双双通过** → **⑥ 在 closestTo 多 session 下已被 SH 解**，无需硬帽。
+3. **SH+硬帽 = SH-only（零增量）**：确证任务② SH 过强发现——SH 已把高频题压死（freq=1 即 0% 出现），硬帽（freq≥K 设大）相对 SH 无任何额外效果。**硬帽无落地必要**。
+4. **第三档①（σ 重构）针对⑥的部分降级**：SH 已解跨 session conc，①不再为⑥必要。
+
+### ① 必要性重定位
+
+① 仍可能必要的部分：① 还针对 §11.7 Stage1 的「early sw*10 锁死」（early 评分锁死、diversity 旋钮无效、earlyCen 高）。这是 **single-session early 集中度**，非跨 session conc，SH 不解此。
+故①的必要性从「解⑥（跨 session conc）」重定位为「解 early sw*10 锁死 / earlyCen」。任务⑨（σ 可行性实验）的判据相应聚焦 early gain 是否退化、earlyCen 是否降，不再看跨 session conc。
