@@ -9,8 +9,8 @@ const good: QuestionBank = {
       id: 'q1',
       stem: 'test?',
       options: [
-        { id: 'q1-a', label: 'A', weights: { sour: 0, sweet: 0, bitter: 0, spicy: 0, salty: 0, rich: 0, crunchy: 0, tender: 0 } },
-        { id: 'q1-b', label: 'B', weights: { sour: 10, sweet: -5, bitter: 0, spicy: 0, salty: 0, rich: 0, crunchy: 0, tender: 0 } },
+        { id: 'q1-a', label: 'A', weights: { sour: 0, sweet: 0, temperature: 0, spicy: 0, salty: 0, rich: 0, crunchy: 0, tender: 0 } },
+        { id: 'q1-b', label: 'B', weights: { sour: 10, sweet: -5, temperature: 0, spicy: 0, salty: 0, rich: 0, crunchy: 0, tender: 0 } },
       ],
     },
   ],
@@ -58,7 +58,7 @@ describe('validateQuestionBank', () => {
           stem: 'x',
           options: [
             { id: 'q1-a', label: 'A' },
-            { id: 'q1-b', label: 'B', weights: { sour: 0, sweet: 0, bitter: 0, spicy: 0, salty: 0, rich: 0, crunchy: 0, tender: 0 } },
+            { id: 'q1-b', label: 'B', weights: { sour: 0, sweet: 0, temperature: 0, spicy: 0, salty: 0, rich: 0, crunchy: 0, tender: 0 } },
           ],
         },
       ],
@@ -94,11 +94,11 @@ describe('validateQuestionBank', () => {
           options: [
             {
               id: 'q1-a', label: 'A',
-              weights: { sour: 0, sweet: 0, bitter: 0, spicy: 0, salty: 0, rich: 0, crunchy: 0, tender: 0, umami: 0 } as any,
+              weights: { sour: 0, sweet: 0, temperature: 0, spicy: 0, salty: 0, rich: 0, crunchy: 0, tender: 0, umami: 0 } as any,
             },
             {
               id: 'q1-b', label: 'B',
-              weights: { sour: 0, sweet: 0, bitter: 0, spicy: 0, salty: 0, rich: 0, crunchy: 0, tender: 0 },
+              weights: { sour: 0, sweet: 0, temperature: 0, spicy: 0, salty: 0, rich: 0, crunchy: 0, tender: 0 },
             },
           ],
         },
@@ -117,11 +117,11 @@ describe('validateQuestionBank', () => {
           options: [
             {
               id: 'q1-a', label: 'A',
-              weights: { sour: 0, sweet: 0, bitter: 0, spicy: 0, salty: 0, rich: 0, crunchy: 0, tender: 0, foo: 5 } as any,
+              weights: { sour: 0, sweet: 0, temperature: 0, spicy: 0, salty: 0, rich: 0, crunchy: 0, tender: 0, foo: 5 } as any,
             },
             {
               id: 'q1-b', label: 'B',
-              weights: { sour: 0, sweet: 0, bitter: 0, spicy: 0, salty: 0, rich: 0, crunchy: 0, tender: 0 },
+              weights: { sour: 0, sweet: 0, temperature: 0, spicy: 0, salty: 0, rich: 0, crunchy: 0, tender: 0 },
             },
           ],
         },

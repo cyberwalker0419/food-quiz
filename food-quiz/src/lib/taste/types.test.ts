@@ -6,7 +6,7 @@ describe('ZERO_VECTOR', () => {
     expect(ZERO_VECTOR).toEqual({
       sour: 0,
       sweet: 0,
-      bitter: 0,
+      temperature: 0,
       spicy: 0,
       salty: 0,
       rich: 0,
@@ -17,7 +17,7 @@ describe('ZERO_VECTOR', () => {
 
   it('包含且仅包含 8 个键', () => {
     expect(Object.keys(ZERO_VECTOR).sort()).toEqual(
-      ['bitter', 'crunchy', 'rich', 'salty', 'sour', 'spicy', 'sweet', 'tender']
+      ['crunchy', 'rich', 'salty', 'sour', 'spicy', 'sweet', 'temperature', 'tender']
     );
   });
 

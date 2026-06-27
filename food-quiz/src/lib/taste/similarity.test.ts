@@ -3,12 +3,12 @@ import { cosineSim, centeredCosineSim, euclideanDist, blendedScore } from './sim
 import type { DimensionVector } from './types';
 
 const full: DimensionVector = {
-  sour: 100, sweet: 100, bitter: 100, spicy: 100,
+  sour: 100, sweet: 100, temperature: 100, spicy: 100,
   salty: 100, rich: 100, crunchy: 100, tender: 100,
 };
 
 const zeros: DimensionVector = {
-  sour: 0, sweet: 0, bitter: 0, spicy: 0,
+  sour: 0, sweet: 0, temperature: 0, spicy: 0,
   salty: 0, rich: 0, crunchy: 0, tender: 0,
 };
 
@@ -23,8 +23,8 @@ describe('cosineSim', () => {
   });
 
   it('正交 → 0', () => {
-    const a: DimensionVector = { ...zeros, sour: 100, sweet: 100, bitter: 100, spicy: 100, salty: 0, rich: 0, crunchy: 0, tender: 0 };
-    const b: DimensionVector = { ...zeros, sour: 0, sweet: 0, bitter: 0, spicy: 0, salty: 100, rich: 100, crunchy: 100, tender: 100 };
+    const a: DimensionVector = { ...zeros, sour: 100, sweet: 100, temperature: 100, spicy: 100, salty: 0, rich: 0, crunchy: 0, tender: 0 };
+    const b: DimensionVector = { ...zeros, sour: 0, sweet: 0, temperature: 0, spicy: 0, salty: 100, rich: 100, crunchy: 100, tender: 100 };
     expect(cosineSim(a, b)).toBeCloseTo(0, 6);
   });
 });
@@ -50,15 +50,15 @@ describe('centeredCosineSim(去中心化余弦)', () => {
   });
 
   it('形状相反(此 4 维高 vs 彼 4 维高)→ -1', () => {
-    const a: DimensionVector = { ...zeros, sour: 100, sweet: 100, bitter: 100, spicy: 100 };
+    const a: DimensionVector = { ...zeros, sour: 100, sweet: 100, temperature: 100, spicy: 100 };
     const b: DimensionVector = { ...zeros, salty: 100, rich: 100, crunchy: 100, tender: 100 };
     expect(centeredCosineSim(a, b)).toBeCloseTo(-1, 6);
   });
 
   it('解决全正压缩:不同维突出,标准 cos 高但去中心化低(区分力)', () => {
     // sour 突出 vs sweet 突出,其余 50:标准 cos ≈0.91(全正压缩),去中心化 <0(有区分)
-    const a: DimensionVector = { sour: 100, sweet: 50, bitter: 50, spicy: 50, salty: 50, rich: 50, crunchy: 50, tender: 50 };
-    const b: DimensionVector = { sour: 50, sweet: 100, bitter: 50, spicy: 50, salty: 50, rich: 50, crunchy: 50, tender: 50 };
+    const a: DimensionVector = { sour: 100, sweet: 50, temperature: 50, spicy: 50, salty: 50, rich: 50, crunchy: 50, tender: 50 };
+    const b: DimensionVector = { sour: 50, sweet: 100, temperature: 50, spicy: 50, salty: 50, rich: 50, crunchy: 50, tender: 50 };
     expect(cosineSim(a, b)).toBeGreaterThan(0.8);       // 标准 cos 仍压缩
     expect(centeredCosineSim(a, b)).toBeLessThan(0.5);  // 去中心化有区分
   });
@@ -74,7 +74,7 @@ describe('blendedScore(cos 项去中心化,映射 [0,1])', () => {
   });
 
   it('形状相反 → 去中心化 cos=-1 映射 0;只剩距离小项', () => {
-    const a: DimensionVector = { ...zeros, sour: 100, sweet: 100, bitter: 100, spicy: 100 };
+    const a: DimensionVector = { ...zeros, sour: 100, sweet: 100, temperature: 100, spicy: 100 };
     const b: DimensionVector = { ...zeros, salty: 100, rich: 100, crunchy: 100, tender: 100 };
     expect(blendedScore(a, b)).toBeCloseTo(0.5 * 0 + 0.5 * (1 / (1 + Math.sqrt(8) * 100)), 4);
   });

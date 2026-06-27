@@ -6,12 +6,12 @@
     "vector": {
       "sour": 15,
       "sweet": 5,
-      "bitter": 2,
       "spicy": 80,
       "salty": 60,
       "rich": 50,
       "crunchy": 10,
-      "tender": 70
+      "tender": 70,
+      "temperature": 0
     },
     "popular": true,
     "isVegetarian": true
@@ -23,12 +23,12 @@
     "vector": {
       "sour": 5,
       "sweet": 2,
-      "bitter": 0,
       "spicy": 95,
       "salty": 70,
       "rich": 60,
       "crunchy": 5,
-      "tender": 80
+      "tender": 80,
+      "temperature": 0
     },
     "popular": true,
     "meatTypes": [
@@ -42,12 +42,12 @@
     "vector": {
       "sour": 10,
       "sweet": 5,
-      "bitter": 0,
       "spicy": 85,
       "salty": 65,
       "rich": 70,
       "crunchy": 30,
-      "tender": 50
+      "tender": 50,
+      "temperature": 90
     },
     "popular": true,
     "meatTypes": [
@@ -62,12 +62,12 @@
     "vector": {
       "sour": 20,
       "sweet": 15,
-      "bitter": 0,
       "spicy": 60,
       "salty": 55,
       "rich": 45,
       "crunchy": 40,
-      "tender": 60
+      "tender": 60,
+      "temperature": 0
     },
     "popular": true,
     "meatTypes": [
@@ -81,12 +81,12 @@
     "vector": {
       "sour": 5,
       "sweet": 2,
-      "bitter": 0,
       "spicy": 70,
       "salty": 60,
       "rich": 55,
       "crunchy": 20,
-      "tender": 55
+      "tender": 55,
+      "temperature": 0
     },
     "popular": true,
     "meatTypes": [
@@ -101,12 +101,12 @@
     "vector": {
       "sour": 5,
       "sweet": 5,
-      "bitter": 0,
       "spicy": 50,
       "salty": 60,
       "rich": 65,
       "crunchy": 15,
-      "tender": 50
+      "tender": 50,
+      "temperature": 6
     },
     "popular": true,
     "meatTypes": [
@@ -120,12 +120,12 @@
     "vector": {
       "sour": 10,
       "sweet": 5,
-      "bitter": 0,
       "spicy": 65,
       "salty": 70,
       "rich": 50,
       "crunchy": 10,
-      "tender": 40
+      "tender": 40,
+      "temperature": 18
     },
     "popular": true,
     "meatTypes": [
@@ -139,12 +139,12 @@
     "vector": {
       "sour": 5,
       "sweet": 5,
-      "bitter": 0,
       "spicy": 75,
       "salty": 55,
       "rich": 40,
       "crunchy": 30,
-      "tender": 50
+      "tender": 50,
+      "temperature": 15
     },
     "popular": true,
     "meatTypes": [
@@ -158,12 +158,12 @@
     "vector": {
       "sour": 5,
       "sweet": 10,
-      "bitter": 2,
       "spicy": 5,
       "salty": 40,
       "rich": 75,
       "crunchy": 15,
-      "tender": 90
+      "tender": 90,
+      "temperature": 0
     },
     "popular": true,
     "meatTypes": [
@@ -177,12 +177,12 @@
     "vector": {
       "sour": 2,
       "sweet": 15,
-      "bitter": 0,
       "spicy": 0,
       "salty": 45,
       "rich": 80,
       "crunchy": 10,
-      "tender": 90
+      "tender": 90,
+      "temperature": 6
     },
     "popular": true,
     "meatTypes": [
@@ -196,12 +196,12 @@
     "vector": {
       "sour": 0,
       "sweet": 10,
-      "bitter": 0,
       "spicy": 2,
       "salty": 55,
       "rich": 70,
       "crunchy": 40,
-      "tender": 50
+      "tender": 50,
+      "temperature": 6
     },
     "popular": true,
     "meatTypes": [
@@ -216,12 +216,12 @@
     "vector": {
       "sour": 0,
       "sweet": 30,
-      "bitter": 0,
       "spicy": 0,
       "salty": 40,
       "rich": 60,
       "crunchy": 20,
-      "tender": 55
+      "tender": 55,
+      "temperature": 6
     },
     "popular": true,
     "meatTypes": [
@@ -235,12 +235,12 @@
     "vector": {
       "sour": 5,
       "sweet": 5,
-      "bitter": 0,
       "spicy": 5,
       "salty": 55,
       "rich": 65,
       "crunchy": 40,
-      "tender": 45
+      "tender": 45,
+      "temperature": 18
     },
     "popular": true,
     "meatTypes": [
@@ -254,12 +254,12 @@
     "vector": {
       "sour": 10,
       "sweet": 5,
-      "bitter": 0,
       "spicy": 0,
       "salty": 45,
       "rich": 60,
       "crunchy": 5,
-      "tender": 85
+      "tender": 85,
+      "temperature": 6
     },
     "popular": true,
     "meatTypes": [
@@ -275,12 +275,12 @@
     "vector": {
       "sour": 0,
       "sweet": 10,
-      "bitter": 0,
       "spicy": 5,
       "salty": 50,
       "rich": 55,
       "crunchy": 10,
-      "tender": 75
+      "tender": 75,
+      "temperature": 18
     },
     "popular": true,
     "meatTypes": [
@@ -294,12 +294,12 @@
     "vector": {
       "sour": 35,
       "sweet": 40,
-      "bitter": 0,
       "spicy": 0,
       "salty": 30,
       "rich": 50,
       "crunchy": 45,
-      "tender": 40
+      "tender": 40,
+      "temperature": 18
     },
     "popular": false,
     "meatTypes": [
@@ -313,12 +313,12 @@
     "vector": {
       "sour": 10,
       "sweet": 15,
-      "bitter": 5,
       "spicy": 5,
       "salty": 55,
       "rich": 70,
       "crunchy": 20,
-      "tender": 40
+      "tender": 40,
+      "temperature": 0
     },
     "popular": false,
     "meatTypes": [
@@ -333,12 +333,12 @@
     "vector": {
       "sour": 0,
       "sweet": 5,
-      "bitter": 2,
       "spicy": 0,
       "salty": 40,
       "rich": 80,
       "crunchy": 5,
-      "tender": 70
+      "tender": 70,
+      "temperature": 0
     },
     "popular": true,
     "meatTypes": [
@@ -352,12 +352,12 @@
     "vector": {
       "sour": 15,
       "sweet": 25,
-      "bitter": 0,
       "spicy": 0,
       "salty": 30,
       "rich": 45,
       "crunchy": 55,
-      "tender": 40
+      "tender": 40,
+      "temperature": 18
     },
     "popular": true,
     "meatTypes": [
@@ -371,12 +371,12 @@
     "vector": {
       "sour": 0,
       "sweet": 5,
-      "bitter": 0,
       "spicy": 0,
       "salty": 50,
       "rich": 65,
       "crunchy": 10,
-      "tender": 80
+      "tender": 80,
+      "temperature": 18
     },
     "popular": false,
     "meatTypes": [
@@ -390,12 +390,12 @@
     "vector": {
       "sour": 10,
       "sweet": 2,
-      "bitter": 0,
       "spicy": 85,
       "salty": 55,
       "rich": 60,
       "crunchy": 5,
-      "tender": 70
+      "tender": 70,
+      "temperature": 0
     },
     "popular": true,
     "meatTypes": [
@@ -409,12 +409,12 @@
     "vector": {
       "sour": 0,
       "sweet": 0,
-      "bitter": 0,
       "spicy": 75,
       "salty": 55,
       "rich": 55,
       "crunchy": 25,
-      "tender": 45
+      "tender": 45,
+      "temperature": 6
     },
     "popular": true,
     "meatTypes": [
@@ -428,12 +428,12 @@
     "vector": {
       "sour": 5,
       "sweet": 0,
-      "bitter": 5,
       "spicy": 60,
       "salty": 50,
       "rich": 40,
       "crunchy": 35,
-      "tender": 60
+      "tender": 60,
+      "temperature": 0
     },
     "popular": true,
     "isVegetarian": true
@@ -445,12 +445,12 @@
     "vector": {
       "sour": 0,
       "sweet": 15,
-      "bitter": 0,
       "spicy": 15,
       "salty": 55,
       "rich": 75,
       "crunchy": 5,
-      "tender": 80
+      "tender": 80,
+      "temperature": 18
     },
     "popular": true,
     "meatTypes": [
@@ -464,12 +464,12 @@
     "vector": {
       "sour": 0,
       "sweet": 5,
-      "bitter": 2,
       "spicy": 30,
       "salty": 70,
       "rich": 60,
       "crunchy": 15,
-      "tender": 40
+      "tender": 40,
+      "temperature": 6
     },
     "popular": true,
     "meatTypes": [
@@ -483,12 +483,12 @@
     "vector": {
       "sour": 25,
       "sweet": 35,
-      "bitter": 0,
       "spicy": 0,
       "salty": 25,
       "rich": 45,
       "crunchy": 40,
-      "tender": 35
+      "tender": 35,
+      "temperature": 18
     },
     "popular": false,
     "meatTypes": [
@@ -502,12 +502,12 @@
     "vector": {
       "sour": 0,
       "sweet": 10,
-      "bitter": 0,
       "spicy": 0,
       "salty": 45,
       "rich": 65,
       "crunchy": 5,
-      "tender": 80
+      "tender": 80,
+      "temperature": 0
     },
     "popular": true,
     "meatTypes": [
@@ -521,12 +521,12 @@
     "vector": {
       "sour": 0,
       "sweet": 0,
-      "bitter": 0,
       "spicy": 0,
       "salty": 60,
       "rich": 55,
       "crunchy": 10,
-      "tender": 65
+      "tender": 65,
+      "temperature": 0
     },
     "popular": true,
     "meatTypes": [
@@ -540,12 +540,12 @@
     "vector": {
       "sour": 0,
       "sweet": 5,
-      "bitter": 0,
       "spicy": 0,
       "salty": 50,
       "rich": 85,
       "crunchy": 5,
-      "tender": 85
+      "tender": 85,
+      "temperature": 18
     },
     "popular": false,
     "meatTypes": [
@@ -560,12 +560,12 @@
     "vector": {
       "sour": 0,
       "sweet": 2,
-      "bitter": 0,
       "spicy": 0,
       "salty": 35,
       "rich": 70,
       "crunchy": 5,
-      "tender": 95
+      "tender": 95,
+      "temperature": 0
     },
     "popular": false,
     "isVegetarian": true
@@ -577,12 +577,12 @@
     "vector": {
       "sour": 45,
       "sweet": 10,
-      "bitter": 0,
       "spicy": 0,
       "salty": 20,
       "rich": 40,
       "crunchy": 5,
-      "tender": 65
+      "tender": 65,
+      "temperature": 0
     },
     "popular": true,
     "meatTypes": [
@@ -596,12 +596,12 @@
     "vector": {
       "sour": 0,
       "sweet": 20,
-      "bitter": 0,
       "spicy": 0,
       "salty": 40,
       "rich": 70,
       "crunchy": 5,
-      "tender": 85
+      "tender": 85,
+      "temperature": 18
     },
     "popular": true,
     "meatTypes": [
@@ -615,12 +615,12 @@
     "vector": {
       "sour": 5,
       "sweet": 5,
-      "bitter": 5,
       "spicy": 0,
       "salty": 35,
       "rich": 65,
       "crunchy": 20,
-      "tender": 80
+      "tender": 80,
+      "temperature": 0
     },
     "popular": false,
     "meatTypes": [
@@ -634,12 +634,12 @@
     "vector": {
       "sour": 0,
       "sweet": 5,
-      "bitter": 0,
       "spicy": 0,
       "salty": 45,
       "rich": 60,
       "crunchy": 15,
-      "tender": 75
+      "tender": 75,
+      "temperature": 18
     },
     "popular": true,
     "meatTypes": [
@@ -653,12 +653,12 @@
     "vector": {
       "sour": 0,
       "sweet": 5,
-      "bitter": 2,
       "spicy": 0,
       "salty": 40,
       "rich": 90,
       "crunchy": 15,
-      "tender": 70
+      "tender": 70,
+      "temperature": 85
     },
     "popular": true,
     "meatTypes": [
@@ -675,12 +675,12 @@
     "vector": {
       "sour": 15,
       "sweet": 30,
-      "bitter": 0,
       "spicy": 5,
       "salty": 35,
       "rich": 45,
       "crunchy": 25,
-      "tender": 55
+      "tender": 55,
+      "temperature": 0
     },
     "popular": false,
     "meatTypes": [
@@ -694,12 +694,12 @@
     "vector": {
       "sour": 5,
       "sweet": 10,
-      "bitter": 0,
       "spicy": 20,
       "salty": 55,
       "rich": 50,
       "crunchy": 15,
-      "tender": 40
+      "tender": 40,
+      "temperature": 0
     },
     "popular": false,
     "meatTypes": [
@@ -714,12 +714,12 @@
     "vector": {
       "sour": 0,
       "sweet": 0,
-      "bitter": 0,
       "spicy": 5,
       "salty": 50,
       "rich": 65,
       "crunchy": 35,
-      "tender": 50
+      "tender": 50,
+      "temperature": 0
     },
     "popular": false,
     "meatTypes": [
@@ -734,12 +734,12 @@
     "vector": {
       "sour": 10,
       "sweet": 5,
-      "bitter": 3,
       "spicy": 10,
       "salty": 55,
       "rich": 70,
       "crunchy": 10,
-      "tender": 60
+      "tender": 60,
+      "temperature": 0
     },
     "popular": true,
     "meatTypes": [
@@ -753,12 +753,12 @@
     "vector": {
       "sour": 5,
       "sweet": 0,
-      "bitter": 2,
       "spicy": 15,
       "salty": 50,
       "rich": 55,
       "crunchy": 20,
-      "tender": 70
+      "tender": 70,
+      "temperature": 0
     },
     "popular": false,
     "isVegetarian": true
@@ -770,12 +770,12 @@
     "vector": {
       "sour": 0,
       "sweet": 5,
-      "bitter": 0,
       "spicy": 10,
       "salty": 50,
       "rich": 60,
       "crunchy": 20,
-      "tender": 55
+      "tender": 55,
+      "temperature": 20
     },
     "popular": false,
     "meatTypes": [
@@ -791,12 +791,12 @@
     "vector": {
       "sour": 0,
       "sweet": 0,
-      "bitter": 2,
       "spicy": 0,
       "salty": 45,
       "rich": 75,
       "crunchy": 5,
-      "tender": 70
+      "tender": 70,
+      "temperature": 18
     },
     "popular": false,
     "meatTypes": [
@@ -811,12 +811,12 @@
     "vector": {
       "sour": 0,
       "sweet": 5,
-      "bitter": 0,
       "spicy": 0,
       "salty": 50,
       "rich": 70,
       "crunchy": 60,
-      "tender": 65
+      "tender": 65,
+      "temperature": 18
     },
     "popular": true,
     "meatTypes": [
@@ -830,12 +830,12 @@
     "vector": {
       "sour": 5,
       "sweet": 0,
-      "bitter": 0,
       "spicy": 10,
       "salty": 45,
       "rich": 65,
       "crunchy": 10,
-      "tender": 80
+      "tender": 80,
+      "temperature": 20
     },
     "popular": true,
     "isHalal": true,
@@ -850,12 +850,12 @@
     "vector": {
       "sour": 5,
       "sweet": 5,
-      "bitter": 0,
       "spicy": 5,
       "salty": 65,
       "rich": 45,
       "crunchy": 15,
-      "tender": 35
+      "tender": 35,
+      "temperature": 6
     },
     "popular": true,
     "meatTypes": [
@@ -869,12 +869,12 @@
     "vector": {
       "sour": 0,
       "sweet": 0,
-      "bitter": 3,
       "spicy": 15,
       "salty": 70,
       "rich": 55,
       "crunchy": 20,
-      "tender": 40
+      "tender": 40,
+      "temperature": 6
     },
     "popular": false,
     "meatTypes": [
@@ -889,12 +889,12 @@
     "vector": {
       "sour": 0,
       "sweet": 25,
-      "bitter": 0,
       "spicy": 0,
       "salty": 45,
       "rich": 70,
       "crunchy": 5,
-      "tender": 75
+      "tender": 75,
+      "temperature": 18
     },
     "popular": true,
     "meatTypes": [
@@ -908,12 +908,12 @@
     "vector": {
       "sour": 5,
       "sweet": 5,
-      "bitter": 0,
       "spicy": 0,
       "salty": 50,
       "rich": 65,
       "crunchy": 5,
-      "tender": 80
+      "tender": 80,
+      "temperature": 18
     },
     "popular": true,
     "meatTypes": [
@@ -927,12 +927,12 @@
     "vector": {
       "sour": 0,
       "sweet": 2,
-      "bitter": 0,
       "spicy": 0,
       "salty": 50,
       "rich": 55,
       "crunchy": 50,
-      "tender": 50
+      "tender": 50,
+      "temperature": 18
     },
     "popular": true,
     "meatTypes": [
@@ -946,12 +946,12 @@
     "vector": {
       "sour": 40,
       "sweet": 0,
-      "bitter": 0,
       "spicy": 75,
       "salty": 55,
       "rich": 45,
       "crunchy": 5,
-      "tender": 35
+      "tender": 35,
+      "temperature": 0
     },
     "popular": true,
     "meatTypes": [
@@ -965,12 +965,12 @@
     "vector": {
       "sour": 0,
       "sweet": 0,
-      "bitter": 0,
       "spicy": 90,
       "salty": 55,
       "rich": 40,
       "crunchy": 35,
-      "tender": 40
+      "tender": 40,
+      "temperature": 0
     },
     "popular": true,
     "meatTypes": [
@@ -984,12 +984,12 @@
     "vector": {
       "sour": 10,
       "sweet": 2,
-      "bitter": 0,
       "spicy": 80,
       "salty": 65,
       "rich": 45,
       "crunchy": 10,
-      "tender": 30
+      "tender": 30,
+      "temperature": 18
     },
     "popular": true,
     "meatTypes": [
@@ -1003,12 +1003,12 @@
     "vector": {
       "sour": 5,
       "sweet": 2,
-      "bitter": 0,
       "spicy": 10,
       "salty": 55,
       "rich": 50,
       "crunchy": 35,
-      "tender": 50
+      "tender": 50,
+      "temperature": 6
     },
     "popular": true,
     "meatTypes": [
@@ -1022,12 +1022,12 @@
     "vector": {
       "sour": 25,
       "sweet": 5,
-      "bitter": 0,
       "spicy": 30,
       "salty": 45,
       "rich": 20,
       "crunchy": 15,
-      "tender": 40
+      "tender": 40,
+      "temperature": 15
     },
     "popular": true,
     "isVegetarian": true
@@ -1039,12 +1039,12 @@
     "vector": {
       "sour": 0,
       "sweet": 0,
-      "bitter": 2,
       "spicy": 10,
       "salty": 50,
       "rich": 70,
       "crunchy": 30,
-      "tender": 35
+      "tender": 35,
+      "temperature": 0
     },
     "popular": true,
     "isHalal": true,
@@ -1059,12 +1059,12 @@
     "vector": {
       "sour": 5,
       "sweet": 5,
-      "bitter": 0,
       "spicy": 10,
       "salty": 45,
       "rich": 40,
       "crunchy": 30,
-      "tender": 50
+      "tender": 50,
+      "temperature": 0
     },
     "popular": true,
     "isVegetarian": true
@@ -1076,12 +1076,12 @@
     "vector": {
       "sour": 35,
       "sweet": 0,
-      "bitter": 0,
       "spicy": 5,
       "salty": 45,
       "rich": 50,
       "crunchy": 10,
-      "tender": 55
+      "tender": 55,
+      "temperature": 0
     },
     "popular": true,
     "meatTypes": [
@@ -1095,12 +1095,12 @@
     "vector": {
       "sour": 10,
       "sweet": 0,
-      "bitter": 0,
       "spicy": 10,
       "salty": 60,
       "rich": 55,
       "crunchy": 15,
-      "tender": 45
+      "tender": 45,
+      "temperature": 0
     },
     "popular": true,
     "meatTypes": [
@@ -1115,12 +1115,12 @@
     "vector": {
       "sour": 5,
       "sweet": 5,
-      "bitter": 0,
       "spicy": 10,
       "salty": 65,
       "rich": 40,
       "crunchy": 5,
-      "tender": 30
+      "tender": 30,
+      "temperature": 18
     },
     "popular": true,
     "isVegetarian": true
@@ -1132,12 +1132,12 @@
     "vector": {
       "sour": 5,
       "sweet": 2,
-      "bitter": 0,
       "spicy": 5,
       "salty": 40,
       "rich": 55,
       "crunchy": 5,
-      "tender": 70
+      "tender": 70,
+      "temperature": 0
     },
     "popular": true,
     "meatTypes": [
@@ -1151,12 +1151,12 @@
     "vector": {
       "sour": 5,
       "sweet": 5,
-      "bitter": 0,
       "spicy": 50,
       "salty": 55,
       "rich": 50,
       "crunchy": 20,
-      "tender": 50
+      "tender": 50,
+      "temperature": 0
     },
     "popular": true,
     "isHalal": true,
@@ -1171,12 +1171,12 @@
     "vector": {
       "sour": 0,
       "sweet": 10,
-      "bitter": 0,
       "spicy": 15,
       "salty": 45,
       "rich": 55,
       "crunchy": 20,
-      "tender": 40
+      "tender": 40,
+      "temperature": 6
     },
     "popular": true,
     "isHalal": true,
@@ -1191,12 +1191,12 @@
     "vector": {
       "sour": 0,
       "sweet": 0,
-      "bitter": 0,
       "spicy": 40,
       "salty": 55,
       "rich": 50,
       "crunchy": 30,
-      "tender": 45
+      "tender": 45,
+      "temperature": 18
     },
     "popular": true,
     "isHalal": true,
@@ -1211,12 +1211,12 @@
     "vector": {
       "sour": 10,
       "sweet": 5,
-      "bitter": 0,
       "spicy": 20,
       "salty": 40,
       "rich": 55,
       "crunchy": 15,
-      "tender": 40
+      "tender": 40,
+      "temperature": 18
     },
     "popular": true,
     "meatTypes": [
@@ -1233,12 +1233,12 @@
     "vector": {
       "sour": 0,
       "sweet": 2,
-      "bitter": 0,
       "spicy": 5,
       "salty": 35,
       "rich": 70,
       "crunchy": 5,
-      "tender": 85
+      "tender": 85,
+      "temperature": 85
     },
     "popular": true,
     "meatTypes": [
@@ -1252,12 +1252,12 @@
     "vector": {
       "sour": 45,
       "sweet": 5,
-      "bitter": 0,
       "spicy": 50,
       "salty": 40,
       "rich": 55,
       "crunchy": 5,
-      "tender": 60
+      "tender": 60,
+      "temperature": 18
     },
     "popular": true,
     "meatTypes": [
@@ -1271,12 +1271,12 @@
     "vector": {
       "sour": 10,
       "sweet": 0,
-      "bitter": 5,
       "spicy": 30,
       "salty": 45,
       "rich": 40,
       "crunchy": 20,
-      "tender": 45
+      "tender": 45,
+      "temperature": 6
     },
     "popular": false,
     "meatTypes": [
@@ -1290,12 +1290,12 @@
     "vector": {
       "sour": 0,
       "sweet": 5,
-      "bitter": 0,
       "spicy": 5,
       "salty": 40,
       "rich": 70,
       "crunchy": 5,
-      "tender": 85
+      "tender": 85,
+      "temperature": 18
     },
     "popular": true,
     "meatTypes": [
@@ -1309,12 +1309,12 @@
     "vector": {
       "sour": 0,
       "sweet": 15,
-      "bitter": 0,
       "spicy": 0,
       "salty": 30,
       "rich": 65,
       "crunchy": 5,
-      "tender": 80
+      "tender": 80,
+      "temperature": 0
     },
     "popular": true,
     "meatTypes": [
@@ -1328,12 +1328,12 @@
     "vector": {
       "sour": 30,
       "sweet": 0,
-      "bitter": 2,
       "spicy": 40,
       "salty": 55,
       "rich": 35,
       "crunchy": 15,
-      "tender": 30
+      "tender": 30,
+      "temperature": 18
     },
     "popular": true,
     "meatTypes": [
@@ -1348,12 +1348,12 @@
     "vector": {
       "sour": 10,
       "sweet": 2,
-      "bitter": 0,
       "spicy": 15,
       "salty": 50,
       "rich": 40,
       "crunchy": 5,
-      "tender": 35
+      "tender": 35,
+      "temperature": 18
     },
     "popular": true,
     "meatTypes": [
@@ -1368,12 +1368,12 @@
     "vector": {
       "sour": 0,
       "sweet": 0,
-      "bitter": 0,
       "spicy": 0,
       "salty": 35,
       "rich": 65,
       "crunchy": 5,
-      "tender": 70
+      "tender": 70,
+      "temperature": 0
     },
     "popular": true,
     "meatTypes": [
@@ -1387,12 +1387,12 @@
     "vector": {
       "sour": 0,
       "sweet": 0,
-      "bitter": 0,
       "spicy": 10,
       "salty": 50,
       "rich": 60,
       "crunchy": 30,
-      "tender": 55
+      "tender": 55,
+      "temperature": 18
     },
     "popular": true,
     "meatTypes": [
@@ -1406,12 +1406,12 @@
     "vector": {
       "sour": 0,
       "sweet": 10,
-      "bitter": 0,
       "spicy": 0,
       "salty": 55,
       "rich": 60,
       "crunchy": 5,
-      "tender": 65
+      "tender": 65,
+      "temperature": 6
     },
     "popular": true,
     "meatTypes": [
@@ -1425,12 +1425,12 @@
     "vector": {
       "sour": 0,
       "sweet": 2,
-      "bitter": 0,
       "spicy": 15,
       "salty": 55,
       "rich": 40,
       "crunchy": 50,
-      "tender": 45
+      "tender": 45,
+      "temperature": 0
     },
     "popular": true,
     "meatTypes": [
@@ -1444,12 +1444,12 @@
     "vector": {
       "sour": 0,
       "sweet": 2,
-      "bitter": 0,
       "spicy": 0,
       "salty": 50,
       "rich": 55,
       "crunchy": 5,
-      "tender": 70
+      "tender": 70,
+      "temperature": 6
     },
     "popular": true,
     "meatTypes": [
@@ -1463,12 +1463,12 @@
     "vector": {
       "sour": 0,
       "sweet": 10,
-      "bitter": 2,
       "spicy": 30,
       "salty": 50,
       "rich": 65,
       "crunchy": 10,
-      "tender": 60
+      "tender": 60,
+      "temperature": 18
     },
     "popular": true,
     "meatTypes": [
@@ -1482,12 +1482,12 @@
     "vector": {
       "sour": 0,
       "sweet": 2,
-      "bitter": 0,
       "spicy": 10,
       "salty": 50,
       "rich": 50,
       "crunchy": 10,
-      "tender": 40
+      "tender": 40,
+      "temperature": 0
     },
     "popular": true,
     "meatTypes": [
@@ -1501,12 +1501,12 @@
     "vector": {
       "sour": 0,
       "sweet": 0,
-      "bitter": 2,
       "spicy": 0,
       "salty": 35,
       "rich": 70,
       "crunchy": 5,
-      "tender": 20
+      "tender": 20,
+      "temperature": 0
     },
     "popular": false,
     "isHalal": true,
@@ -1519,12 +1519,12 @@
     "vector": {
       "sour": 0,
       "sweet": 2,
-      "bitter": 0,
       "spicy": 0,
       "salty": 20,
       "rich": 50,
       "crunchy": 15,
-      "tender": 25
+      "tender": 25,
+      "temperature": 0
     },
     "popular": false,
     "isHalal": true,
@@ -1537,12 +1537,12 @@
     "vector": {
       "sour": 0,
       "sweet": 0,
-      "bitter": 0,
       "spicy": 15,
       "salty": 40,
       "rich": 60,
       "crunchy": 5,
-      "tender": 70
+      "tender": 70,
+      "temperature": 0
     },
     "popular": true,
     "isHalal": true,
@@ -1557,12 +1557,12 @@
     "vector": {
       "sour": 20,
       "sweet": 10,
-      "bitter": 2,
       "spicy": 55,
       "salty": 40,
       "rich": 45,
       "crunchy": 30,
-      "tender": 50
+      "tender": 50,
+      "temperature": 0
     },
     "popular": false,
     "meatTypes": [
@@ -1578,12 +1578,12 @@
     "vector": {
       "sour": 25,
       "sweet": 5,
-      "bitter": 0,
       "spicy": 45,
       "salty": 40,
       "rich": 30,
       "crunchy": 25,
-      "tender": 60
+      "tender": 60,
+      "temperature": 0
     },
     "popular": false,
     "meatTypes": [
@@ -1597,12 +1597,12 @@
     "vector": {
       "sour": 0,
       "sweet": 2,
-      "bitter": 0,
       "spicy": 5,
       "salty": 40,
       "rich": 35,
       "crunchy": 50,
-      "tender": 20
+      "tender": 20,
+      "temperature": 0
     },
     "popular": true,
     "isVegetarian": true
@@ -1614,12 +1614,12 @@
     "vector": {
       "sour": 0,
       "sweet": 55,
-      "bitter": 0,
       "spicy": 10,
       "salty": 60,
       "rich": 50,
       "crunchy": 85,
-      "tender": 55
+      "tender": 55,
+      "temperature": 6
     },
     "popular": false,
     "meatTypes": [
@@ -1633,12 +1633,12 @@
     "vector": {
       "sour": 15,
       "sweet": 70,
-      "bitter": 0,
       "spicy": 0,
       "salty": 30,
       "rich": 45,
       "crunchy": 80,
-      "tender": 50
+      "tender": 50,
+      "temperature": 18
     },
     "popular": true,
     "meatTypes": [
@@ -1652,12 +1652,12 @@
     "vector": {
       "sour": 0,
       "sweet": 15,
-      "bitter": 0,
       "spicy": 5,
       "salty": 80,
       "rich": 75,
       "crunchy": 10,
-      "tender": 55
+      "tender": 55,
+      "temperature": 6
     },
     "popular": false,
     "meatTypes": [
@@ -1671,12 +1671,12 @@
     "vector": {
       "sour": 0,
       "sweet": 10,
-      "bitter": 0,
       "spicy": 0,
       "salty": 55,
       "rich": 40,
       "crunchy": 90,
-      "tender": 65
+      "tender": 65,
+      "temperature": 18
     },
     "popular": false,
     "meatTypes": [
@@ -1690,12 +1690,12 @@
     "vector": {
       "sour": 0,
       "sweet": 20,
-      "bitter": 0,
       "spicy": 5,
       "salty": 65,
       "rich": 60,
       "crunchy": 5,
-      "tender": 75
+      "tender": 75,
+      "temperature": 6
     },
     "popular": false,
     "meatTypes": [
@@ -1709,12 +1709,12 @@
     "vector": {
       "sour": 5,
       "sweet": 15,
-      "bitter": 5,
       "spicy": 15,
       "salty": 60,
       "rich": 70,
       "crunchy": 10,
-      "tender": 65
+      "tender": 65,
+      "temperature": 18
     },
     "popular": false,
     "meatTypes": [
@@ -1728,12 +1728,12 @@
     "vector": {
       "sour": 0,
       "sweet": 10,
-      "bitter": 0,
       "spicy": 5,
       "salty": 80,
       "rich": 80,
       "crunchy": 5,
-      "tender": 60
+      "tender": 60,
+      "temperature": 6
     },
     "popular": false,
     "meatTypes": [
@@ -1747,12 +1747,12 @@
     "vector": {
       "sour": 0,
       "sweet": 15,
-      "bitter": 0,
       "spicy": 10,
       "salty": 65,
       "rich": 65,
       "crunchy": 5,
-      "tender": 70
+      "tender": 70,
+      "temperature": 20
     },
     "popular": true,
     "meatTypes": [
@@ -1766,12 +1766,12 @@
     "vector": {
       "sour": 50,
       "sweet": 10,
-      "bitter": 5,
       "spicy": 10,
       "salty": 45,
       "rich": 35,
       "crunchy": 15,
-      "tender": 60
+      "tender": 60,
+      "temperature": 0
     },
     "popular": false,
     "meatTypes": [
@@ -1785,12 +1785,12 @@
     "vector": {
       "sour": 0,
       "sweet": 10,
-      "bitter": 0,
       "spicy": 5,
       "salty": 60,
       "rich": 65,
       "crunchy": 5,
-      "tender": 70
+      "tender": 70,
+      "temperature": 18
     },
     "popular": false,
     "meatTypes": [
@@ -1804,12 +1804,12 @@
     "vector": {
       "sour": 5,
       "sweet": 15,
-      "bitter": 0,
       "spicy": 5,
       "salty": 75,
       "rich": 70,
       "crunchy": 60,
-      "tender": 40
+      "tender": 40,
+      "temperature": 6
     },
     "popular": false,
     "meatTypes": [
@@ -1823,12 +1823,12 @@
     "vector": {
       "sour": 55,
       "sweet": 10,
-      "bitter": 0,
       "spicy": 10,
       "salty": 55,
       "rich": 55,
       "crunchy": 5,
-      "tender": 70
+      "tender": 70,
+      "temperature": 18
     },
     "popular": true,
     "meatTypes": [
@@ -1842,12 +1842,12 @@
     "vector": {
       "sour": 0,
       "sweet": 5,
-      "bitter": 0,
       "spicy": 5,
       "salty": 60,
       "rich": 65,
       "crunchy": 5,
-      "tender": 75
+      "tender": 75,
+      "temperature": 20
     },
     "popular": false,
     "meatTypes": [
@@ -1861,12 +1861,12 @@
     "vector": {
       "sour": 10,
       "sweet": 5,
-      "bitter": 0,
       "spicy": 0,
       "salty": 65,
       "rich": 60,
       "crunchy": 20,
-      "tender": 75
+      "tender": 75,
+      "temperature": 0
     },
     "popular": false,
     "meatTypes": [
@@ -1881,12 +1881,12 @@
     "vector": {
       "sour": 0,
       "sweet": 85,
-      "bitter": 0,
       "spicy": 0,
       "salty": 10,
       "rich": 30,
       "crunchy": 75,
-      "tender": 65
+      "tender": 65,
+      "temperature": 0
     },
     "popular": true,
     "isVegetarian": true,
@@ -1899,12 +1899,12 @@
     "vector": {
       "sour": 12,
       "sweet": 8,
-      "bitter": 0,
       "spicy": 12,
       "salty": 72,
       "rich": 62,
       "crunchy": 28,
-      "tender": 70
+      "tender": 70,
+      "temperature": 15
     },
     "popular": false,
     "isVegetarian": true
@@ -1916,12 +1916,12 @@
     "vector": {
       "sour": 0,
       "sweet": 5,
-      "bitter": 0,
       "spicy": 0,
       "salty": 60,
       "rich": 35,
       "crunchy": 95,
-      "tender": 5
+      "tender": 5,
+      "temperature": 0
     },
     "popular": false,
     "isVegetarian": true
@@ -1933,12 +1933,12 @@
     "vector": {
       "sour": 0,
       "sweet": 50,
-      "bitter": 0,
       "spicy": 0,
       "salty": 35,
       "rich": 50,
       "crunchy": 85,
-      "tender": 15
+      "tender": 15,
+      "temperature": 0
     },
     "popular": false,
     "isVegetarian": true
@@ -1950,12 +1950,12 @@
     "vector": {
       "sour": 0,
       "sweet": 10,
-      "bitter": 0,
       "spicy": 5,
       "salty": 55,
       "rich": 45,
       "crunchy": 90,
-      "tender": 30
+      "tender": 30,
+      "temperature": 6
     },
     "popular": true,
     "isVegetarian": true,
@@ -1968,12 +1968,12 @@
     "vector": {
       "sour": 5,
       "sweet": 5,
-      "bitter": 0,
       "spicy": 0,
       "salty": 55,
       "rich": 40,
       "crunchy": 5,
-      "tender": 75
+      "tender": 75,
+      "temperature": 0
     },
     "popular": false,
     "isVegetarian": true
@@ -1985,12 +1985,12 @@
     "vector": {
       "sour": 0,
       "sweet": 15,
-      "bitter": 0,
       "spicy": 75,
       "salty": 45,
       "rich": 40,
       "crunchy": 60,
-      "tender": 30
+      "tender": 30,
+      "temperature": 6
     },
     "popular": false,
     "isVegetarian": true
@@ -2002,12 +2002,12 @@
     "vector": {
       "sour": 5,
       "sweet": 15,
-      "bitter": 0,
       "spicy": 5,
       "salty": 65,
       "rich": 60,
       "crunchy": 0,
-      "tender": 70
+      "tender": 70,
+      "temperature": 18
     },
     "popular": true,
     "meatTypes": [
@@ -2021,12 +2021,12 @@
     "vector": {
       "sour": 5,
       "sweet": 30,
-      "bitter": 0,
       "spicy": 15,
       "salty": 60,
       "rich": 75,
       "crunchy": 5,
-      "tender": 60
+      "tender": 60,
+      "temperature": 18
     },
     "popular": false,
     "meatTypes": [
@@ -2040,12 +2040,12 @@
     "vector": {
       "sour": 0,
       "sweet": 10,
-      "bitter": 0,
       "spicy": 30,
       "salty": 65,
       "rich": 60,
       "crunchy": 30,
-      "tender": 50
+      "tender": 50,
+      "temperature": 6
     },
     "popular": false,
     "meatTypes": [
@@ -2059,12 +2059,12 @@
     "vector": {
       "sour": 5,
       "sweet": 10,
-      "bitter": 0,
       "spicy": 10,
       "salty": 55,
       "rich": 50,
       "crunchy": 5,
-      "tender": 75
+      "tender": 75,
+      "temperature": 0
     },
     "popular": false,
     "meatTypes": [
@@ -2079,12 +2079,12 @@
     "vector": {
       "sour": 5,
       "sweet": 15,
-      "bitter": 0,
       "spicy": 5,
       "salty": 60,
       "rich": 65,
       "crunchy": 10,
-      "tender": 70
+      "tender": 70,
+      "temperature": 18
     },
     "popular": true,
     "meatTypes": [
@@ -2098,12 +2098,12 @@
     "vector": {
       "sour": 5,
       "sweet": 20,
-      "bitter": 0,
       "spicy": 10,
       "salty": 75,
       "rich": 70,
       "crunchy": 15,
-      "tender": 65
+      "tender": 65,
+      "temperature": 18
     },
     "popular": true,
     "meatTypes": [
@@ -2117,12 +2117,12 @@
     "vector": {
       "sour": 5,
       "sweet": 10,
-      "bitter": 0,
       "spicy": 10,
       "salty": 60,
       "rich": 55,
       "crunchy": 10,
-      "tender": 60
+      "tender": 60,
+      "temperature": 18
     },
     "popular": true,
     "meatTypes": [
@@ -2136,12 +2136,12 @@
     "vector": {
       "sour": 20,
       "sweet": 10,
-      "bitter": 0,
       "spicy": 65,
       "salty": 65,
       "rich": 60,
       "crunchy": 5,
-      "tender": 50
+      "tender": 50,
+      "temperature": 18
     },
     "popular": true,
     "meatTypes": [
@@ -2156,12 +2156,12 @@
     "vector": {
       "sour": 40,
       "sweet": 10,
-      "bitter": 5,
       "spicy": 5,
       "salty": 50,
       "rich": 40,
       "crunchy": 0,
-      "tender": 60
+      "tender": 60,
+      "temperature": 0
     },
     "popular": false,
     "isVegetarian": true
@@ -2173,12 +2173,12 @@
     "vector": {
       "sour": 5,
       "sweet": 10,
-      "bitter": 0,
       "spicy": 15,
       "salty": 75,
       "rich": 70,
       "crunchy": 10,
-      "tender": 60
+      "tender": 60,
+      "temperature": 0
     },
     "popular": false,
     "isHalal": true,
@@ -2194,12 +2194,12 @@
     "vector": {
       "sour": 10,
       "sweet": 15,
-      "bitter": 0,
       "spicy": 30,
       "salty": 65,
       "rich": 60,
       "crunchy": 10,
-      "tender": 55
+      "tender": 55,
+      "temperature": 18
     },
     "popular": false,
     "isHalal": true,
@@ -2214,12 +2214,12 @@
     "vector": {
       "sour": 5,
       "sweet": 10,
-      "bitter": 0,
       "spicy": 10,
       "salty": 60,
       "rich": 50,
       "crunchy": 5,
-      "tender": 75
+      "tender": 75,
+      "temperature": 6
     },
     "popular": false,
     "isHalal": true,
@@ -2234,12 +2234,12 @@
     "vector": {
       "sour": 25,
       "sweet": 10,
-      "bitter": 0,
       "spicy": 20,
       "salty": 65,
       "rich": 60,
       "crunchy": 5,
-      "tender": 65
+      "tender": 65,
+      "temperature": 0
     },
     "popular": false,
     "isHalal": true,
@@ -2254,12 +2254,12 @@
     "vector": {
       "sour": 10,
       "sweet": 15,
-      "bitter": 0,
       "spicy": 15,
       "salty": 60,
       "rich": 55,
       "crunchy": 20,
-      "tender": 60
+      "tender": 60,
+      "temperature": 0
     },
     "popular": false,
     "isHalal": true,
@@ -2275,12 +2275,12 @@
     "vector": {
       "sour": 0,
       "sweet": 10,
-      "bitter": 0,
       "spicy": 0,
       "salty": 60,
       "rich": 40,
       "crunchy": 90,
-      "tender": 55
+      "tender": 55,
+      "temperature": 18
     },
     "popular": false,
     "meatTypes": [
@@ -2294,12 +2294,12 @@
     "vector": {
       "sour": 0,
       "sweet": 15,
-      "bitter": 0,
       "spicy": 10,
       "salty": 65,
       "rich": 60,
       "crunchy": 5,
-      "tender": 70
+      "tender": 70,
+      "temperature": 18
     },
     "popular": false,
     "meatTypes": [
@@ -2313,12 +2313,12 @@
     "vector": {
       "sour": 10,
       "sweet": 5,
-      "bitter": 0,
       "spicy": 5,
       "salty": 55,
       "rich": 55,
       "crunchy": 5,
-      "tender": 75
+      "tender": 75,
+      "temperature": 0
     },
     "popular": true,
     "meatTypes": [
@@ -2332,12 +2332,12 @@
     "vector": {
       "sour": 0,
       "sweet": 55,
-      "bitter": 0,
       "spicy": 0,
       "salty": 20,
       "rich": 40,
       "crunchy": 10,
-      "tender": 65
+      "tender": 65,
+      "temperature": 0
     },
     "popular": false,
     "isVegetarian": true
@@ -2349,12 +2349,12 @@
     "vector": {
       "sour": 5,
       "sweet": 10,
-      "bitter": 0,
       "spicy": 90,
       "salty": 55,
       "rich": 50,
       "crunchy": 65,
-      "tender": 40
+      "tender": 40,
+      "temperature": 15
     },
     "popular": true,
     "meatTypes": [
@@ -2368,12 +2368,12 @@
     "vector": {
       "sour": 0,
       "sweet": 20,
-      "bitter": 0,
       "spicy": 75,
       "salty": 60,
       "rich": 65,
       "crunchy": 10,
-      "tender": 70
+      "tender": 70,
+      "temperature": 18
     },
     "popular": true,
     "meatTypes": [
@@ -2387,12 +2387,12 @@
     "vector": {
       "sour": 5,
       "sweet": 15,
-      "bitter": 0,
       "spicy": 10,
       "salty": 55,
       "rich": 45,
       "crunchy": 80,
-      "tender": 40
+      "tender": 40,
+      "temperature": 0
     },
     "popular": true,
     "meatTypes": [
@@ -2408,12 +2408,12 @@
     "vector": {
       "sour": 5,
       "sweet": 15,
-      "bitter": 0,
       "spicy": 5,
       "salty": 65,
       "rich": 65,
       "crunchy": 0,
-      "tender": 70
+      "tender": 70,
+      "temperature": 18
     },
     "popular": true,
     "meatTypes": [
@@ -2427,12 +2427,12 @@
     "vector": {
       "sour": 5,
       "sweet": 15,
-      "bitter": 0,
       "spicy": 20,
       "salty": 60,
       "rich": 60,
       "crunchy": 5,
-      "tender": 75
+      "tender": 75,
+      "temperature": 20
     },
     "popular": false,
     "meatTypes": [
@@ -2446,12 +2446,12 @@
     "vector": {
       "sour": 5,
       "sweet": 15,
-      "bitter": 0,
       "spicy": 10,
       "salty": 75,
       "rich": 70,
       "crunchy": 25,
-      "tender": 50
+      "tender": 50,
+      "temperature": 6
     },
     "popular": false,
     "meatTypes": [
@@ -2465,12 +2465,12 @@
     "vector": {
       "sour": 5,
       "sweet": 25,
-      "bitter": 0,
       "spicy": 5,
       "salty": 70,
       "rich": 75,
       "crunchy": 40,
-      "tender": 35
+      "tender": 35,
+      "temperature": 6
     },
     "popular": false,
     "meatTypes": [
@@ -2484,12 +2484,12 @@
     "vector": {
       "sour": 15,
       "sweet": 10,
-      "bitter": 0,
       "spicy": 65,
       "salty": 55,
       "rich": 50,
       "crunchy": 15,
-      "tender": 70
+      "tender": 70,
+      "temperature": 18
     },
     "popular": false,
     "meatTypes": [
@@ -2503,12 +2503,12 @@
     "vector": {
       "sour": 70,
       "sweet": 10,
-      "bitter": 0,
       "spicy": 50,
       "salty": 45,
       "rich": 40,
       "crunchy": 5,
-      "tender": 55
+      "tender": 55,
+      "temperature": 18
     },
     "popular": false,
     "meatTypes": [
@@ -2522,12 +2522,12 @@
     "vector": {
       "sour": 40,
       "sweet": 10,
-      "bitter": 0,
       "spicy": 30,
       "salty": 40,
       "rich": 25,
       "crunchy": 45,
-      "tender": 55
+      "tender": 55,
+      "temperature": 0
     },
     "popular": false,
     "isVegetarian": true
@@ -2539,12 +2539,12 @@
     "vector": {
       "sour": 15,
       "sweet": 15,
-      "bitter": 0,
       "spicy": 55,
       "salty": 60,
       "rich": 65,
       "crunchy": 10,
-      "tender": 60
+      "tender": 60,
+      "temperature": 20
     },
     "popular": false,
     "meatTypes": [
@@ -2558,12 +2558,12 @@
     "vector": {
       "sour": 5,
       "sweet": 20,
-      "bitter": 0,
       "spicy": 15,
       "salty": 65,
       "rich": 55,
       "crunchy": 10,
-      "tender": 80
+      "tender": 80,
+      "temperature": 0
     },
     "popular": false,
     "meatTypes": [
@@ -2577,12 +2577,12 @@
     "vector": {
       "sour": 5,
       "sweet": 15,
-      "bitter": 0,
       "spicy": 10,
       "salty": 65,
       "rich": 65,
       "crunchy": 5,
-      "tender": 75
+      "tender": 75,
+      "temperature": 0
     },
     "popular": false,
     "meatTypes": [
@@ -2596,12 +2596,12 @@
     "vector": {
       "sour": 0,
       "sweet": 75,
-      "bitter": 0,
       "spicy": 0,
       "salty": 15,
       "rich": 45,
       "crunchy": 20,
-      "tender": 50
+      "tender": 50,
+      "temperature": 0
     },
     "popular": false,
     "isVegetarian": true
@@ -2613,12 +2613,12 @@
     "vector": {
       "sour": 15,
       "sweet": 65,
-      "bitter": 0,
       "spicy": 0,
       "salty": 15,
       "rich": 30,
       "crunchy": 30,
-      "tender": 55
+      "tender": 55,
+      "temperature": 12
     },
     "popular": true,
     "isVegetarian": true,
@@ -2631,12 +2631,12 @@
     "vector": {
       "sour": 5,
       "sweet": 25,
-      "bitter": 0,
       "spicy": 15,
       "salty": 60,
       "rich": 80,
       "crunchy": 5,
-      "tender": 55
+      "tender": 55,
+      "temperature": 0
     },
     "popular": true,
     "meatTypes": [
@@ -2650,12 +2650,12 @@
     "vector": {
       "sour": 0,
       "sweet": 20,
-      "bitter": 0,
       "spicy": 5,
       "salty": 50,
       "rich": 50,
       "crunchy": 30,
-      "tender": 60
+      "tender": 60,
+      "temperature": 6
     },
     "popular": false,
     "meatTypes": [
@@ -2669,12 +2669,12 @@
     "vector": {
       "sour": 30,
       "sweet": 10,
-      "bitter": 0,
       "spicy": 70,
       "salty": 55,
       "rich": 50,
       "crunchy": 10,
-      "tender": 55
+      "tender": 55,
+      "temperature": 18
     },
     "popular": false,
     "meatTypes": [
@@ -2688,12 +2688,12 @@
     "vector": {
       "sour": 20,
       "sweet": 15,
-      "bitter": 15,
       "spicy": 0,
       "salty": 70,
       "rich": 60,
       "crunchy": 0,
-      "tender": 45
+      "tender": 45,
+      "temperature": 0
     },
     "popular": false,
     "isHalal": true,
@@ -2706,12 +2706,12 @@
     "vector": {
       "sour": 5,
       "sweet": 15,
-      "bitter": 0,
       "spicy": 10,
       "salty": 65,
       "rich": 60,
       "crunchy": 10,
-      "tender": 70
+      "tender": 70,
+      "temperature": 6
     },
     "popular": false,
     "meatTypes": [
@@ -2725,12 +2725,12 @@
     "vector": {
       "sour": 10,
       "sweet": 10,
-      "bitter": 0,
       "spicy": 20,
       "salty": 55,
       "rich": 55,
       "crunchy": 35,
-      "tender": 70
+      "tender": 70,
+      "temperature": 0
     },
     "popular": false,
     "meatTypes": [
@@ -2744,12 +2744,12 @@
     "vector": {
       "sour": 15,
       "sweet": 15,
-      "bitter": 0,
       "spicy": 5,
       "salty": 65,
       "rich": 60,
       "crunchy": 5,
-      "tender": 65
+      "tender": 65,
+      "temperature": 0
     },
     "popular": false,
     "meatTypes": [
@@ -2765,12 +2765,12 @@
     "vector": {
       "sour": 5,
       "sweet": 15,
-      "bitter": 0,
       "spicy": 5,
       "salty": 60,
       "rich": 50,
       "crunchy": 5,
-      "tender": 75
+      "tender": 75,
+      "temperature": 18
     },
     "popular": false,
     "meatTypes": [
@@ -2784,12 +2784,12 @@
     "vector": {
       "sour": 15,
       "sweet": 80,
-      "bitter": 0,
       "spicy": 0,
       "salty": 5,
       "rich": 20,
       "crunchy": 85,
-      "tender": 15
+      "tender": 15,
+      "temperature": 12
     },
     "popular": true,
     "isVegetarian": true
@@ -2801,12 +2801,12 @@
     "vector": {
       "sour": 5,
       "sweet": 90,
-      "bitter": 0,
       "spicy": 0,
       "salty": 10,
       "rich": 35,
       "crunchy": 75,
-      "tender": 35
+      "tender": 35,
+      "temperature": 12
     },
     "popular": true,
     "isVegetarian": true
@@ -2818,12 +2818,12 @@
     "vector": {
       "sour": 5,
       "sweet": 45,
-      "bitter": 0,
       "spicy": 0,
       "salty": 35,
       "rich": 50,
       "crunchy": 5,
-      "tender": 60
+      "tender": 60,
+      "temperature": 0
     },
     "popular": false,
     "isHalal": true,
@@ -2836,12 +2836,12 @@
     "vector": {
       "sour": 5,
       "sweet": 10,
-      "bitter": 5,
       "spicy": 5,
       "salty": 55,
       "rich": 50,
       "crunchy": 10,
-      "tender": 60
+      "tender": 60,
+      "temperature": 0
     },
     "popular": false,
     "isHalal": true,
@@ -2856,12 +2856,12 @@
     "vector": {
       "sour": 10,
       "sweet": 5,
-      "bitter": 0,
       "spicy": 5,
       "salty": 65,
       "rich": 60,
       "crunchy": 25,
-      "tender": 65
+      "tender": 65,
+      "temperature": 0
     },
     "popular": false,
     "meatTypes": [
@@ -2877,12 +2877,12 @@
     "vector": {
       "sour": 15,
       "sweet": 10,
-      "bitter": 20,
       "spicy": 0,
       "salty": 60,
       "rich": 65,
       "crunchy": 15,
-      "tender": 50
+      "tender": 50,
+      "temperature": 6
     },
     "popular": false,
     "isHalal": true,
@@ -2895,12 +2895,12 @@
     "vector": {
       "sour": 10,
       "sweet": 10,
-      "bitter": 0,
       "spicy": 55,
       "salty": 55,
       "rich": 60,
       "crunchy": 25,
-      "tender": 60
+      "tender": 60,
+      "temperature": 6
     },
     "popular": false,
     "meatTypes": [
@@ -2915,12 +2915,12 @@
     "vector": {
       "sour": 0,
       "sweet": 25,
-      "bitter": 0,
       "spicy": 5,
       "salty": 45,
       "rich": 50,
       "crunchy": 20,
-      "tender": 60
+      "tender": 60,
+      "temperature": 6
     },
     "popular": false,
     "meatTypes": [
@@ -2934,12 +2934,12 @@
     "vector": {
       "sour": 65,
       "sweet": 10,
-      "bitter": 0,
       "spicy": 45,
       "salty": 50,
       "rich": 55,
       "crunchy": 5,
-      "tender": 70
+      "tender": 70,
+      "temperature": 0
     },
     "popular": false,
     "meatTypes": [
@@ -2953,12 +2953,12 @@
     "vector": {
       "sour": 10,
       "sweet": 15,
-      "bitter": 0,
       "spicy": 40,
       "salty": 55,
       "rich": 50,
       "crunchy": 20,
-      "tender": 70
+      "tender": 70,
+      "temperature": 18
     },
     "popular": false,
     "meatTypes": [
@@ -2972,12 +2972,12 @@
     "vector": {
       "sour": 10,
       "sweet": 15,
-      "bitter": 0,
       "spicy": 85,
       "salty": 60,
       "rich": 60,
       "crunchy": 20,
-      "tender": 60
+      "tender": 60,
+      "temperature": 18
     },
     "popular": true,
     "meatTypes": [
@@ -2991,12 +2991,12 @@
     "vector": {
       "sour": 5,
       "sweet": 10,
-      "bitter": 0,
       "spicy": 90,
       "salty": 50,
       "rich": 55,
       "crunchy": 75,
-      "tender": 40
+      "tender": 40,
+      "temperature": 0
     },
     "popular": false,
     "meatTypes": [
@@ -3010,12 +3010,12 @@
     "vector": {
       "sour": 30,
       "sweet": 10,
-      "bitter": 0,
       "spicy": 80,
       "salty": 50,
       "rich": 55,
       "crunchy": 10,
-      "tender": 70
+      "tender": 70,
+      "temperature": 0
     },
     "popular": false,
     "meatTypes": [
@@ -3029,12 +3029,12 @@
     "vector": {
       "sour": 10,
       "sweet": 15,
-      "bitter": 0,
       "spicy": 50,
       "salty": 65,
       "rich": 55,
       "crunchy": 50,
-      "tender": 55
+      "tender": 55,
+      "temperature": 0
     },
     "popular": true,
     "isVegetarian": true
@@ -3046,12 +3046,12 @@
     "vector": {
       "sour": 5,
       "sweet": 20,
-      "bitter": 0,
       "spicy": 10,
       "salty": 60,
       "rich": 70,
       "crunchy": 65,
-      "tender": 65
+      "tender": 65,
+      "temperature": 18
     },
     "popular": false,
     "meatTypes": [
@@ -3065,12 +3065,12 @@
     "vector": {
       "sour": 10,
       "sweet": 15,
-      "bitter": 0,
       "spicy": 30,
       "salty": 65,
       "rich": 55,
       "crunchy": 10,
-      "tender": 60
+      "tender": 60,
+      "temperature": 18
     },
     "popular": true,
     "meatTypes": [
@@ -3084,12 +3084,12 @@
     "vector": {
       "sour": 5,
       "sweet": 25,
-      "bitter": 0,
       "spicy": 5,
       "salty": 55,
       "rich": 65,
       "crunchy": 5,
-      "tender": 70
+      "tender": 70,
+      "temperature": 0
     },
     "popular": false,
     "meatTypes": [
@@ -3103,12 +3103,12 @@
     "vector": {
       "sour": 5,
       "sweet": 40,
-      "bitter": 0,
       "spicy": 10,
       "salty": 65,
       "rich": 60,
       "crunchy": 80,
-      "tender": 55
+      "tender": 55,
+      "temperature": 6
     },
     "popular": true,
     "meatTypes": [
@@ -3122,12 +3122,12 @@
     "vector": {
       "sour": 5,
       "sweet": 20,
-      "bitter": 0,
       "spicy": 5,
       "salty": 65,
       "rich": 75,
       "crunchy": 5,
-      "tender": 60
+      "tender": 60,
+      "temperature": 0
     },
     "popular": false,
     "meatTypes": [
@@ -3142,12 +3142,12 @@
     "vector": {
       "sour": 0,
       "sweet": 10,
-      "bitter": 0,
       "spicy": 5,
       "salty": 60,
       "rich": 55,
       "crunchy": 75,
-      "tender": 70
+      "tender": 70,
+      "temperature": 6
     },
     "popular": false,
     "meatTypes": [
@@ -3161,12 +3161,12 @@
     "vector": {
       "sour": 0,
       "sweet": 15,
-      "bitter": 0,
       "spicy": 5,
       "salty": 65,
       "rich": 55,
       "crunchy": 10,
-      "tender": 75
+      "tender": 75,
+      "temperature": 0
     },
     "popular": false,
     "meatTypes": [
@@ -3180,12 +3180,12 @@
     "vector": {
       "sour": 15,
       "sweet": 65,
-      "bitter": 0,
       "spicy": 0,
       "salty": 45,
       "rich": 60,
       "crunchy": 40,
-      "tender": 55
+      "tender": 55,
+      "temperature": 18
     },
     "popular": true,
     "meatTypes": [
@@ -3199,12 +3199,12 @@
     "vector": {
       "sour": 5,
       "sweet": 20,
-      "bitter": 0,
       "spicy": 0,
       "salty": 50,
       "rich": 40,
       "crunchy": 0,
-      "tender": 75
+      "tender": 75,
+      "temperature": 0
     },
     "popular": false,
     "isVegetarian": true
@@ -3216,12 +3216,12 @@
     "vector": {
       "sour": 10,
       "sweet": 15,
-      "bitter": 0,
       "spicy": 15,
       "salty": 60,
       "rich": 55,
       "crunchy": 5,
-      "tender": 65
+      "tender": 65,
+      "temperature": 0
     },
     "popular": false,
     "isVegetarian": true
@@ -3233,12 +3233,12 @@
     "vector": {
       "sour": 5,
       "sweet": 15,
-      "bitter": 0,
       "spicy": 5,
       "salty": 65,
       "rich": 50,
       "crunchy": 5,
-      "tender": 80
+      "tender": 80,
+      "temperature": 0
     },
     "popular": true,
     "meatTypes": [
@@ -3252,12 +3252,12 @@
     "vector": {
       "sour": 5,
       "sweet": 20,
-      "bitter": 0,
       "spicy": 5,
       "salty": 60,
       "rich": 60,
       "crunchy": 5,
-      "tender": 75
+      "tender": 75,
+      "temperature": 18
     },
     "popular": false,
     "meatTypes": [
@@ -3271,12 +3271,12 @@
     "vector": {
       "sour": 5,
       "sweet": 15,
-      "bitter": 0,
       "spicy": 10,
       "salty": 60,
       "rich": 55,
       "crunchy": 10,
-      "tender": 70
+      "tender": 70,
+      "temperature": 6
     },
     "popular": false,
     "meatTypes": [
@@ -3290,12 +3290,12 @@
     "vector": {
       "sour": 75,
       "sweet": 5,
-      "bitter": 10,
       "spicy": 0,
       "salty": 45,
       "rich": 40,
       "crunchy": 85,
-      "tender": 20
+      "tender": 20,
+      "temperature": 15
     },
     "popular": false,
     "isVegetarian": true
@@ -3307,12 +3307,12 @@
     "vector": {
       "sour": 30,
       "sweet": 80,
-      "bitter": 0,
       "spicy": 0,
       "salty": 5,
       "rich": 25,
       "crunchy": 90,
-      "tender": 30
+      "tender": 30,
+      "temperature": 0
     },
     "popular": true,
     "isVegetarian": true
@@ -3324,12 +3324,12 @@
     "vector": {
       "sour": 10,
       "sweet": 15,
-      "bitter": 0,
       "spicy": 30,
       "salty": 65,
       "rich": 55,
       "crunchy": 20,
-      "tender": 55
+      "tender": 55,
+      "temperature": 0
     },
     "popular": true,
     "isVegetarian": true
@@ -3341,12 +3341,12 @@
     "vector": {
       "sour": 10,
       "sweet": 10,
-      "bitter": 0,
       "spicy": 75,
       "salty": 55,
       "rich": 50,
       "crunchy": 50,
-      "tender": 60
+      "tender": 60,
+      "temperature": 0
     },
     "popular": true,
     "meatTypes": [
@@ -3360,12 +3360,12 @@
     "vector": {
       "sour": 5,
       "sweet": 10,
-      "bitter": 0,
       "spicy": 60,
       "salty": 55,
       "rich": 45,
       "crunchy": 55,
-      "tender": 50
+      "tender": 50,
+      "temperature": 6
     },
     "popular": true,
     "isVegetarian": true
@@ -3377,12 +3377,12 @@
     "vector": {
       "sour": 5,
       "sweet": 80,
-      "bitter": 0,
       "spicy": 0,
       "salty": 20,
       "rich": 50,
       "crunchy": 65,
-      "tender": 50
+      "tender": 50,
+      "temperature": 0
     },
     "popular": true,
     "isVegetarian": true,
@@ -3395,12 +3395,12 @@
     "vector": {
       "sour": 0,
       "sweet": 15,
-      "bitter": 0,
       "spicy": 10,
       "salty": 65,
       "rich": 65,
       "crunchy": 75,
-      "tender": 55
+      "tender": 55,
+      "temperature": 6
     },
     "popular": true
   },
@@ -3411,12 +3411,12 @@
     "vector": {
       "sour": 5,
       "sweet": 15,
-      "bitter": 0,
       "spicy": 15,
       "salty": 60,
       "rich": 60,
       "crunchy": 10,
-      "tender": 70
+      "tender": 70,
+      "temperature": 0
     },
     "popular": false,
     "meatTypes": [
@@ -3430,12 +3430,12 @@
     "vector": {
       "sour": 10,
       "sweet": 10,
-      "bitter": 0,
       "spicy": 15,
       "salty": 75,
       "rich": 70,
       "crunchy": 5,
-      "tender": 60
+      "tender": 60,
+      "temperature": 0
     },
     "popular": false,
     "meatTypes": [
@@ -3449,12 +3449,12 @@
     "vector": {
       "sour": 5,
       "sweet": 20,
-      "bitter": 0,
       "spicy": 20,
       "salty": 70,
       "rich": 75,
       "crunchy": 25,
-      "tender": 65
+      "tender": 65,
+      "temperature": 18
     },
     "popular": false,
     "meatTypes": [
@@ -3468,12 +3468,12 @@
     "vector": {
       "sour": 10,
       "sweet": 10,
-      "bitter": 0,
       "spicy": 15,
       "salty": 60,
       "rich": 55,
       "crunchy": 40,
-      "tender": 55
+      "tender": 55,
+      "temperature": 0
     },
     "popular": true,
     "meatTypes": [
@@ -3487,12 +3487,12 @@
     "vector": {
       "sour": 5,
       "sweet": 15,
-      "bitter": 0,
       "spicy": 10,
       "salty": 65,
       "rich": 60,
       "crunchy": 55,
-      "tender": 65
+      "tender": 65,
+      "temperature": 0
     },
     "popular": true,
     "meatTypes": [
@@ -3506,12 +3506,12 @@
     "vector": {
       "sour": 5,
       "sweet": 15,
-      "bitter": 0,
       "spicy": 5,
       "salty": 75,
       "rich": 65,
       "crunchy": 10,
-      "tender": 70
+      "tender": 70,
+      "temperature": 0
     },
     "popular": true,
     "meatTypes": [
@@ -3525,12 +3525,12 @@
     "vector": {
       "sour": 5,
       "sweet": 10,
-      "bitter": 0,
       "spicy": 10,
       "salty": 55,
       "rich": 50,
       "crunchy": 45,
-      "tender": 60
+      "tender": 60,
+      "temperature": 0
     },
     "popular": false,
     "meatTypes": [
@@ -3544,12 +3544,12 @@
     "vector": {
       "sour": 10,
       "sweet": 10,
-      "bitter": 0,
       "spicy": 45,
       "salty": 65,
       "rich": 60,
       "crunchy": 15,
-      "tender": 60
+      "tender": 60,
+      "temperature": 0
     },
     "popular": true,
     "isHalal": true,
@@ -3564,12 +3564,12 @@
     "vector": {
       "sour": 15,
       "sweet": 10,
-      "bitter": 0,
       "spicy": 30,
       "salty": 50,
       "rich": 45,
       "crunchy": 50,
-      "tender": 60
+      "tender": 60,
+      "temperature": 0
     },
     "popular": true,
     "isVegetarian": true
@@ -3581,12 +3581,12 @@
     "vector": {
       "sour": 5,
       "sweet": 65,
-      "bitter": 0,
       "spicy": 0,
       "salty": 20,
       "rich": 40,
       "crunchy": 5,
-      "tender": 55
+      "tender": 55,
+      "temperature": 0
     },
     "popular": false,
     "isVegetarian": true
@@ -3598,12 +3598,12 @@
     "vector": {
       "sour": 5,
       "sweet": 5,
-      "bitter": 0,
       "spicy": 75,
       "salty": 60,
       "rich": 55,
       "crunchy": 15,
-      "tender": 75
+      "tender": 75,
+      "temperature": 6
     },
     "popular": true,
     "meatTypes": [
@@ -3617,12 +3617,12 @@
     "vector": {
       "sour": 5,
       "sweet": 10,
-      "bitter": 0,
       "spicy": 5,
       "salty": 55,
       "rich": 45,
       "crunchy": 5,
-      "tender": 80
+      "tender": 80,
+      "temperature": 0
     },
     "popular": false,
     "meatTypes": [
@@ -3639,12 +3639,12 @@
     "vector": {
       "sour": 25,
       "sweet": 10,
-      "bitter": 0,
       "spicy": 65,
       "salty": 60,
       "rich": 55,
       "crunchy": 35,
-      "tender": 60
+      "tender": 60,
+      "temperature": 0
     },
     "popular": false,
     "meatTypes": [
@@ -3658,12 +3658,12 @@
     "vector": {
       "sour": 30,
       "sweet": 15,
-      "bitter": 0,
       "spicy": 70,
       "salty": 60,
       "rich": 50,
       "crunchy": 75,
-      "tender": 55
+      "tender": 55,
+      "temperature": 6
     },
     "popular": false,
     "meatTypes": [
@@ -3677,12 +3677,12 @@
     "vector": {
       "sour": 0,
       "sweet": 10,
-      "bitter": 0,
       "spicy": 10,
       "salty": 80,
       "rich": 60,
       "crunchy": 50,
-      "tender": 70
+      "tender": 70,
+      "temperature": 0
     },
     "popular": true,
     "meatTypes": [
@@ -3697,12 +3697,12 @@
     "vector": {
       "sour": 25,
       "sweet": 5,
-      "bitter": 0,
       "spicy": 5,
       "salty": 55,
       "rich": 35,
       "crunchy": 85,
-      "tender": 15
+      "tender": 15,
+      "temperature": 15
     },
     "popular": true
   },
@@ -3714,12 +3714,12 @@
     "vector": {
       "sour": 20,
       "sweet": 5,
-      "bitter": 0,
       "spicy": 15,
       "salty": 40,
       "rich": 15,
       "crunchy": 60,
-      "tender": 40
+      "tender": 40,
+      "temperature": 15
     },
     "popular": true
   },
@@ -3731,12 +3731,12 @@
     "vector": {
       "sour": 30,
       "sweet": 5,
-      "bitter": 0,
       "spicy": 20,
       "salty": 40,
       "rich": 10,
       "crunchy": 70,
-      "tender": 35
+      "tender": 35,
+      "temperature": 15
     },
     "popular": true
   },
@@ -3748,12 +3748,12 @@
     "vector": {
       "sour": 15,
       "sweet": 10,
-      "bitter": 0,
       "spicy": 10,
       "salty": 45,
       "rich": 25,
       "crunchy": 55,
-      "tender": 50
+      "tender": 50,
+      "temperature": 0
     },
     "popular": true
   },
@@ -3765,12 +3765,12 @@
     "vector": {
       "sour": 5,
       "sweet": 10,
-      "bitter": 0,
       "spicy": 0,
       "salty": 50,
       "rich": 45,
       "crunchy": 5,
-      "tender": 70
+      "tender": 70,
+      "temperature": 6
     },
     "popular": true
   },
@@ -3782,12 +3782,12 @@
     "vector": {
       "sour": 5,
       "sweet": 15,
-      "bitter": 0,
       "spicy": 5,
       "salty": 55,
       "rich": 45,
       "crunchy": 20,
-      "tender": 60
+      "tender": 60,
+      "temperature": 6
     },
     "popular": true
   },
@@ -3799,12 +3799,12 @@
     "vector": {
       "sour": 5,
       "sweet": 10,
-      "bitter": 0,
       "spicy": 5,
       "salty": 60,
       "rich": 40,
       "crunchy": 10,
-      "tender": 40
+      "tender": 40,
+      "temperature": 6
     },
     "popular": true
   },
@@ -3816,12 +3816,12 @@
     "vector": {
       "sour": 5,
       "sweet": 10,
-      "bitter": 0,
       "spicy": 5,
       "salty": 50,
       "rich": 40,
       "crunchy": 5,
-      "tender": 65
+      "tender": 65,
+      "temperature": 6
     },
     "popular": true
   },
@@ -3833,12 +3833,12 @@
     "vector": {
       "sour": 15,
       "sweet": 10,
-      "bitter": 0,
       "spicy": 20,
       "salty": 50,
       "rich": 30,
       "crunchy": 10,
-      "tender": 55
+      "tender": 55,
+      "temperature": 15
     },
     "popular": true
   },
@@ -3850,12 +3850,12 @@
     "vector": {
       "sour": 5,
       "sweet": 5,
-      "bitter": 0,
       "spicy": 0,
       "salty": 20,
       "rich": 25,
       "crunchy": 5,
-      "tender": 70
+      "tender": 70,
+      "temperature": 6
     },
     "popular": true
   },
@@ -3867,12 +3867,12 @@
     "vector": {
       "sour": 10,
       "sweet": 15,
-      "bitter": 0,
       "spicy": 10,
       "salty": 45,
       "rich": 40,
       "crunchy": 30,
-      "tender": 45
+      "tender": 45,
+      "temperature": 0
     },
     "popular": true,
     "isContainsEgg": true
@@ -3885,12 +3885,12 @@
     "vector": {
       "sour": 20,
       "sweet": 10,
-      "bitter": 0,
       "spicy": 15,
       "salty": 40,
       "rich": 20,
       "crunchy": 50,
-      "tender": 35
+      "tender": 35,
+      "temperature": 15
     },
     "popular": true
   },
@@ -3902,12 +3902,12 @@
     "vector": {
       "sour": 5,
       "sweet": 10,
-      "bitter": 0,
       "spicy": 5,
       "salty": 55,
       "rich": 40,
       "crunchy": 5,
-      "tender": 50
+      "tender": 50,
+      "temperature": 6
     },
     "popular": true
   },
@@ -3919,12 +3919,12 @@
     "vector": {
       "sour": 5,
       "sweet": 10,
-      "bitter": 0,
       "spicy": 0,
       "salty": 40,
       "rich": 35,
       "crunchy": 70,
-      "tender": 25
+      "tender": 25,
+      "temperature": 6
     },
     "popular": true
   },
@@ -3936,12 +3936,12 @@
     "vector": {
       "sour": 10,
       "sweet": 5,
-      "bitter": 0,
       "spicy": 0,
       "salty": 35,
       "rich": 20,
       "crunchy": 75,
-      "tender": 30
+      "tender": 30,
+      "temperature": 6
     },
     "popular": true
   },
@@ -3953,12 +3953,12 @@
     "vector": {
       "sour": 10,
       "sweet": 10,
-      "bitter": 0,
       "spicy": 5,
       "salty": 50,
       "rich": 40,
       "crunchy": 5,
-      "tender": 55
+      "tender": 55,
+      "temperature": 0
     },
     "popular": true
   },
@@ -3970,12 +3970,12 @@
     "vector": {
       "sour": 5,
       "sweet": 5,
-      "bitter": 0,
       "spicy": 0,
       "salty": 40,
       "rich": 25,
       "crunchy": 5,
-      "tender": 70
+      "tender": 70,
+      "temperature": 0
     },
     "popular": true
   },
@@ -3987,12 +3987,12 @@
     "vector": {
       "sour": 15,
       "sweet": 5,
-      "bitter": 0,
       "spicy": 10,
       "salty": 40,
       "rich": 20,
       "crunchy": 45,
-      "tender": 40
+      "tender": 40,
+      "temperature": 0
     },
     "popular": true
   },
@@ -4004,12 +4004,12 @@
     "vector": {
       "sour": 20,
       "sweet": 25,
-      "bitter": 0,
       "spicy": 0,
       "salty": 15,
       "rich": 35,
       "crunchy": 5,
-      "tender": 30
+      "tender": 30,
+      "temperature": 0
     },
     "popular": true
   },
@@ -4021,12 +4021,12 @@
     "vector": {
       "sour": 40,
       "sweet": 20,
-      "bitter": 0,
       "spicy": 0,
       "salty": 10,
       "rich": 20,
       "crunchy": 0,
-      "tender": 40
+      "tender": 40,
+      "temperature": 12
     },
     "popular": true
   },
@@ -4038,12 +4038,12 @@
     "vector": {
       "sour": 10,
       "sweet": 5,
-      "bitter": 5,
       "spicy": 5,
       "salty": 50,
       "rich": 40,
       "crunchy": 5,
-      "tender": 55
+      "tender": 55,
+      "temperature": 0
     },
     "popular": true
   },
@@ -4055,12 +4055,12 @@
     "vector": {
       "sour": 5,
       "sweet": 10,
-      "bitter": 0,
       "spicy": 0,
       "salty": 20,
       "rich": 35,
       "crunchy": 0,
-      "tender": 65
+      "tender": 65,
+      "temperature": 18
     },
     "popular": true
   },
@@ -4072,12 +4072,12 @@
     "vector": {
       "sour": 5,
       "sweet": 10,
-      "bitter": 0,
       "spicy": 5,
       "salty": 50,
       "rich": 40,
       "crunchy": 5,
-      "tender": 65
+      "tender": 65,
+      "temperature": 6
     },
     "popular": true
   },
@@ -4090,12 +4090,12 @@
     "vector": {
       "sour": 20,
       "sweet": 10,
-      "bitter": 0,
       "spicy": 20,
       "salty": 45,
       "rich": 25,
       "crunchy": 20,
-      "tender": 45
+      "tender": 45,
+      "temperature": 15
     },
     "popular": true
   },
@@ -4108,12 +4108,12 @@
     "vector": {
       "sour": 10,
       "sweet": 10,
-      "bitter": 0,
       "spicy": 10,
       "salty": 50,
       "rich": 35,
       "crunchy": 5,
-      "tender": 55
+      "tender": 55,
+      "temperature": 0
     },
     "popular": true
   },
@@ -4128,12 +4128,12 @@
     "vector": {
       "sour": 0,
       "sweet": 15,
-      "bitter": 0,
       "spicy": 10,
       "salty": 45,
       "rich": 55,
       "crunchy": 15,
-      "tender": 45
+      "tender": 45,
+      "temperature": 6
     },
     "popular": true
   },
@@ -4145,12 +4145,12 @@
     "vector": {
       "sour": 10,
       "sweet": 15,
-      "bitter": 0,
       "spicy": 15,
       "salty": 55,
       "rich": 50,
       "crunchy": 10,
-      "tender": 60
+      "tender": 60,
+      "temperature": 0
     },
     "popular": true,
     "meatTypes": [
@@ -4166,12 +4166,12 @@
     "vector": {
       "sour": 5,
       "sweet": 40,
-      "bitter": 0,
       "spicy": 0,
       "salty": 25,
       "rich": 40,
       "crunchy": 30,
-      "tender": 40
+      "tender": 40,
+      "temperature": 6
     },
     "popular": true
   },
@@ -4183,12 +4183,12 @@
     "vector": {
       "sour": 5,
       "sweet": 30,
-      "bitter": 0,
       "spicy": 0,
       "salty": 35,
       "rich": 45,
       "crunchy": 5,
-      "tender": 60
+      "tender": 60,
+      "temperature": 6
     },
     "popular": true
   },
@@ -4199,12 +4199,12 @@
     "vector": {
       "sour": 5,
       "sweet": 10,
-      "bitter": 6,
       "spicy": 60,
       "salty": 55,
       "rich": 45,
       "crunchy": 50,
-      "tender": 30
+      "tender": 30,
+      "temperature": 18
     },
     "popular": true,
     "isVegetarian": true
@@ -4217,12 +4217,12 @@
     "vector": {
       "sour": 5,
       "sweet": 5,
-      "bitter": 6,
       "spicy": 4,
       "salty": 50,
       "rich": 45,
       "crunchy": 72,
-      "tender": 0
+      "tender": 0,
+      "temperature": 0
     },
     "popular": true
   },
@@ -4234,12 +4234,12 @@
     "vector": {
       "sour": 5,
       "sweet": 5,
-      "bitter": 6,
       "spicy": 10,
       "salty": 60,
       "rich": 40,
       "crunchy": 92,
-      "tender": 0
+      "tender": 0,
+      "temperature": 0
     },
     "popular": true
   },
@@ -4251,12 +4251,12 @@
     "vector": {
       "sour": 5,
       "sweet": 5,
-      "bitter": 6,
       "spicy": 5,
       "salty": 45,
       "rich": 40,
       "crunchy": 0,
-      "tender": 85
+      "tender": 85,
+      "temperature": 15
     },
     "popular": true
   },
@@ -4268,12 +4268,12 @@
     "vector": {
       "sour": 40,
       "sweet": 0,
-      "bitter": 6,
       "spicy": 55,
       "salty": 45,
       "rich": 30,
       "crunchy": 65,
-      "tender": 20
+      "tender": 20,
+      "temperature": 0
     },
     "popular": true
   },
@@ -4284,12 +4284,12 @@
     "vector": {
       "sour": 5,
       "sweet": 5,
-      "bitter": 0,
       "spicy": 0,
       "salty": 35,
       "rich": 50,
       "crunchy": 0,
-      "tender": 80
+      "tender": 80,
+      "temperature": 18
     },
     "popular": true,
     "meatTypes": [
@@ -4304,12 +4304,12 @@
     "vector": {
       "sour": 50,
       "sweet": 5,
-      "bitter": 6,
       "spicy": 55,
       "salty": 55,
       "rich": 55,
       "crunchy": 10,
-      "tender": 45
+      "tender": 45,
+      "temperature": 0
     },
     "popular": true
   },
@@ -4321,12 +4321,12 @@
     "vector": {
       "sour": 5,
       "sweet": 55,
-      "bitter": 15,
       "spicy": 0,
       "salty": 5,
       "rich": 60,
       "crunchy": 15,
-      "tender": 70
+      "tender": 70,
+      "temperature": 12
     },
     "popular": true,
     "isContainsEgg": true
@@ -4339,12 +4339,12 @@
     "vector": {
       "sour": 10,
       "sweet": 55,
-      "bitter": 0,
       "spicy": 0,
       "salty": 10,
       "rich": 55,
       "crunchy": 0,
-      "tender": 85
+      "tender": 85,
+      "temperature": 12
     },
     "popular": true,
     "isContainsEgg": true
@@ -4357,12 +4357,12 @@
     "vector": {
       "sour": 5,
       "sweet": 80,
-      "bitter": 0,
       "spicy": 0,
       "salty": 5,
       "rich": 45,
       "crunchy": 10,
-      "tender": 80
+      "tender": 80,
+      "temperature": 12
     },
     "popular": true
   },
@@ -4373,12 +4373,12 @@
     "vector": {
       "sour": 5,
       "sweet": 0,
-      "bitter": 0,
       "spicy": 0,
       "salty": 35,
       "rich": 35,
       "crunchy": 60,
-      "tender": 55
+      "tender": 55,
+      "temperature": 0
     },
     "popular": true,
     "meatTypes": [
@@ -4393,12 +4393,12 @@
     "vector": {
       "sour": 5,
       "sweet": 5,
-      "bitter": 6,
       "spicy": 5,
       "salty": 45,
       "rich": 60,
       "crunchy": 0,
-      "tender": 70
+      "tender": 70,
+      "temperature": 0
     },
     "popular": true,
     "meatTypes": [
@@ -4412,12 +4412,12 @@
     "vector": {
       "sour": 5,
       "sweet": 30,
-      "bitter": 6,
       "spicy": 4,
       "salty": 55,
       "rich": 75,
       "crunchy": 15,
-      "tender": 75
+      "tender": 75,
+      "temperature": 18
     },
     "popular": true,
     "meatTypes": [
@@ -4432,12 +4432,12 @@
     "vector": {
       "sour": 35,
       "sweet": 5,
-      "bitter": 6,
       "spicy": 20,
       "salty": 40,
       "rich": 15,
       "crunchy": 70,
-      "tender": 40
+      "tender": 40,
+      "temperature": 15
     },
     "popular": true
   },
@@ -4449,12 +4449,12 @@
     "vector": {
       "sour": 30,
       "sweet": 35,
-      "bitter": 6,
       "spicy": 4,
       "salty": 40,
       "rich": 45,
       "crunchy": 0,
-      "tender": 75
+      "tender": 75,
+      "temperature": 6
     },
     "popular": true,
     "isContainsEgg": true
@@ -4466,12 +4466,12 @@
     "vector": {
       "sour": 5,
       "sweet": 60,
-      "bitter": 6,
       "spicy": 4,
       "salty": 50,
       "rich": 55,
       "crunchy": 15,
-      "tender": 80
+      "tender": 80,
+      "temperature": 0
     },
     "popular": true,
     "meatTypes": [
@@ -4485,12 +4485,12 @@
     "vector": {
       "sour": 10,
       "sweet": 5,
-      "bitter": 6,
       "spicy": 75,
       "salty": 60,
       "rich": 70,
       "crunchy": 20,
-      "tender": 45
+      "tender": 45,
+      "temperature": 90
     },
     "popular": true,
     "meatTypes": [
@@ -4505,12 +4505,12 @@
     "vector": {
       "sour": 5,
       "sweet": 5,
-      "bitter": 6,
       "spicy": 80,
       "salty": 60,
       "rich": 65,
       "crunchy": 30,
-      "tender": 70
+      "tender": 70,
+      "temperature": 18
     },
     "popular": true,
     "meatTypes": [
@@ -4525,12 +4525,12 @@
     "vector": {
       "sour": 5,
       "sweet": 40,
-      "bitter": 0,
       "spicy": 0,
       "salty": 30,
       "rich": 45,
       "crunchy": 82,
-      "tender": 15
+      "tender": 15,
+      "temperature": 0
     },
     "popular": true
   },
@@ -4542,12 +4542,12 @@
     "vector": {
       "sour": 5,
       "sweet": 5,
-      "bitter": 6,
       "spicy": 5,
       "salty": 50,
       "rich": 50,
       "crunchy": 60,
-      "tender": 50
+      "tender": 50,
+      "temperature": 0
     },
     "popular": true
   },
@@ -4558,12 +4558,12 @@
     "vector": {
       "sour": 5,
       "sweet": 5,
-      "bitter": 0,
       "spicy": 85,
       "salty": 60,
       "rich": 55,
       "crunchy": 15,
-      "tender": 60
+      "tender": 60,
+      "temperature": 0
     },
     "popular": true,
     "meatTypes": [

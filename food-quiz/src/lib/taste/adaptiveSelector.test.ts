@@ -40,14 +40,14 @@ function makeState(askedIds: string[], answers: { questionId: string }[], profil
 
 describe('prunedDimensions', () => {
   it('< 3 题时永远不剪枝', () => {
-    const p = { ...ZERO_VECTOR, bitter: -50 };
+    const p = { ...ZERO_VECTOR, temperature: -50 };
     expect(prunedDimensions(p, 0).size).toBe(0);
     expect(prunedDimensions(p, 2).size).toBe(0);
   });
 
   it('≥ 3 题 + 某维 ≤ -30 → 进入剪枝', () => {
-    const p = { ...ZERO_VECTOR, bitter: -40 };
-    expect(prunedDimensions(p, 3).has('bitter')).toBe(true);
+    const p = { ...ZERO_VECTOR, temperature: -40 };
+    expect(prunedDimensions(p, 3).has('temperature')).toBe(true);
   });
 
   it('profile 全 0 → 不剪枝', () => {
@@ -83,7 +83,7 @@ describe('pickNextQuestion', () => {
     expect(q).toBeNull();
   });
 
-  it('剪枝生效:profile bitter ≤ -30,问 3 题后,后续题不应触发 bitter', () => {
+  it('剪枝生效:profile spicy ≤ -30,问 3 题后,后续题不应触发 spicy', () => {
     const answers: { questionId: string; weights?: WeightVector }[] = [];
     const askedIds: string[] = [];
     let profile: WeightVector = { ...ZERO_VECTOR };
@@ -96,15 +96,15 @@ describe('pickNextQuestion', () => {
       for (const k of Object.keys(profile) as (keyof WeightVector)[]) {
         profile[k] += opt.weights[k] || 0;
       }
-      // 模拟"极度排斥苦"
-      profile.bitter = -40;
+      // 模拟"极度排斥辣"
+      profile.spicy = -40;
     }
-    // 第 4 题起:所有 option 在 bitter 上都应为 0
+    // 第 4 题起:所有 option 在 spicy 上都应为 0(剪枝滤掉辣菜题,幸存题 spicy 全 0)
     for (let step = 3; step < 10; step++) {
       const q = pickNextQuestion(makeState(askedIds, answers, profile), step + 1);
       if (!q) break;
       for (const opt of q.options) {
-        expect(opt.weights.bitter || 0).toBe(0);
+        expect(opt.weights.spicy || 0).toBe(0);
       }
       // 模拟答完,推进
       const opt = q.options[0]!;
@@ -118,11 +118,11 @@ describe('pickNextQuestion', () => {
 
   it('5 seed × 5 目标:出题数 ∈ [20, 45] & 余弦 ≥ 0.85', () => {
     const targets: WeightVector[] = [
-      { sour: 90, sweet: 30, bitter: 80, spicy: 0, salty: 20, rich: 40, crunchy: 60, tender: 30 },
-      { sour: 10, sweet: 20, bitter: 10, spicy: 95, salty: 60, rich: 70, crunchy: 30, tender: 40 },
-      { sour: 0, sweet: 0, bitter: 0, spicy: 0, salty: 0, rich: 0, crunchy: 0, tender: 0 },
-      { sour: 50, sweet: 50, bitter: 50, spicy: 50, salty: 50, rich: 50, crunchy: 50, tender: 50 },
-      { sour: 95, sweet: 0, bitter: 95, spicy: 0, salty: 0, rich: 0, crunchy: 0, tender: 0 },
+      { sour: 90, sweet: 30, temperature: 80, spicy: 0, salty: 20, rich: 40, crunchy: 60, tender: 30 },
+      { sour: 10, sweet: 20, temperature: 10, spicy: 95, salty: 60, rich: 70, crunchy: 30, tender: 40 },
+      { sour: 0, sweet: 0, temperature: 0, spicy: 0, salty: 0, rich: 0, crunchy: 0, tender: 0 },
+      { sour: 50, sweet: 50, temperature: 50, spicy: 50, salty: 50, rich: 50, crunchy: 50, tender: 50 },
+      { sour: 95, sweet: 0, temperature: 95, spicy: 0, salty: 0, rich: 0, crunchy: 0, tender: 0 },
     ];
     for (let seed = 1; seed <= 5; seed++) {
       for (let t = 0; t < targets.length; t++) {
@@ -163,7 +163,7 @@ describe('pickNextQuestion', () => {
           const sim = cosineSim(v, normalize(targetVec));
           expect(sim, `seed=${seed} t=${t} sim=${sim}`).toBeGreaterThanOrEqual(0.85);
         } else if (t === 4) {
-          // 极端目标(sour=95, bitter=95)允许余弦略低
+          // 极端目标(sour=95, temperature=95)允许余弦略低
           const v = normalize(profile);
           const sim = cosineSim(v, normalize(targetVec));
           expect(sim, `seed=${seed} t=${t} sim=${sim}`).toBeGreaterThanOrEqual(0.80);
@@ -185,7 +185,7 @@ describe('shouldStop(渐进式 25–45 追问)', () => {
   it('count = MIN + 无追问维 → 停', () => {
     // 构造高覆盖度答案:每维累计 > COVERAGE_FLOOR,使机制 C 不触发
     const highCovWeights: WeightVector = {
-      sour: 30, sweet: 30, bitter: 30, spicy: 30,
+      sour: 30, sweet: 30, temperature: 30, spicy: 30,
       salty: 30, rich: 30, crunchy: 30, tender: 30,
     };
     const answers = Array.from({ length: MIN_QUESTIONS }, (_, i) => ({
@@ -193,7 +193,7 @@ describe('shouldStop(渐进式 25–45 追问)', () => {
       weights: highCovWeights,
     }));
     const profile: WeightVector = {
-      sour: 150, sweet: 150, bitter: 150, spicy: 150,
+      sour: 150, sweet: 150, temperature: 150, spicy: 150,
       salty: 150, rich: 150, crunchy: 150, tender: 150,
     };
     expect(shouldStop({
@@ -220,12 +220,12 @@ describe('shouldStop(渐进式 25–45 追问)', () => {
   it('count = 33 + 仅 1 个追问维 → 停(渐进容忍)', () => {
     // 构造只有 1 个欠探索维的状态
     const profile: WeightVector = {
-      sour: 150, sweet: 150, bitter: 0, spicy: 150,
+      sour: 150, sweet: 150, temperature: 0, spicy: 150,
       salty: 150, rich: 150, crunchy: 150, tender: 150,
     };
     // sour 低覆盖,其他维高覆盖
     const mixedWeights: WeightVector = {
-      sour: 2, sweet: 30, bitter: 0, spicy: 30,
+      sour: 2, sweet: 30, temperature: 0, spicy: 30,
       salty: 30, rich: 30, crunchy: 30, tender: 30,
     };
     const answers = Array.from({ length: 33 }, (_, i) => ({
@@ -244,7 +244,7 @@ describe('shouldStop(渐进式 25–45 追问)', () => {
   it('count = 37 + 仅 1 个追问维 → 停(渐进容忍)', () => {
     // 构造只有 1 个欠探索维的状态
     const mixedWeights: WeightVector = {
-      sour: 2, sweet: 30, bitter: 0, spicy: 30,
+      sour: 2, sweet: 30, temperature: 0, spicy: 30,
       salty: 30, rich: 30, crunchy: 30, tender: 30,
     };
     const answers = Array.from({ length: 37 }, (_, i) => ({
@@ -252,7 +252,7 @@ describe('shouldStop(渐进式 25–45 追问)', () => {
       weights: mixedWeights,
     }));
     const profile: WeightVector = {
-      sour: 150, sweet: 150, bitter: 0, spicy: 150,
+      sour: 150, sweet: 150, temperature: 0, spicy: 150,
       salty: 150, rich: 150, crunchy: 150, tender: 150,
     };
     // sour 累计 = 37*2 = 74 < 180 → 机制 C 标记;其他 > 180 → 仅 1 个追问维
@@ -470,11 +470,11 @@ describe('detectPursueDims(追问维度:A同主题不一致 ∪ B强弱波动 �
     expect(BANK_MIN_DENSITY).toBeGreaterThan(0);
   });
 
-  it('无答题历史 + 无 profile → 机制 C 标记欠探索维(排除苦维)', () => {
+  it('无答题历史 + 无 profile → 机制 C 标记欠探索维(排除温度维)', () => {
     // 空答案时机制 C 会将题库密度 ≥ BANK_MIN_DENSITY 的维度标为欠探索
     const pursue = detectPursueDims([], ZERO_VECTOR);
-    // bitter 密度 ≈ 14.4 < 25 → 不应被标记
-    expect(pursue.has('bitter')).toBe(false);
+    // temperature 维密度 ≈ 24.8 < 25 → 不应被标记(与原苦维对称,被机制C跳过)
+    expect(pursue.has('temperature')).toBe(false);
     // 其他维度应被标记(题库密度充足 + 累计 = 0 < COVERAGE_FLOOR)
     expect(pursue.has('sour')).toBe(true);
   });
@@ -483,8 +483,8 @@ describe('detectPursueDims(追问维度:A同主题不一致 ∪ B强弱波动 �
     // 无有效答案时机制 A/B 不触发,但机制 C 仍会标记欠探索维
     const answers: { questionId?: string; weights?: WeightVector }[] = [{}, {}];
     const pursue = detectPursueDims(answers, ZERO_VECTOR);
-    // 机制 A/B 不抛错,机制 C 仍会标记(因为 answered 也为空)
-    expect(pursue.has('bitter')).toBe(false);
+    // 机制 A/B 不抛错,机制 C 仍会标记(因为 answered 也为空);温度维密度低仍被跳过
+    expect(pursue.has('temperature')).toBe(false);
   });
 
   it('机制 A:真实题库同主题题对不抛错', () => {
@@ -507,7 +507,7 @@ describe('detectPursueDims(追问维度:A同主题不一致 ∪ B强弱波动 �
     ];
     // profile 全部推过 CLARIFIED_ABS → 任何维都不该出现在追问集
     const clarified: WeightVector = {
-      sour: CLARIFIED_ABS, sweet: CLARIFIED_ABS, bitter: CLARIFIED_ABS, spicy: CLARIFIED_ABS,
+      sour: CLARIFIED_ABS, sweet: CLARIFIED_ABS, temperature: CLARIFIED_ABS, spicy: CLARIFIED_ABS,
       salty: CLARIFIED_ABS, rich: CLARIFIED_ABS, crunchy: CLARIFIED_ABS, tender: CLARIFIED_ABS,
     };
     expect(detectPursueDims(answers, clarified).size).toBe(0);
@@ -517,10 +517,10 @@ describe('detectPursueDims(追问维度:A同主题不一致 ∪ B强弱波动 �
     // 构造每维累计 > COVERAGE_FLOOR(180) 的答案
     const q0 = questionBank.questions[0]!;
     const highWeights: WeightVector = {
-      sour: 30, sweet: 30, bitter: 30, spicy: 30,
+      sour: 30, sweet: 30, temperature: 30, spicy: 30,
       salty: 30, rich: 30, crunchy: 30, tender: 30,
     };
-    // 7 题 * 30 = 210 > 180 → 所有非苦维都应脱离追问集
+    // 7 题 * 30 = 210 > 180 → 所有密度足的维都应脱离追问集
     const answers = Array.from({ length: 7 }, () => ({
       questionId: q0.id,
       weights: highWeights,
@@ -535,7 +535,7 @@ describe('detectPursueDims(追问维度:A同主题不一致 ∪ B强弱波动 �
     // 构造 sour 低覆盖、其他维高覆盖的答案
     const q0 = questionBank.questions[0]!;
     const mixedWeights: WeightVector = {
-      sour: 2, sweet: 30, bitter: 0, spicy: 30,
+      sour: 2, sweet: 30, temperature: 0, spicy: 30,
       salty: 30, rich: 30, crunchy: 30, tender: 30,
     };
     // 10 题: sour 累计 = 20 < 180, 其他 = 300 > 180
@@ -546,7 +546,7 @@ describe('detectPursueDims(追问维度:A同主题不一致 ∪ B强弱波动 �
     const pursue = detectPursueDims(answers, ZERO_VECTOR);
     expect(pursue.has('sour')).toBe(true);
     expect(pursue.has('sweet')).toBe(false);
-    expect(pursue.has('bitter')).toBe(false); // 题库密度不足,跳过
+    expect(pursue.has('temperature')).toBe(false); // 题库密度 < 25,机制C跳过
   });
 });
 
@@ -591,11 +591,11 @@ describe('P7.1 二级 + 三级去重常量', () => {
 describe('P7.1 回归:5 目标 × 3 seed 出题数 ∈ [20, 45]', () => {
   it('去重机制不破坏 MIN/MAX 区间', () => {
     const targets: WeightVector[] = [
-      { sour: 90, sweet: 30, bitter: 80, spicy: 0, salty: 20, rich: 40, crunchy: 60, tender: 30 },
-      { sour: 10, sweet: 20, bitter: 10, spicy: 95, salty: 60, rich: 70, crunchy: 30, tender: 40 },
-      { sour: 0, sweet: 0, bitter: 0, spicy: 0, salty: 0, rich: 0, crunchy: 0, tender: 0 },
-      { sour: 50, sweet: 50, bitter: 50, spicy: 50, salty: 50, rich: 50, crunchy: 50, tender: 50 },
-      { sour: 95, sweet: 0, bitter: 95, spicy: 0, salty: 0, rich: 0, crunchy: 0, tender: 0 },
+      { sour: 90, sweet: 30, temperature: 80, spicy: 0, salty: 20, rich: 40, crunchy: 60, tender: 30 },
+      { sour: 10, sweet: 20, temperature: 10, spicy: 95, salty: 60, rich: 70, crunchy: 30, tender: 40 },
+      { sour: 0, sweet: 0, temperature: 0, spicy: 0, salty: 0, rich: 0, crunchy: 0, tender: 0 },
+      { sour: 50, sweet: 50, temperature: 50, spicy: 50, salty: 50, rich: 50, crunchy: 50, tender: 50 },
+      { sour: 95, sweet: 0, temperature: 95, spicy: 0, salty: 0, rich: 0, crunchy: 0, tender: 0 },
     ];
     for (let seed = 1; seed <= 3; seed++) {
       for (let t = 0; t < targets.length; t++) {
@@ -831,9 +831,9 @@ describe('P9/A1 集中度护栏', () => {
 describe('P10 先决:去中心化 dedup 度量', () => {
   it('相邻题对 centeredSim < EXACT_DEDUP_THRESHOLD(exact dedup 生效,兜底外罕见违反)', () => {
     const targets: WeightVector[] = [
-      { sour: 90, sweet: 30, bitter: 80, spicy: 0, salty: 20, rich: 40, crunchy: 60, tender: 30 },
-      { sour: 10, sweet: 20, bitter: 10, spicy: 95, salty: 60, rich: 70, crunchy: 30, tender: 40 },
-      { sour: 20, sweet: 90, bitter: 0, spicy: 10, salty: 30, rich: 80, crunchy: 20, tender: 70 },
+      { sour: 90, sweet: 30, temperature: 80, spicy: 0, salty: 20, rich: 40, crunchy: 60, tender: 30 },
+      { sour: 10, sweet: 20, temperature: 10, spicy: 95, salty: 60, rich: 70, crunchy: 30, tender: 40 },
+      { sour: 20, sweet: 90, temperature: 0, spicy: 10, salty: 30, rich: 80, crunchy: 20, tender: 70 },
     ];
     let violations = 0, pairs = 0, maxSim = 0;
     for (const target of targets) {
@@ -920,9 +920,9 @@ describe('P11 MMR 连续去冗余(后期 topicPenalty 连续化)', () => {
 
   it('集成:后期 MMR 不破坏选题(3 画像 × 4 seed,出题数 ∈ [MIN,MAX],全 id 唯一)', () => {
     const targets: WeightVector[] = [
-      { sour: 90, sweet: 30, bitter: 80, spicy: 0, salty: 20, rich: 40, crunchy: 60, tender: 30 },
-      { sour: 10, sweet: 20, bitter: 10, spicy: 95, salty: 60, rich: 70, crunchy: 30, tender: 40 },
-      { sour: 20, sweet: 90, bitter: 0, spicy: 10, salty: 30, rich: 80, crunchy: 20, tender: 70 },
+      { sour: 90, sweet: 30, temperature: 80, spicy: 0, salty: 20, rich: 40, crunchy: 60, tender: 30 },
+      { sour: 10, sweet: 20, temperature: 10, spicy: 95, salty: 60, rich: 70, crunchy: 30, tender: 40 },
+      { sour: 20, sweet: 90, temperature: 0, spicy: 10, salty: 30, rich: 80, crunchy: 20, tender: 70 },
     ];
     for (const target of targets) {
       for (let s = 0; s < 4; s++) {

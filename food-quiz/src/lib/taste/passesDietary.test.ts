@@ -8,7 +8,7 @@ function mk(over: Partial<DishEntry>): DishEntry {
     name: 'x',
     cuisine: 'c',
     region: 'r',
-    vector: { sour: 0, sweet: 0, bitter: 0, spicy: 0, salty: 0, rich: 0, crunchy: 0, tender: 0 },
+    vector: { sour: 0, sweet: 0, temperature: 0, spicy: 0, salty: 0, rich: 0, crunchy: 0, tender: 0 },
     ...over,
   };
 }

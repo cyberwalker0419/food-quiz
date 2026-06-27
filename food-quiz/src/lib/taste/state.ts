@@ -22,8 +22,8 @@ export function initialState(): QuizState {
   return {
     askedIds: [],
     answers: [],
-    // 苦味初始-15：让苦味接受度低的人更容易区分
-    profile: { sour: 0, sweet: 0, bitter: -15, spicy: 0, salty: 0, rich: 0, crunchy: 0, tender: 0 },
+    // 温度无进化论式的默认偏恶，不预设偏置
+    profile: { sour: 0, sweet: 0, temperature: 0, spicy: 0, salty: 0, rich: 0, crunchy: 0, tender: 0 },
     currentIndex: 0,
   };
 }

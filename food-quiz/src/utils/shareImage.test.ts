@@ -17,20 +17,20 @@ function makeResult(): AssembledResult {
     allIntervals: DIMS.map((l, i) => makeInterval(l, 30 + i * 8, 'B')),
     profileLabel: '重口爱好者',
     profileCopy: '你偏爱厚味，重口是你的底色，桌上味道越杂你越来劲。',
-    tierLabels: { S: '', T: '', K: '', L: '', I: '', X: '', C: '', N: '' },
+    tierLabels: { S: '', T: '', H: '', L: '', I: '', X: '', C: '', N: '' },
     topDishes: [
-      { name: '麻婆豆腐', cuisine: '川菜', region: '四川', vector: { sour: 0, sweet: 0, bitter: 0, spicy: 0, salty: 0, rich: 0, crunchy: 0, tender: 0 } },
-      { name: '小笼包', cuisine: '江浙菜', region: '上海', vector: { sour: 0, sweet: 0, bitter: 0, spicy: 0, salty: 0, rich: 0, crunchy: 0, tender: 0 } },
-      { name: '北京烤鸭', cuisine: '京菜', region: '北京', vector: { sour: 0, sweet: 0, bitter: 0, spicy: 0, salty: 0, rich: 0, crunchy: 0, tender: 0 } },
-      { name: '兰州牛肉面', cuisine: '西北菜', region: '兰州', vector: { sour: 0, sweet: 0, bitter: 0, spicy: 0, salty: 0, rich: 0, crunchy: 0, tender: 0 } },
+      { name: '麻婆豆腐', cuisine: '川菜', region: '四川', vector: { sour: 0, sweet: 0, temperature: 0, spicy: 0, salty: 0, rich: 0, crunchy: 0, tender: 0 } },
+      { name: '小笼包', cuisine: '江浙菜', region: '上海', vector: { sour: 0, sweet: 0, temperature: 0, spicy: 0, salty: 0, rich: 0, crunchy: 0, tender: 0 } },
+      { name: '北京烤鸭', cuisine: '京菜', region: '北京', vector: { sour: 0, sweet: 0, temperature: 0, spicy: 0, salty: 0, rich: 0, crunchy: 0, tender: 0 } },
+      { name: '兰州牛肉面', cuisine: '西北菜', region: '兰州', vector: { sour: 0, sweet: 0, temperature: 0, spicy: 0, salty: 0, rich: 0, crunchy: 0, tender: 0 } },
     ],
     topCuisines: [
       { cuisine: '川菜', score: 0.9, percent: 90, dishCount: 3 },
       { cuisine: '京菜', score: 0.7, percent: 70, dishCount: 2 },
     ],
     synergy: null, allround: null,
-    vector: { sour: 0, sweet: 0, bitter: 0, spicy: 0, salty: 0, rich: 0, crunchy: 0, tender: 0 },
-    raw: { sour: 0, sweet: 0, bitter: 0, spicy: 0, salty: 0, rich: 0, crunchy: 0, tender: 0 },
+    vector: { sour: 0, sweet: 0, temperature: 0, spicy: 0, salty: 0, rich: 0, crunchy: 0, tender: 0 },
+    raw: { sour: 0, sweet: 0, temperature: 0, spicy: 0, salty: 0, rich: 0, crunchy: 0, tender: 0 },
     std: 0,
   };
 }
@@ -192,7 +192,7 @@ describe('P8.3 分享图文案补全', () => {
   it('drawShareCard 8 维档位明细含 8 个中文 + 8 个 grade 徽章 + 8 个 value', () => {
     drawShareCard(canvas as unknown as HTMLCanvasElement, makeData());
     const texts = ctx.fillText.mock.calls.map((c: any[]) => c[0]);
-    const chinese = ['酸', '甜', '苦', '辣', '咸', '浓', '脆', '嫩'];
+    const chinese = ['酸', '甜', '热', '辣', '咸', '浓', '脆', '嫩'];
     for (const c of chinese) expect(texts).toContain(c);
     // grade='B' 各 8 次(8 维档位明细) + 雷达图 grade 徽章
     const bCount = texts.filter((s: string) => s === 'B').length;

@@ -1,7 +1,7 @@
 import type { DimensionVector, TasteDimension } from './types';
 
 const DIMS: readonly TasteDimension[] = [
-  'sour', 'sweet', 'bitter', 'spicy',
+  'sour', 'sweet', 'temperature', 'spicy',
   'salty', 'rich', 'crunchy', 'tender',
 ] as const;
 

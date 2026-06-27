@@ -58,21 +58,21 @@ describe('letterToDim / dimToLetter 双向闭环', () => {
 });
 
 describe('keyToIndex / indexToKey', () => {
-  it('全小写 stklixcn → 0', () => {
-    expect(keyToIndex('stklixcn')).toBe(0);
+  it('全小写 sthlixcn → 0', () => {
+    expect(keyToIndex('sthlixcn')).toBe(0);
   });
 
-  it('全大写 STKLIXCN → 255', () => {
-    expect(keyToIndex('STKLIXCN')).toBe(255);
+  it('全大写 STHLIXCN → 255', () => {
+    expect(keyToIndex('STHLIXCN')).toBe(255);
   });
 
-  it('混合大小写 "Stklixcn" → 128(仅 S 位为 1)', () => {
-    expect(keyToIndex('Stklixcn')).toBe(0b10000000);
+  it('混合大小写 "Sthlixcn" → 128(仅 S 位为 1)', () => {
+    expect(keyToIndex('Sthlixcn')).toBe(0b10000000);
   });
 
-  it('pro.md 给出的 "StKliXcN" → 165(0b10100101)', () => {
-    expect(keyToIndex('StKliXcN')).toBe(0b10100101);
-    expect(keyToIndex('StKliXcN')).toBe(165); // 128+32+4+1
+  it('pro.md 给出的 "StHliXcN" → 165(0b10100101)', () => {
+    expect(keyToIndex('StHliXcN')).toBe(0b10100101);
+    expect(keyToIndex('StHliXcN')).toBe(165); // 128+32+4+1
   });
 
   it('indexToKey 还原 keyToIndex', () => {
@@ -88,8 +88,8 @@ describe('keyToIndex / indexToKey', () => {
   });
 
   it('indexToKey 对应示例', () => {
-    expect(indexToKey(0)).toBe('stklixcn');
-    expect(indexToKey(255)).toBe('STKLIXCN');
+    expect(indexToKey(0)).toBe('sthlixcn');
+    expect(indexToKey(255)).toBe('STHLIXCN');
   });
 
   it('非法 key 长度抛错', () => {
@@ -98,8 +98,8 @@ describe('keyToIndex / indexToKey', () => {
   });
 
   it('非法字符抛错', () => {
-    expect(() => keyToIndex('stkliXcn')).not.toThrow(); // X 是合法
-    expect(() => keyToIndex('stklizcn')).toThrow(/Invalid char/); // z 非法
+    expect(() => keyToIndex('sthliXcn')).not.toThrow(); // X 是合法
+    expect(() => keyToIndex('sthlizcn')).toThrow(/Invalid char/); // z 非法
   });
 
   it('index 越界抛错', () => {
@@ -121,9 +121,9 @@ describe('isHigh', () => {
 });
 
 describe('letterToTierLabel', () => {
-  // 8 维非浓档的 7 维(S/T/K/L/I/C/N)
-  const nonX: Array<'S' | 'T' | 'K' | 'L' | 'I' | 'C' | 'N'> = [
-    'S', 'T', 'K', 'L', 'I', 'C', 'N',
+  // 8 维非浓非热档的 6 维(S/T/L/I/C/N)
+  const nonX: Array<'S' | 'T' | 'L' | 'I' | 'C' | 'N'> = [
+    'S', 'T', 'L', 'I', 'C', 'N',
   ];
 
   it('非浓维低档 (score ≤ 60) → "低<中文名>"', () => {
@@ -135,7 +135,6 @@ describe('letterToTierLabel', () => {
   it('非浓维高档 (score > 60) → "重<中文名>"(90 及以上归高档,无 ⚡极)', () => {
     expect(letterToTierLabel('S', 61)).toBe('重酸');
     expect(letterToTierLabel('L', 89.9)).toBe('重辣');
-    expect(letterToTierLabel('K', 75)).toBe('重苦');
     expect(letterToTierLabel('S', 90)).toBe('重酸');
     expect(letterToTierLabel('L', 100)).toBe('重辣');
     expect(letterToTierLabel('N', 95)).toBe('重嫩');
@@ -153,6 +152,17 @@ describe('letterToTierLabel', () => {
     expect(letterToTierLabel('X', 100)).toBe('浓');
   });
 
+  it('热维三档平分:凉(<33) / 温(33≤x<66) / 烫(≥66)', () => {
+    expect(letterToTierLabel('H', 0)).toBe('凉');
+    expect(letterToTierLabel('H', 32.9)).toBe('凉');
+    expect(letterToTierLabel('H', 33)).toBe('温');
+    expect(letterToTierLabel('H', 50)).toBe('温');
+    expect(letterToTierLabel('H', 65.9)).toBe('温');
+    expect(letterToTierLabel('H', 66)).toBe('烫');
+    expect(letterToTierLabel('H', 75)).toBe('烫');
+    expect(letterToTierLabel('H', 100)).toBe('烫');
+  });
+
   it('边界 60.0 → 低档,60.0001 → 高档,90.0 → 高档', () => {
     expect(letterToTierLabel('S', 60.0)).toBe('低酸');
     expect(letterToTierLabel('S', 60.0001)).toBe('重酸');
@@ -160,11 +170,11 @@ describe('letterToTierLabel', () => {
     expect(letterToTierLabel('X', 90.0)).toBe('浓');
   });
 
-  it('所有 7 个非浓维字母的低/高两档 14 种组合均可', () => {
+  it('所有 6 个非浓非热维字母的低/高两档组合均可', () => {
     for (const l of nonX) {
-      expect(letterToTierLabel(l, 10)).toMatch(/^低[酸甜苦辣咸脆嫩]$/);
-      expect(letterToTierLabel(l, 75)).toMatch(/^重[酸甜苦辣咸脆嫩]$/);
-      expect(letterToTierLabel(l, 95)).toMatch(/^重[酸甜苦辣咸脆嫩]$/);
+      expect(letterToTierLabel(l, 10)).toMatch(/^低[酸甜热辣咸脆嫩]$/);
+      expect(letterToTierLabel(l, 75)).toMatch(/^重[酸甜热辣咸脆嫩]$/);
+      expect(letterToTierLabel(l, 95)).toMatch(/^重[酸甜热辣咸脆嫩]$/);
     }
   });
 

@@ -27,7 +27,7 @@ describe('assembleResult — profileCopy 长综合评价', () => {
     const cases = [
       { ...ZERO_VECTOR, spicy: 90, salty: 85, rich: 80 },
       { ...ZERO_VECTOR, spicy: 95 },
-      { ...ZERO_VECTOR, sour: 90, bitter: 90 },
+      { ...ZERO_VECTOR, sour: 90, temperature: 90 },
       { ...ZERO_VECTOR },
     ];
     for (const v of cases) {
@@ -51,7 +51,7 @@ describe('assembleResult — 4 典型输入', () => {
   it('全高(>= 60):归一化后 8 维接近 75,std=0(allround 触发);有 synergy', () => {
     // 归一化是相对 max(|raw|) 缩放,所以全 80 输入 → 全 75 输出 → std=0 → allround 触发
     const v: WeightVector = {
-      sour: 80, sweet: 80, bitter: 80, spicy: 80,
+      sour: 80, sweet: 80, temperature: 80, spicy: 80,
       salty: 80, rich: 80, crunchy: 80, tender: 80,
     };
     const r = assembleResult(v);
@@ -64,7 +64,7 @@ describe('assembleResult — 4 典型输入', () => {
 
   it('8 维混合高(差别大):std>0,无 allround,有 synergy', () => {
     const v: WeightVector = {
-      sour: 100, sweet: 30, bitter: 80, spicy: 0,
+      sour: 100, sweet: 30, temperature: 80, spicy: 0,
       salty: 50, rich: 70, crunchy: 20, tender: 90,
     };
     const r = assembleResult(v);
@@ -114,8 +114,8 @@ describe('assembleResult — 旧极档临界(90)现已并入高档', () => {
 });
 
 describe('assembleResult — 联动未命中走 _fallback', () => {
-  it('S+K 未命中具体 synergy 文件 → 走 _fallback,copy 非空', () => {
-    const v: WeightVector = { ...ZERO_VECTOR, sour: 90, bitter: 90 };
+  it('S+H 未命中具体 synergy 文件 → 走 _fallback,copy 非空', () => {
+    const v: WeightVector = { ...ZERO_VECTOR, sour: 90, temperature: 90 };
     const r = assembleResult(v);
     expect(r.synergy).not.toBeNull();
     const syn = r.synergy!.copy;
@@ -166,7 +166,7 @@ describe('assembleResult — 推荐菜只取日常/知名菜', () => {
   });
 
   it('极端偏好也能推荐到日常菜（不会因小众口味被逼推荐冷门菜）', () => {
-    const r = assembleResult({ ...ZERO_VECTOR, sour: 90, bitter: 90 });
+    const r = assembleResult({ ...ZERO_VECTOR, sour: 90, temperature: 90 });
     expect(r.topDishes.length).toBeGreaterThan(0);
     for (const d of r.topDishes) {
       expect(d.popular).not.toBe(false);
