@@ -83,6 +83,9 @@ const TOP_K_WEIGHTS = [
 /** 跨 session 频次衰减(轻量 SH):最近 3 轮每题出现 freq 次 → 评分 × 此值^freq(0.7^freq)。
  *  freq=1 ×0.7(沿用 P9 二元基线),freq=2 ×0.49,freq=3 ×0.34——频次越高惩罚越重,压跨 session 高频垄断题。 */
 export const SESSION_SOFT_PENALTY = 0.7;
+/** B 任务:跨 session 主题频次衰减上限(capped)。主题题跨 session 累计 ≥ 此值后惩罚封顶,
+ *  避免大主题(如 scenario-hook 占 26%)连带屠版。0.7^3=0.343,与 id 级自然上限(idFreq≤3)一致。 */
+export const SESSION_TOPIC_FREQ_CAP = 3;
 /** P9 多样性:早期 seeded 抖动(乘性,只作用于 std+coverage,不动 sw*10 犀利度分层)。 */
 const EARLY_JITTER_LO = 0.3;
 const EARLY_JITTER_HI = 1.7;
@@ -362,10 +365,20 @@ function recentOccurrences(
   return window.filter((id) => id === qid).length;
 }
 
+/** 题的主题衰减键:topics 中首个**非 flavor-axis、非 format** 标签(B 任务)。
+ *  排除 flavor-axis(口味维是测量维度,机制B 需同维探测,当重复主题压会误伤追问);
+ *  排除 format(题型太粗——dish-vs-dish 占主体,作主标签会让 200+ 题跨 session 连带屠版)。
+ *  取 region/scene/ingredient/temperature(细粒度内容主题)。无合适标签返回 undefined(回退)。 */
+function primaryTopic(q: QuizQuestion): string | undefined {
+  return q.topics?.find((t) => !t.startsWith('flavor-axis.') && !t.startsWith('format.'));
+}
+
 /**
- * P8.1 stem 全 session 频次统计:已答所有题(全 askedIds 范围)的 stem 出现次数。
- * - 用户原始诉求"避免后期抽到前期的题"——窗口覆盖整个 session,不是最近 N 题。
- * - 配合 `STEM_DEDUP_SOFT_PENALTY` 使用,索引 = 累计出现次数,capped at 4。
+ * P8.1 全 session 频次统计:已答所有题(全 askedIds 范围)按 stem(题干全文)出现次数。
+ * - 配合 `STEM_DEDUP_SOFT_PENALTY`,索引 = 累计次数,capped at 4。
+ * - 注意:stem 全文几乎唯一 → 频次多恒 1 → 此函数实际只在"完全重复题"兜底,平时近沉睡。
+ *   B 任务的"同主题去重"不在 session 内做(MMR topicPenalty 已解 session 内同主题扎堆),
+ *   而在跨 session(sessionPenalty 用 primaryTopic 主题键,见 pickNextQuestion)。
  */
 export function getSessionStemCounts(askedIds: readonly string[]): Map<string, number> {
   const out = new Map<string, number>();
@@ -560,12 +573,13 @@ export function pickNextQuestion(
       const jr = jitterRng(seed, count, q.id);
       const jitter = EARLY_JITTER_LO + jr() * (EARLY_JITTER_HI - EARLY_JITTER_LO);
       const jitterBase = jr() * EARLY_JITTER_BASE;
-      // P8.1 stem 软惩罚(全 session 累计)
+      // P8.1 stem 软惩罚(全 session 累计,按题干全文)
       const stemCount = stemCounts.get(q.stem) ?? 0;
       const stemPenaltyIdx = Math.min(stemCount, STEM_DEDUP_SOFT_PENALTY.length - 1);
       const stemPenalty = STEM_DEDUP_SOFT_PENALTY[stemPenaltyIdx]!;
-      // P11 轻量 SH:跨 session 频次衰减(0.7^freq)
-      const sessionPenalty = SESSION_SOFT_PENALTY ** (recentCounts.get(q.id) ?? 0);
+      // P11/B 跨 session 主题频次衰减(0.7^freq,主标签键,capped 避免大主题屠版)
+      const sessionPenalty =
+        SESSION_SOFT_PENALTY ** Math.min(recentCounts.get(primaryTopic(q) ?? q.id) ?? 0, SESSION_TOPIC_FREQ_CAP);
       return {
         q,
         // ①+②:归一化 + jitter 只碰 covTerm(stdTerm 固定不抖);sw*10 主导分层,covTerm 提供多样性打散
@@ -638,7 +652,8 @@ export function pickNextQuestion(
     // P9:再乘 seeded modest 抖动(打散固有排名)+ 跨 session 软惩罚
     const jr = jitterRng(seed, count, q.id);
     const jitter = LATE_JITTER_LO + jr() * (LATE_JITTER_HI - LATE_JITTER_LO);
-    const sessionPenalty = SESSION_SOFT_PENALTY ** (recentCounts.get(q.id) ?? 0);
+    const sessionPenalty =
+      SESSION_SOFT_PENALTY ** Math.min(recentCounts.get(primaryTopic(q) ?? q.id) ?? 0, SESSION_TOPIC_FREQ_CAP);
     return {
       q,
       score: (gain * (0.6 + 0.4 * sw) + gain * 0.3 * lowCoverNorm + lowCoverNorm * 5 + contraBoost) * topicPenalty * stemPenalty * jitter * sessionPenalty,

@@ -142,4 +142,34 @@ describe('validateQuestionBank', () => {
     const ok = { ...good, questions: [{ ...good.questions[0], probeLetters: ['S', 'L', 'X'] }] };
     expect(() => validateQuestionBank(ok)).not.toThrow();
   });
+
+  it('topics 非数组抛错', () => {
+    const bad = { ...good, questions: [{ ...good.questions[0], topics: 'scene.home' }] };
+    expect(() => validateQuestionBank(bad)).toThrow(/topics must be an array/);
+  });
+
+  it('topics 空数组抛错', () => {
+    const bad = { ...good, questions: [{ ...good.questions[0], topics: [] }] };
+    expect(() => validateQuestionBank(bad)).toThrow(/1-3 entries/);
+  });
+
+  it('topics 超过 3 个抛错', () => {
+    const bad = { ...good, questions: [{ ...good.questions[0], topics: ['format.dish-vs-dish', 'ingredient.meat', 'region.northern', 'temperature.hot'] }] };
+    expect(() => validateQuestionBank(bad)).toThrow(/1-3 entries/);
+  });
+
+  it('topics 格式错(无点分)抛错', () => {
+    const bad = { ...good, questions: [{ ...good.questions[0], topics: ['meat'] }] };
+    expect(() => validateQuestionBank(bad)).toThrow(/invalid label/);
+  });
+
+  it('topics 同大类重复抛错', () => {
+    const bad = { ...good, questions: [{ ...good.questions[0], topics: ['ingredient.meat', 'ingredient.seafood'] }] };
+    expect(() => validateQuestionBank(bad)).toThrow(/duplicate category/);
+  });
+
+  it('topics 合法(1-3 个、不同大类)不抛错', () => {
+    const ok = { ...good, questions: [{ ...good.questions[0], topics: ['format.dish-vs-dish', 'region.northern', 'temperature.hot'] }] };
+    expect(() => validateQuestionBank(ok)).not.toThrow();
+  });
 });

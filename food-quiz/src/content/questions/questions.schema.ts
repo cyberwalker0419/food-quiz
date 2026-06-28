@@ -57,6 +57,27 @@ function validateQuestion(q: unknown, seenIds: Set<string>): asserts q is QuizQu
       }
     }
   }
+  // topics:可选主题标签(点分 "大类.具体",1-3 个,同大类前缀互斥)。
+  // 不锁白名单 —— 词表可动态增添,只校验结构。
+  if (qq.topics !== undefined) {
+    if (!Array.isArray(qq.topics)) {
+      throw new Error(`Question ${qq.id}.topics must be an array`);
+    }
+    if (qq.topics.length < 1 || qq.topics.length > 3) {
+      throw new Error(`Question ${qq.id}.topics must have 1-3 entries`);
+    }
+    const seenCat = new Set<string>();
+    for (const t of qq.topics) {
+      if (typeof t !== 'string' || !/^[a-z][a-z0-9-]*\.[a-z][a-z0-9-]*$/.test(t)) {
+        throw new Error(`Question ${qq.id}.topics has invalid label: ${t} (expected "category.name")`);
+      }
+      const cat = t.split('.')[0]!;
+      if (seenCat.has(cat)) {
+        throw new Error(`Question ${qq.id}.topics has duplicate category: ${cat} (only one label per category)`);
+      }
+      seenCat.add(cat);
+    }
+  }
 }
 
 function validateOption(

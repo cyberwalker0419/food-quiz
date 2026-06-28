@@ -45,6 +45,14 @@ export interface QuizQuestion {
    * - 填写时,优先级高于自动提取
    */
   probeLetters?: TasteLetter[];
+  /**
+   * 可选:主题标签(1-3 个),点分格式 "大类.具体"(如 "scene.late-night")。
+   * - 用于跨 session 主题级去重(B 任务):替失效的 stem 全文聚合(题干 0 重复 → 频次恒 1)。
+   * - 大类: ingredient / scene / region / temperature / format / flavor-axis(词表可动态增添)。
+   * - schema 只校验结构(1-3、格式、同大类前缀互斥),不锁白名单 —— 加新标签/大类无需改 schema。
+   * - 聚合按 topics[0](主标签),优先级 format > flavor-axis > ingredient。
+   */
+  topics?: string[];
 }
 
 /** 题库根结构 */
