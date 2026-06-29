@@ -20311,6 +20311,158 @@
         "format.dish-vs-dish",
         "flavor-axis.sour-driven"
       ]
+    },
+    {
+      "id": "q508",
+      "stem": "糖醋排骨和糖醋里脊，你更馋哪个的酸甜？",
+      "options": [
+        {
+          "id": "a",
+          "label": "糖醋排骨",
+          "weights": {
+            "sour": 60,
+            "sweet": 55,
+            "temperature": 0,
+            "spicy": 0,
+            "salty": 30,
+            "rich": 0,
+            "crunchy": 25,
+            "tender": 30
+          }
+        },
+        {
+          "id": "b",
+          "label": "糖醋里脊",
+          "weights": {
+            "sour": 65,
+            "sweet": 50,
+            "temperature": 0,
+            "spicy": 0,
+            "salty": 0,
+            "rich": 0,
+            "crunchy": 40,
+            "tender": 25
+          }
+        }
+      ],
+      "topics": [
+        "format.dish-vs-dish",
+        "flavor-axis.sour-driven"
+      ]
+    },
+    {
+      "id": "q509",
+      "stem": "酸豆角和泡椒，炒肉你用哪个的酸？",
+      "options": [
+        {
+          "id": "a",
+          "label": "酸豆角",
+          "weights": {
+            "sour": 85,
+            "sweet": 0,
+            "temperature": 0,
+            "spicy": 30,
+            "salty": 40,
+            "rich": 0,
+            "crunchy": 35,
+            "tender": 0
+          }
+        },
+        {
+          "id": "b",
+          "label": "泡椒",
+          "weights": {
+            "sour": 80,
+            "sweet": 0,
+            "temperature": 0,
+            "spicy": 60,
+            "salty": 25,
+            "rich": 0,
+            "crunchy": 0,
+            "tender": 0
+          }
+        }
+      ],
+      "topics": [
+        "format.dish-vs-dish",
+        "flavor-axis.sour-driven"
+      ]
+    },
+    {
+      "id": "q510",
+      "stem": "酸笋和酸萝卜，哪种酸更上头？",
+      "options": [
+        {
+          "id": "a",
+          "label": "酸笋",
+          "weights": {
+            "sour": 88,
+            "sweet": 0,
+            "temperature": 0,
+            "spicy": 0,
+            "salty": 30,
+            "rich": 0,
+            "crunchy": 30,
+            "tender": 0
+          }
+        },
+        {
+          "id": "b",
+          "label": "酸萝卜",
+          "weights": {
+            "sour": 82,
+            "sweet": 0,
+            "temperature": 0,
+            "spicy": 0,
+            "salty": 35,
+            "rich": 0,
+            "crunchy": 40,
+            "tender": 0
+          }
+        }
+      ],
+      "topics": [
+        "format.dish-vs-dish",
+        "flavor-axis.sour-driven"
+      ]
+    },
+    {
+      "id": "q511",
+      "stem": "百香果和西梅，馋酸你选哪个？",
+      "options": [
+        {
+          "id": "a",
+          "label": "百香果",
+          "weights": {
+            "sour": 78,
+            "sweet": 35,
+            "temperature": 0,
+            "spicy": 0,
+            "salty": 0,
+            "rich": 0,
+            "crunchy": 0,
+            "tender": 0
+          }
+        },
+        {
+          "id": "b",
+          "label": "西梅",
+          "weights": {
+            "sour": 72,
+            "sweet": 40,
+            "temperature": 0,
+            "spicy": 0,
+            "salty": 0,
+            "rich": 0,
+            "crunchy": 0,
+            "tender": 0
+          }
+        }
+      ],
+      "topics": [
+        "format.dish-vs-dish",
+        "flavor-axis.sour-driven"
+      ]
     }
   ]
 }

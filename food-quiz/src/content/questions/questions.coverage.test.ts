@@ -14,8 +14,8 @@ describe('questions.json 形状与硬约束', () => {
     expect(() => validateQuestionBank(bank)).not.toThrow();
   });
 
-  it('总题数 = 456', () => {
-    expect(bank.questions).toHaveLength(456);
+  it('总题数 = 460', () => {
+    expect(bank.questions).toHaveLength(460);
   });
 
   it('约束 4: 每题至少 1 个选项对 8 维中 ≥ 2 维有非零权重', () => {

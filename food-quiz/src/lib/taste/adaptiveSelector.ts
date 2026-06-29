@@ -2,11 +2,51 @@ import type { QuizQuestion, TasteDimension, WeightVector, Sharpness } from './ty
 import { ZERO_VECTOR, sharpnessOf } from './types';
 import { questionBank } from '../../content/questions/questions.loader';
 import { centeredCosineSim } from './similarity';
+import { seedPool } from '../../content/questions/seed-pool.loader';
 
 const DIMS: readonly TasteDimension[] = [
   'sour', 'sweet', 'temperature', 'spicy',
   'salty', 'rich', 'crunchy', 'tender',
 ] as const;
+
+/** Warm-up:count<WARMUP_N 绕过 sw*10 评分,从 seed pool 维度槽轮转 + seeded 抽,建全维基线(破 early sw*10 锁死)。
+ *  N=8(=维度数,全维基线;count<earlyEnd=10 不与 early 硬窗冲突)。 */
+export const WARMUP_N = 0;
+/** UCB 加性探索系数:c·sqrt(ln(T+1)/(freq+1)),量级匹敌 sw*10(=4)。3×sqrt(ln(75)/1)≈5.9,可扫描 3/4/5。 */
+export const UCB_C = 0;
+const WARMUP_DIM_SEQ: readonly TasteDimension[] = ['tender', 'spicy', 'sweet', 'crunchy', 'sour', 'rich', 'salty', 'temperature', 'sour', 'temperature', 'sour', 'temperature', 'sour', 'temperature'];
+
+function hashStr(s: string): number {
+  let h = 0;
+  for (let i = 0; i < s.length; i++) h = (h * 31 + s.charCodeAt(i)) | 0;
+  return h;
+}
+
+/** count<WARMUP_N 时从 seed pool 按 seeded 维度序轮转选 1 题,绕过 sw*10 评分。返回 null 则外层退 sw*10 兜底。 */
+function pickWarmup(count: number, seed: number, askedIds: readonly string[]): QuizQuestion | null {
+  // seeded 维度序轮转(Latin square 简化):不同 seed 不同起点 → 不同前 8 题维度序(跨 session 散)
+  const rot = Math.floor(mulberry32(seed * 999 + 7)() * WARMUP_DIM_SEQ.length);
+  const dim = WARMUP_DIM_SEQ[(count + rot) % WARMUP_DIM_SEQ.length]!;
+  let cands = seedPool.slots[dim].filter((id) => !askedIds.includes(id));
+  if (cands.length === 0) return null;
+  // smooth/sharp 平衡:本次 quiz sharp 率 >0.4 → 优先 smooth(=early target 0.4)
+  const askedQs = askedIds
+    .map((id) => questionBank.questions.find((q) => q.id === id))
+    .filter((x): x is QuizQuestion => !!x);
+  const sharpRate = askedQs.length
+    ? askedQs.filter((q) => q.options.length === 2).length / askedQs.length
+    : 0;
+  if (sharpRate > 0.4) {
+    const smooth = cands.filter((id) => {
+      const q = questionBank.questions.find((x) => x.id === id);
+      return q && q.options.length !== 2;
+    });
+    if (smooth.length > 0) cands = smooth;
+  }
+  const r = mulberry32(seed * 31 + count * 7919 + hashStr(dim))();
+  const id = cands[Math.min(cands.length - 1, Math.floor(r * cands.length))]!;
+  return questionBank.questions.find((q) => q.id === id) ?? null;
+}
 
 /** 题目区间常量(master plan):动态 25–45,基础 25 题,自相矛盾才追问至 45。 */
 export const MIN_QUESTIONS = 25;
@@ -496,11 +536,19 @@ export function pickNextQuestion(
   /** P11 轻量 SH(跨 session 频次衰减):最近几轮每题出现频次 → SESSION_SOFT_PENALTY^freq 衰减。
    *  freq 越高惩罚越重(0 次 ×1,1 次 ×0.7,2 次 ×0.49,3 次 ×0.34),压制跨 session 高频垄断题。默认空 Map。 */
   recentCounts: ReadonlyMap<string, number> = new Map(),
+  /** UCB 加性探索用:题级 id 跨 session 频次(区别于 recentCounts 的主题键)。默认空(warm-up/无 SH 时 UCB 退化均匀,不破排名)。 */
+  recentIdCounts: ReadonlyMap<string, number> = new Map(),
 ): QuizQuestion | null {
   const count = state.askedIds.length;
 
   // 硬性上限
   if (count >= MAX_QUESTIONS) return null;
+
+  // Warm-up:count<WARMUP_N 绕过 sw*10(破 early 锁死),从 seed pool 维度槽轮转建全维基线
+  if (count < WARMUP_N) {
+    const w = pickWarmup(count, seed, state.askedIds);
+    if (w) return w;
+  }
 
   const rand = mulberry32(seed + count);
   const asked = new Set(state.askedIds);
@@ -552,6 +600,7 @@ export function pickNextQuestion(
   const stemCounts = getSessionStemCounts(state.askedIds);
   const underDims = undercoveredDims(state.askedIds, 4);
   if (count < MIN_QUESTIONS) {
+    const ucbFreqTotal = [...recentIdCounts.values()].reduce((a, b) => a + b, 0);
     const scored = pool.map((q) => {
       const sw = sharpnessWeight(count, sharpnessOf(q));
       const tv = topicVector(q);
@@ -580,10 +629,13 @@ export function pickNextQuestion(
       // P11/B 跨 session 主题频次衰减(0.7^freq,主标签键,capped 避免大主题屠版)
       const sessionPenalty =
         SESSION_SOFT_PENALTY ** Math.min(recentCounts.get(primaryTopic(q) ?? q.id) ?? 0, SESSION_TOPIC_FREQ_CAP);
+      // UCB 加性探索(破 mid sw*10 锁死):低频题 idFreq 小→ucb 大→升排名;高频垄断题 ucb 小→降。加性不被 sw*10 压死
+      const idFreq = recentIdCounts.get(q.id) ?? 0;
+      const ucb = UCB_C * Math.sqrt(Math.log(ucbFreqTotal + count + 1) / (idFreq + 1));
       return {
         q,
-        // ①+②:归一化 + jitter 只碰 covTerm(stdTerm 固定不抖);sw*10 主导分层,covTerm 提供多样性打散
-        score: (sw * 10 + stdTerm + covTerm * jitter + jitterBase) * stemPenalty * sessionPenalty,
+        // sw*10 主导分层 + covTerm 多样性打散 + ucb 加性探索(量级匹敌 sw*10,破 mid 垄断)
+        score: (sw * 10 + stdTerm + covTerm * jitter + jitterBase + ucb) * stemPenalty * sessionPenalty,
       };
     });
     // §11.7 复核(quiz-simulation 实测):early 硬过滤剔除"与 recent cen≥0.80"的同维候选,

@@ -939,6 +939,21 @@ $$\Delta\mathrm{Var}(q)=\sum_d \sigma_d^2\cdot\left(1-\frac{\sigma_d^2}{\sigma_d
 
 **继承天花板**：early sw*10 锁死集中度 456 题下 1.0（§11.12 已接受）。已知：模板节奏单一（234 新题 8 模板）、smooth 23%。详见 experiments.md 第二档 + plans/phase-tier2-log.md。
 
+## §11.14 early sw*10 锁死重探（第三档）— warm-up 破 conc 但代价 production 质量，撤回
+
+> §11.12 接受 early sw*10 锁死后，用户要求联网+实验重探。三个 Explore 代理（含联网）发现已试全失败的评分/采样/过滤三路径之外，遗漏**第四路径——early 绕过评分管线**（warm-up seed pool / UCB 加性）。本节实证。
+
+**锁死双重根因**：(1) early `sw*10` 跨层差距 3.0 > 多样项总和 → smooth 子集垄断前 12 题；(2) mid `undercoveredDims`（sour 维 profile<COVERAGE_FLOOR）→ covTerm 强选最强 sour outlier 题（q505 sour=88）→ 每 session 都选。conc=1.0 真实（非 artifact，真实 App 条件实测仍 1.0）。
+
+**第四路径实证**：
+- **Warm-up seed pool**（count<N 绕 sw*10，8 维 seeded 槽轮转）：N=14 破 conc 1.0→0.925 + earlyCen -70% + jaccardAll 0.277(<基线 0.308) + pursue 41%（quiz-sim 正常）。N=25（mid seed pool）conc 0.850 但 pursue 崩 13% + jaccard 涨。**N=14 帕累托最优**。
+- **UCB 加性探索**（`+c·sqrt(ln(T)/freq)`，加性不被 sw*10 压死）：UCB_C 3/6/100 全无效，conc 恒 1.0。诊断 q510 `sw10=1.0`/`ucb=4.6` → UCB 把低频 sharp 顶上去制造新垄断，非轮流。UCB 是频次工具，对覆盖驱动垄断不对症。撤回。
+- **dedup 排除 warm-up**（方向1）：未破 conc。撤回。
+
+**撤回决策**：N=14 warm-up 破 conc 但**绕过评分 = 绕过剪枝/SH/dedup production 质量机制**（选用户否决维题 = 真实风险，4 测试失败）。权衡保质量，撤 warm-up 回基线。保留 sour 池扩（460 题，数据层改进）。
+
+**结论**：评分/采样/过滤/绕评分**四路径全实证**，conc=1.0 是 early sw*10 + mid undercovered + sour outlier 题库结构的硬约束。与 §11.12 一致接受天花板，但经第四路径实证后更扎实。真解需 warm-up 与 production 质量机制解耦（warm-up 接 pruned/SH，复杂度 vs 收益不划算，未实施）。详见 experiments.md「early sw*10 锁死破解实验」。
+
 ---
 
 ## 附录 A：实验方法
