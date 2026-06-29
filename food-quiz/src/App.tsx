@@ -3,7 +3,8 @@ import { initialState, applyAnswer, undoLast, type QuizState } from './lib/taste
 import { pickNextQuestion, shouldStop, MIN_QUESTIONS, MAX_QUESTIONS } from './lib/taste/adaptiveSelector'
 import { assembleResult, type AssembledResult } from './lib/taste/result'
 import { downloadShareCard, preloadShareCardFonts } from './utils/shareImage'
-import { loadRecentAskedCounts, recordSession } from './utils/sessionMemory'
+import { loadRecentStemCounts, recordSession } from './utils/sessionMemory'
+import { questionBank } from './content/questions/questions.loader'
 import { ResultCard } from './components/ResultCard'
 import { RandomDish } from './components/RandomDish'
 import type { QuizQuestion, DietaryRestriction } from './lib/taste/types'
@@ -28,6 +29,13 @@ const DIETARY_OPTIONS: { key: DietaryRestriction; emoji: string; label: string }
   { key: 'vegetarian', emoji: '🥬', label: '素食' },
 ]
 
+/** id → topics 映射(模块级缓存,recordSession 写跨 session 主题快照用)。 */
+const TOPICS_BY_ID = new Map<string, string[]>(
+  questionBank.questions
+    .filter((q) => q.topics && q.topics.length > 0)
+    .map((q) => [q.id, q.topics!] as [string, string[]]),
+)
+
 function App() {
   const [phase, setPhase] = useState<Phase>('intro')
   const [state, setState] = useState<QuizState>(initialState)
@@ -43,7 +51,7 @@ function App() {
   const [noRestriction, setNoRestriction] = useState(false)
   // P11 跨 session 频次记忆(轻量 SH):本轮启动时读最近几轮每题出现频次,传给 pickNextQuestion 做 0.7^freq 衰减。
   // 用 ref 而非 state——它不参与渲染,且两处回调都要稳定读到同一份。
-  const recentSessionCounts = useRef<Map<string, number>>(loadRecentAskedCounts())
+  const recentSessionCounts = useRef<Map<string, number>>(loadRecentStemCounts())
 
   // P7.2 顶层预加载分享卡字体,确保 result 阶段字体已就绪
   useEffect(() => {
@@ -55,7 +63,7 @@ function App() {
     const newSeed = Math.floor(Math.random() * 1000000)
     setSeed(newSeed)
     // P11:每轮重新读取跨 session 频次(上一轮刚 recordSession 写入的会进来)
-    recentSessionCounts.current = loadRecentAskedCounts()
+    recentSessionCounts.current = loadRecentStemCounts()
     setPhase('quiz')
     setState(initialState())
     setCurrentQuestion(null)
@@ -107,8 +115,13 @@ function App() {
         }
       }
       setPhase('calculating')
-      // P9:quiz 完成,把本轮 askedIds 写入跨 session 记忆(下一轮启动时读出施轻惩罚)
-      recordSession(newState.askedIds)
+      // P9/B:quiz 完成,把本轮 askedIds + 主题快照写入跨 session 记忆(下一轮 loadRecentStemCounts 读出做主题衰减)
+      const topicsById: Record<string, string[]> = {}
+      for (const id of newState.askedIds) {
+        const t = TOPICS_BY_ID.get(id)
+        if (t && t.length > 0) topicsById[id] = [...t]
+      }
+      recordSession(newState.askedIds, topicsById)
       setTimeout(() => {
         // 每次进入 result 都用独立 seed,让推荐菜锚点随机化(同画像每次推不同)
         const assembled = assembleResult(newState.profile, { seed: Math.floor(Math.random() * 1_000_000), dietary })

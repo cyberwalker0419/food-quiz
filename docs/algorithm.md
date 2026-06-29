@@ -922,6 +922,38 @@ $$\Delta\mathrm{Var}(q)=\sum_d \sigma_d^2\cdot\left(1-\frac{\sigma_d^2}{\sigma_d
 
 **真正解 early 锁死的方向**（非①）：扩基线建立题库（数据层，第二档任务⑦）——而非换更强评分信号（VR/σ 强区分反而加剧锁死，任务⑨①证伪），也非评分后硬过滤（任务⑨② 实证：early 硬过滤+追问维保护/提阈值对跨 session 无正收益，hard080 反使跨 session jaccard +16%/conc +20%，且跨 session 同质化已被 SH 解至 jaccard 0.050/used 100%，硬过滤无空间）。Lookahead/Thompson/QD-DPP（§11.10.4 序 9-11）均依赖①先行，随①关闭一并搁置。**early sw*10 锁死的评分/采样/过滤三条路径全部实证失败**（VR 评分层 / top-K randomesque 已饱和 / 硬过滤层），唯一剩余解是扩题库（让 early 合规基线题池变大，从源头分散）。详见 experiments.md 任务⑨②。
 
+## §11.13 第二档（数据层）落地 — C→B→D→humanizer 双循环，214→456 题
+
+> §11.12 关闭①后，第二档作为算法侧终点落地。解瓶颈⑤（文案同质化）+ ③（温度维）+ B 跨次主题衰减。
+
+**C 主题标签**：QuizQuestion 加 `topics?: string[]`（点分 `大类.具体`），schema 只校验结构（1-3/格式/同大类互斥）**不锁白名单**（词表可增添）。六大类：ingredient/scene/region/temperature/format/flavor-axis。
+
+**B 跨 session 主题衰减**（sessionMemory 扩 StoredSession + loadRecentStemCounts，App 接线 recordSession 传 topicsById）：
+- sessionPenalty 用 **primaryTopic 主题键**（替纯 id 键），SESSION_TOPIC_FREQ_CAP=3 防大主题连带。
+- primaryTopic **排除 flavor-axis**（测量维，机制B 需同维探测）**+ format**（题型太粗，dish-vs-dish 占 71% 连带屠版），取 region/scene/ingredient/temperature。
+- **getSessionStemCounts 回退 stem 键**——主题键含 flavor-axis 致 pursueRate 41%→22%（误杀机制B 同维探测）+ 集中度升。session 内同主题靠 MMR topicPenalty，B 只做跨 session。
+
+**D 温度维启用**：补 20 温度题，密度 24.8→27.7≥25，机制C 不再跳过温度维（瓶颈③解决）。
+
+**扩题**（214→456）：mmx 核查北方菜系 + dishes.popular 知名度门槛 + 同 cuisine 配对/去重 + 补 sour/温度偏好题维持密度。humanizer 机械扫描 0 AI 味 + Skill 抽样 45+/50。
+
+**继承天花板**：early sw*10 锁死集中度 456 题下 1.0（§11.12 已接受）。已知：模板节奏单一（234 新题 8 模板）、smooth 23%。详见 experiments.md 第二档 + plans/phase-tier2-log.md。
+
+## §11.14 early sw*10 锁死重探（第三档）— warm-up 破 conc 但代价 production 质量，撤回
+
+> §11.12 接受 early sw*10 锁死后，用户要求联网+实验重探。三个 Explore 代理（含联网）发现已试全失败的评分/采样/过滤三路径之外，遗漏**第四路径——early 绕过评分管线**（warm-up seed pool / UCB 加性）。本节实证。
+
+**锁死双重根因**：(1) early `sw*10` 跨层差距 3.0 > 多样项总和 → smooth 子集垄断前 12 题；(2) mid `undercoveredDims`（sour 维 profile<COVERAGE_FLOOR）→ covTerm 强选最强 sour outlier 题（q505 sour=88）→ 每 session 都选。conc=1.0 真实（非 artifact，真实 App 条件实测仍 1.0）。
+
+**第四路径实证**：
+- **Warm-up seed pool**（count<N 绕 sw*10，8 维 seeded 槽轮转）：N=14 破 conc 1.0→0.925 + earlyCen -70% + jaccardAll 0.277(<基线 0.308) + pursue 41%（quiz-sim 正常）。N=25（mid seed pool）conc 0.850 但 pursue 崩 13% + jaccard 涨。**N=14 帕累托最优**。
+- **UCB 加性探索**（`+c·sqrt(ln(T)/freq)`，加性不被 sw*10 压死）：UCB_C 3/6/100 全无效，conc 恒 1.0。诊断 q510 `sw10=1.0`/`ucb=4.6` → UCB 把低频 sharp 顶上去制造新垄断，非轮流。UCB 是频次工具，对覆盖驱动垄断不对症。撤回。
+- **dedup 排除 warm-up**（方向1）：未破 conc。撤回。
+
+**撤回决策**：N=14 warm-up 破 conc 但**绕过评分 = 绕过剪枝/SH/dedup production 质量机制**（选用户否决维题 = 真实风险，4 测试失败）。权衡保质量，撤 warm-up 回基线。保留 sour 池扩（460 题，数据层改进）。
+
+**结论**：评分/采样/过滤/绕评分**四路径全实证**，conc=1.0 是 early sw*10 + mid undercovered + sour outlier 题库结构的硬约束。与 §11.12 一致接受天花板，但经第四路径实证后更扎实。真解需 warm-up 与 production 质量机制解耦（warm-up 接 pruned/SH，复杂度 vs 收益不划算，未实施）。详见 experiments.md「early sw*10 锁死破解实验」。
+
 ---
 
 ## 附录 A：实验方法
