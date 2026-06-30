@@ -341,7 +341,10 @@ export function assembleResult(
     const scored = pool0.map((d) => ({ d, score: blendedScore(v, d.vector) }));
     scored.sort((a, b) => b.score - a.score);
     const topScore = scored[0]?.score ?? 0;
-    const MATCH_RATIO = 0.6;
+    // 任务⑭:0.6→0.8 收窄推荐池。2A 打开天花板后 topScore≈0.85–0.91,0.6 池(score≥0.5)放进
+    // 大量"菜系对但主导维不突出"的菜(如嗜辣池的炸酱面/羊肉泡馍)→ topDishes 抽到非典型菜。
+    // 0.8 只留 score≥0.68–0.73 的高分典型菜,推荐更准;池<5 退回全量(兜底)。
+    const MATCH_RATIO = 0.8;
     let pool = scored.filter((p) => p.score >= topScore * MATCH_RATIO);
     if (pool.length < topNDishes) pool = scored;
     const seenNames = new Set<string>();

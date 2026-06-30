@@ -48,9 +48,15 @@ function pickWarmup(count: number, seed: number, askedIds: readonly string[]): Q
   return questionBank.questions.find((q) => q.id === id) ?? null;
 }
 
-/** 题目区间常量(master plan):动态 25–45,基础 25 题,自相矛盾才追问至 45。 */
-export const MIN_QUESTIONS = 25;
+/** 题目区间常量(master plan):动态 30–45,基础 30 题,自相矛盾才追问至 45。 */
+export const MIN_QUESTIONS = 30;
 export const MAX_QUESTIONS = 45;
+/** late 评分(信息增益 + 追问 contraBoost)启动门槛,与必答下限 MIN_QUESTIONS 解耦:
+ *  count≥LATE_START 即走 late 分支(追问窗口 25–45),shouldStop 另用 MIN_QUESTIONS(必答下限)。
+ *  解耦动机:单纯提 MIN_QUESTIONS=30 会让 late 分支推迟到 count≥30,追问窗口被压缩 →
+ *  实测 pursueRate 56%→50%(quiz-sim 一致 50%→45%、摇摆 67%→58%)。固定 LATE_START=25,
+ *  提必答量不压追问率;sharpnessWeight 的早/晚阶层也锚定此值(12/25),不随必答量漂移。 */
+export const LATE_START = 25;
 /** 剪枝阈值:某维 raw 落入拒绝区的边界。 */
 export const PRUNE_THRESHOLD = -30;
 
@@ -317,9 +323,9 @@ function centeredSig(a: WeightVector, b: WeightVector): number {
  *  返回 [0, 1],仅用于评分时的乘法加权。
  */
 export function sharpnessWeight(count: number, sharpness: Sharpness): number {
-  // 阶段判定
-  const earlyEnd = Math.floor(MIN_QUESTIONS / 2);   // 10
-  const lateStart = MIN_QUESTIONS;                   // 20
+  // 阶段判定(锚定 LATE_START=25,不随必答下限 MIN_QUESTIONS 漂移)
+  const earlyEnd = Math.floor(LATE_START / 2);   // 12
+  const lateStart = LATE_START;                   // 25
   let target: number;  // 0~1,目标"犀利比例"
   if (count < earlyEnd) {
     // early: 目标犀利比例 = (1 - EARLY_SMOOTH_RATIO) = 0.4
@@ -593,13 +599,13 @@ export function pickNextQuestion(
     // 兜底:全被过滤 → 退回原 pool
   }
 
-  // 早期(count < MIN_QUESTIONS)走犀利度匹配权重 + 主题向量对全维覆盖的均匀奖励
+  // 早期(count < LATE_START)走犀利度匹配权重 + 主题向量对全维覆盖的均匀奖励
   // (早期没有 profile 信息,信息增益退化为"主题向量在 DIMS 上的均匀覆盖")
   // P8.1:加 stem 全 session 软惩罚,让同 stem 尽量不复出。
   // P9:加 seeded 抖动(打散固有排名)+ 已答欠覆盖维奖励(自适应多样性)+ 跨 session 软惩罚。
   const stemCounts = getSessionStemCounts(state.askedIds);
   const underDims = undercoveredDims(state.askedIds, 4);
-  if (count < MIN_QUESTIONS) {
+  if (count < LATE_START) {
     const ucbFreqTotal = [...recentIdCounts.values()].reduce((a, b) => a + b, 0);
     const scored = pool.map((q) => {
       const sw = sharpnessWeight(count, sharpnessOf(q));
@@ -646,7 +652,7 @@ export function pickNextQuestion(
     return weightedPick(scored, rand);
   }
 
-  // 后期(count ≥ MIN_QUESTIONS):犀利度分层 + 追问 + 信息增益 + 追问维度澄清
+  // 后期(count ≥ LATE_START):犀利度分层 + 追问 + 信息增益 + 追问维度澄清
   const lowResDims = lowResponseDims(state);
   const pursueDims = detectPursueDims(state.answers, state.profile);
   const scored = pool.map((q) => {

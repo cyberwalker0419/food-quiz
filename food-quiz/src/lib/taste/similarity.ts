@@ -52,11 +52,16 @@ export function euclideanDist(a: DimensionVector, b: DimensionVector): number {
 }
 
 /**
- * 混合相似度(master plan):0.5·cos + 0.5·1/(1+dist)。
- * 问题二:cos 项改用去中心化余弦(映射 [0,1] 保非负),让推荐菜/菜系匹配按"形状差异"
- * 而非"都正"排序——大菜系(川菜)不再凭全正压缩对各画像虚高,小菜系特色菜能突围。
+ * 混合相似度(master plan):0.5·cos + 0.5·distNorm。
+ * - cos 项:去中心化余弦(映射 [0,1] 保非负),按"形状差异"排序——大菜系(川菜)不再凭全正
+ *   压缩对各画像虚高,小菜系特色菜能突围(问题二 cos 去中心化)。
+ * - distNorm 项:欧氏距离归一化 `1 - dist/MAX_DIST`(MAX_DIST=√8·100≈282.84),∈[0,1]。
+ *   任务⑬:原 `1/(1+dist)` 在 [0,100] 量纲恒≈0.005(贡献≈0),blendedScore 退化为 0.5·cos,
+ *   天花板~0.5 → 菜系匹配度恒定~49%、推荐菜近随机。归一化后距离项恢复区分力,天花板打开到~0.85。
  */
 export function blendedScore(a: DimensionVector, b: DimensionVector): number {
   const cos = (centeredCosineSim(a, b) + 1) / 2;
-  return 0.5 * cos + 0.5 * (1 / (1 + euclideanDist(a, b)));
+  const MAX_DIST = Math.sqrt(DIMS.length) * 100;
+  const distNorm = 1 - Math.min(1, euclideanDist(a, b) / MAX_DIST);
+  return 0.5 * cos + 0.5 * distNorm;
 }

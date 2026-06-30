@@ -64,18 +64,18 @@ describe('centeredCosineSim(去中心化余弦)', () => {
   });
 });
 
-describe('blendedScore(cos 项去中心化,映射 [0,1])', () => {
+describe('blendedScore(cos 项去中心化 + 距离项归一化,均映射 [0,1])', () => {
   it('同常数向量(full)→ cos 项 0.5 + dist 项 1 = 0.75', () => {
     expect(blendedScore(full, full)).toBeCloseTo(0.75, 2);
   });
 
-  it('zeros vs full(均常数)→ cos 项 0.5 + 远距离小项', () => {
-    expect(blendedScore(zeros, full)).toBeCloseTo(0.5 * 0.5 + 0.5 * (1 / (1 + Math.sqrt(8) * 100)), 4);
+  it('zeros vs full(均常数)→ cos 项 0.5 + dist 项 0(最大距离归一化为 0) = 0.25', () => {
+    expect(blendedScore(zeros, full)).toBeCloseTo(0.25, 4);
   });
 
-  it('形状相反 → 去中心化 cos=-1 映射 0;只剩距离小项', () => {
+  it('形状相反 → 去中心化 cos=-1 映射 0;距离最大归一化 0 → blended=0', () => {
     const a: DimensionVector = { ...zeros, sour: 100, sweet: 100, temperature: 100, spicy: 100 };
     const b: DimensionVector = { ...zeros, salty: 100, rich: 100, crunchy: 100, tender: 100 };
-    expect(blendedScore(a, b)).toBeCloseTo(0.5 * 0 + 0.5 * (1 / (1 + Math.sqrt(8) * 100)), 4);
+    expect(blendedScore(a, b)).toBeCloseTo(0, 4);
   });
 });

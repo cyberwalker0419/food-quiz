@@ -412,11 +412,11 @@ describe('P6.2 完全重复判定', () => {
 });
 
 describe('P6.2 追问策略(集成)', () => {
-  it('完整 25 题流程不出错', () => {
+  it('完整 30 题流程不出错', () => {
     const askedIds: string[] = [];
     let profile: WeightVector = { ...ZERO_VECTOR };
     const answers: { questionId: string; weights?: WeightVector }[] = [];
-    for (let step = 0; step < 25; step++) {
+    for (let step = 0; step < 30; step++) {
       const q = pickNextQuestion(makeState(askedIds, answers, profile), 300 + step);
       if (!q) break;
       askedIds.push(q.id);
